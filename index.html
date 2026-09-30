@@ -88,6 +88,26 @@ textarea.input{height:auto;min-height:76px;padding:12px 14px;resize:none}
 .select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%238C7D71' stroke-width='2' stroke-linecap='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center;background-size:18px;padding-right:38px}
 .input:focus,.select:focus{border-color:var(--brand2);box-shadow:0 0 0 4px color-mix(in srgb,var(--brand2) 18%,transparent)}
 .input:disabled{opacity:.6}
+/* menu de seleção próprio do app (substitui o menu padrão do navegador) */
+.dd-native{display:none!important}
+.dd{position:relative;min-width:0}
+.dd-btn{display:flex;align-items:center;gap:8px;text-align:left;cursor:pointer;white-space:nowrap}
+.dd-btn>span{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis}
+.dd-btn>svg{width:18px;height:18px;color:var(--brand)}
+.dd-btn.open{border-color:var(--brand2);box-shadow:0 0 0 4px color-mix(in srgb,var(--brand2) 18%,transparent)}
+.dd-menu{position:fixed;z-index:80;background:var(--card);border:1px solid color-mix(in srgb,var(--line) 80%,transparent);border-radius:var(--r-md);box-shadow:0 14px 40px rgba(40,25,15,.2);padding:6px;overflow-y:auto;overscroll-behavior:contain;opacity:0;transform:translateY(-6px) scale(.98);transform-origin:top center;transition:opacity .16s,transform .2s cubic-bezier(.2,.9,.2,1)}
+.dd-menu.up{transform-origin:bottom center;transform:translateY(6px) scale(.98)}
+.dd-menu.show{opacity:1;transform:none}
+.dd-opt{display:flex;align-items:center;gap:10px;width:100%;min-height:44px;padding:0 12px;border-radius:var(--r-sm);font-size:15px;font-weight:500;color:var(--ink);text-align:left;transition:background .12s}
+.dd-opt>span{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.dd-opt>svg{width:18px;height:18px;color:var(--muted)}
+.dd-opt:hover,.dd-opt.hl{background:var(--soft)}
+.dd-opt.on{color:var(--brand);font-weight:600}
+.dd-opt.on>svg{color:var(--brand)}
+.dd-opt .ck{margin-left:auto}
+.dd-opt.action{color:var(--brand);font-weight:600;margin-top:6px;position:relative}
+.dd-opt.action>svg{color:var(--brand)}
+.dd-opt.action::before{content:"";position:absolute;left:8px;right:8px;top:-4px;height:1px;background:var(--line)}
 input[type=date].input{display:flex;align-items:center;line-height:var(--h-ctl);min-width:0;width:100%}
 .row2{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:10px}
 .row2 .field>span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
@@ -928,6 +948,66 @@ function viewStores(){
   : `<div class="card empty"><div class="logo">${ic("store")}</div><h4>Nenhuma loja cadastrada</h4><p>Cadastre as lojas onde vocês compram para saber quanto foi gasto em cada uma.</p>${canEdit() ? `<button class="btn primary" data-act="addStore">${ic("plus")} Cadastrar loja</button>` : ""}</div>`}`;
 }
 
+/* ================= MENU DE SELEÇÃO (visual do app) =================
+   Cada <select class="select"> continua existindo escondido (o resto do código lê .value e ouve "change"),
+   mas quem aparece é um botão com um menu próprio, arredondado e com as cores do app. */
+const SEL_VALUE = Object.getOwnPropertyDescriptor(HTMLSelectElement.prototype, "value");
+let ddOpen = null;
+function closeDropdown(){
+  if (!ddOpen) return; const { menu, btn } = ddOpen; ddOpen = null;
+  btn.classList.remove("open"); btn.setAttribute("aria-expanded", "false");
+  menu.classList.remove("show"); setTimeout(() => menu.remove(), 180);
+}
+function enhanceSelect(sel){
+  if (sel.dataset.enh) return; sel.dataset.enh = "1";
+  const wrap = document.createElement("div"); wrap.className = "dd";
+  const btn = document.createElement("button"); btn.type = "button";
+  btn.className = "select dd-btn"; btn.setAttribute("aria-haspopup", "listbox"); btn.setAttribute("aria-expanded", "false");
+  sel.parentNode.insertBefore(wrap, sel); wrap.appendChild(btn); wrap.appendChild(sel);
+  sel.classList.add("dd-native"); sel.tabIndex = -1;
+  const cur = () => sel.options[sel.selectedIndex] || sel.options[0];
+  const refresh = () => { const o = cur(); btn.innerHTML = `${o && o.dataset.icon && !o.value.startsWith("__") ? ic(o.dataset.icon) : ""}<span>${esc(o ? o.textContent : "")}</span>`; };
+  Object.defineProperty(sel, "value", { configurable:true, get(){ return SEL_VALUE.get.call(sel); }, set(v){ SEL_VALUE.set.call(sel, v); refresh(); } });
+  new MutationObserver(refresh).observe(sel, { childList:true, subtree:true });
+  refresh();
+  const choose = v => { closeDropdown(); if (v === sel.value) return; SEL_VALUE.set.call(sel, v); refresh(); sel.dispatchEvent(new Event("change", { bubbles:true })); };
+  const open = () => {
+    if (ddOpen && ddOpen.btn === btn) return closeDropdown();
+    closeDropdown();
+    const menu = document.createElement("div"); menu.className = "dd-menu"; menu.setAttribute("role", "listbox");
+    menu.innerHTML = [...sel.options].map((o, k) => { const act = o.value.startsWith("__"), on = !act && k === sel.selectedIndex;
+      return `<button type="button" role="option" class="dd-opt ${on ? "on" : ""} ${act ? "action" : ""}" data-v="${esc(o.value)}" aria-selected="${on}">${o.dataset.icon ? ic(o.dataset.icon) : ""}<span>${esc(o.textContent)}</span>${on ? ic("check", "ck") : ""}</button>`; }).join("");
+    document.body.appendChild(menu);
+    const r = btn.getBoundingClientRect(), gap = 6, vh = window.innerHeight, vw = window.innerWidth;
+    const below = vh - r.bottom - 12, above = r.top - 12, up = below < 220 && above > below;
+    const w = Math.min(Math.max(r.width, 200), vw - 24);
+    menu.style.width = w + "px";
+    menu.style.left = Math.min(Math.max(12, r.left), vw - w - 12) + "px";
+    menu.style.maxHeight = Math.min(320, (up ? above : below) - gap) + "px";
+    if (up) { menu.classList.add("up"); menu.style.bottom = (vh - r.top + gap) + "px"; } else menu.style.top = (r.bottom + gap) + "px";
+    menu.addEventListener("click", e => { const b = e.target.closest("[data-v]"); if (b) choose(b.dataset.v); });
+    ddOpen = { menu, btn, sel, choose };
+    btn.classList.add("open"); btn.setAttribute("aria-expanded", "true");
+    requestAnimationFrame(() => menu.classList.add("show"));
+    const on = $(".dd-opt.on", menu); if (on) on.scrollIntoView({ block:"nearest" });
+  };
+  btn.addEventListener("click", e => { e.preventDefault(); e.stopPropagation(); open(); });
+  btn.addEventListener("keydown", e => { if (!ddOpen && (e.key === "ArrowDown" || e.key === "ArrowUp")) { e.preventDefault(); open(); } });
+}
+function enhanceSelects(root){ $$("select.select", root || document).forEach(enhanceSelect); }
+new MutationObserver(() => enhanceSelects(document)).observe(document.body, { childList:true, subtree:true });
+document.addEventListener("pointerdown", e => { if (ddOpen && !e.target.closest(".dd-menu") && e.target.closest(".dd-btn") !== ddOpen.btn) closeDropdown(); }, true);
+window.addEventListener("scroll", e => { if (ddOpen && !(e.target.closest && e.target.closest(".dd-menu"))) closeDropdown(); }, true);
+window.addEventListener("resize", closeDropdown);
+document.addEventListener("keydown", e => {
+  if (!ddOpen) return;
+  const opts = $$(".dd-opt", ddOpen.menu); let k = opts.findIndex(o => o.classList.contains("hl")); if (k < 0) k = opts.findIndex(o => o.classList.contains("on"));
+  if (e.key === "Escape") { e.preventDefault(); e.stopImmediatePropagation(); const b = ddOpen.btn; closeDropdown(); b.focus(); return; }
+  if (e.key === "ArrowDown" || e.key === "ArrowUp") { e.preventDefault(); k = Math.max(0, Math.min(opts.length - 1, k + (e.key === "ArrowDown" ? 1 : -1))); opts.forEach((o, i) => o.classList.toggle("hl", i === k)); opts[k].scrollIntoView({ block:"nearest" }); }
+  if ((e.key === "Enter" || e.key === " ") && k >= 0) { e.preventDefault(); ddOpen.choose(opts[k].dataset.v); }
+  if (e.key === "Tab") closeDropdown();
+}, true);
+
 /* ================= FOLHAS (janelas que sobem de baixo) ================= */
 function openSheet(html, onMount){
   const w = document.createElement("div");
@@ -943,7 +1023,7 @@ function openSheet(html, onMount){
 }
 function closeSheet(w){
   w = w || $$("#sheets .sheet-wrap").pop(); if (!w || w.closing) return;
-  w.closing = true; w.classList.remove("open");
+  w.closing = true; w.classList.remove("open"); closeDropdown();
   if (w.onClose) w.onClose();
   setTimeout(() => { w.remove(); if (!$("#sheets .sheet-wrap")) document.body.classList.remove("locked"); }, 380);
 }
@@ -997,14 +1077,14 @@ function itemForm(item, preset={}){
   const curPhoto = () => newFile ? URL.createObjectURL(newFile) : (!removePhoto && it.photo_path ? S.photos[it.photo_path] : null);
   const photoHtml = () => { const src = curPhoto(); return `<div class="photo ${src?"has":""}" id="ph">${src ? `<img src="${esc(src)}" alt="">` : `${ic("image")}<span style="font-size:14px">Adicione uma foto do produto</span>`}
       <div class="pbtns"><label>${ic("camera")} Câmera<input type="file" accept="image/*" capture="environment" hidden data-file></label><label>${ic("image")} Galeria<input type="file" accept="image/*" hidden data-file></label>${src ? `<button type="button" data-rmph aria-label="Remover foto">${ic("trash")}</button>` : ""}</div></div>`; };
-  const storeOpts = () => `<option value="">Sem loja</option>` + S.stores.map(s => `<option value="${s.id}" ${s.id===it.store_id?"selected":""}>${esc(s.name)}</option>`).join("") + `<option value="__new">+ Cadastrar nova loja</option>`;
+  const storeOpts = () => `<option value="" data-icon="box">Sem loja</option>` + S.stores.map(s => `<option value="${s.id}" data-icon="${s.kind === "online" ? "globe" : "store"}" ${s.id===it.store_id?"selected":""}>${esc(s.name)}</option>`).join("") + `<option value="__new" data-icon="plus">Cadastrar nova loja</option>`;
   const priceStr = it.unit_price ? (+it.unit_price).toLocaleString("pt-BR", { minimumFractionDigits:2, maximumFractionDigits:2 }) : "";
   openSheet(`<form id="itf" novalidate>
     <div class="sheet-h"><h3>${isNew ? "Nova compra" : "Editar compra"}</h3><button type="button" class="iconbtn" data-close aria-label="Fechar">${ic("x")}</button></div>
     <div id="phw">${photoHtml()}</div>
     <label class="field"><span>Nome do produto</span><input class="input" name="name" value="${esc(it.name)}" placeholder="Ex.: Jogo de panelas" maxlength="120" autocomplete="off"></label>
     <div class="row2">
-      <label class="field"><span>Cômodo</span><select class="select" name="room"><option value="">Sem cômodo</option>${S.rooms.map(r => `<option value="${r.id}" ${r.id===it.room_id?"selected":""}>${esc(r.name)}</option>`).join("")}</select></label>
+      <label class="field"><span>Cômodo</span><select class="select" name="room"><option value="" data-icon="box">Sem cômodo</option>${S.rooms.map(r => `<option value="${r.id}" data-icon="${esc(r.icon)}" ${r.id===it.room_id?"selected":""}>${esc(r.name)}</option>`).join("")}</select></label>
       <label class="field"><span>Data da compra</span><input class="input" type="date" name="date" value="${esc(it.purchased_on)}"></label>
     </div>
     <label class="field"><span>Loja</span><select class="select" name="store">${storeOpts()}</select></label>
@@ -1248,7 +1328,7 @@ function shareSheet(){
   const draw = () => S.members.map(m => {
     const me = String(m.email).toLowerCase() === myEmail();
     const ctrl = isOwner() && m.role !== "owner"
-      ? `<select class="select" data-role="${m.id}"><option value="editor" ${m.role==="editor"?"selected":""}>Pode editar</option><option value="viewer" ${m.role==="viewer"?"selected":""}>Só visualizar</option></select><button type="button" class="iconbtn" data-rm="${m.id}" aria-label="Remover">${ic("x")}</button>`
+      ? `<select class="select" data-role="${m.id}"><option value="editor" data-icon="edit" ${m.role==="editor"?"selected":""}>Pode editar</option><option value="viewer" data-icon="eye" ${m.role==="viewer"?"selected":""}>Só visualizar</option></select><button type="button" class="iconbtn" data-rm="${m.id}" aria-label="Remover">${ic("x")}</button>`
       : `<span class="badge ${m.role==="owner"?"owner":""}">${ROLE[m.role] || m.role}</span>`;
     return `<div class="member"><span class="avatar">${esc(initials(m.email))}</span><span class="mid"><b>${esc(m.email)}${me ? " (você)" : ""}</b><small>${m.role === "owner" ? "Criou o projeto" : "Convidado"}</small></span>${ctrl}</div>`;
   }).join("");
