@@ -1,0 +1,1288 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1">
+<meta name="theme-color" content="#F7F3EE" id="meta-theme">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Nosso Lar">
+<title>Nosso Lar</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='16' fill='%237A5236'/%3E%3Cpath d='M14 31 32 16l18 15M19 28v19h26V28' fill='none' stroke='%23F7F3EE' stroke-width='4.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3Cpath d='M28 47v-9h8v9' fill='none' stroke='%23F7F3EE' stroke-width='4.5' stroke-linejoin='round'/%3E%3C/svg%3E">
+<link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 180 180'%3E%3Crect width='180' height='180' fill='%237A5236'/%3E%3Cpath d='M44 88 90 50l46 38M57 80v50h66V80' fill='none' stroke='%23F7F3EE' stroke-width='11' stroke-linecap='round' stroke-linejoin='round'/%3E%3Cpath d='M79 130v-24h22v24' fill='none' stroke='%23F7F3EE' stroke-width='11' stroke-linejoin='round'/%3E%3C/svg%3E">
+<style>
+:root{
+  --bg:#F7F3EE; --bg2:#EFE7DD; --card:#FFFFFF; --ink:#2B211B; --ink2:#5A4A3F; --muted:#8C7D71;
+  --line:#E7DDD1; --soft:#F1E8DE; --brand:#7A5236; --brand2:#A47551; --brandInk:#FFFFFF;
+  --accent:#C9A27E; --danger:#B8412F; --dangerSoft:#F6E3DE; --shadow:0 1px 2px rgba(60,40,25,.06),0 8px 24px rgba(60,40,25,.07);
+  --glass:rgba(255,252,248,.78); --r:20px; --r-sm:14px;
+  --font:-apple-system,BlinkMacSystemFont,"SF Pro Text","SF Pro Display","Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+  color-scheme:light;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --bg:#15100D; --bg2:#1D1612; --card:#221A15; --ink:#F4EBE2; --ink2:#D5C6B8; --muted:#A39284;
+    --line:#352A22; --soft:#2B211B; --brand:#C99A70; --brand2:#E0B891; --brandInk:#1B130E;
+    --accent:#A47551; --danger:#E0735F; --dangerSoft:#3A221C; --shadow:0 1px 2px rgba(0,0,0,.3),0 10px 30px rgba(0,0,0,.35);
+    --glass:rgba(34,26,21,.78); color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#15100D; --bg2:#1D1612; --card:#221A15; --ink:#F4EBE2; --ink2:#D5C6B8; --muted:#A39284;
+  --line:#352A22; --soft:#2B211B; --brand:#C99A70; --brand2:#E0B891; --brandInk:#1B130E;
+  --accent:#A47551; --danger:#E0735F; --dangerSoft:#3A221C; --shadow:0 1px 2px rgba(0,0,0,.3),0 10px 30px rgba(0,0,0,.35);
+  --glass:rgba(34,26,21,.78); color-scheme:dark;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--font);font-size:16px;line-height:1.35;-webkit-font-smoothing:antialiased;-webkit-text-size-adjust:100%}
+body{min-height:100dvh;overscroll-behavior-y:none}
+body.locked{overflow:hidden}
+button,input,select,textarea{font:inherit;color:inherit}
+button{cursor:pointer;border:0;background:none;padding:0}
+svg.i{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;flex:none}
+.hidden{display:none!important}
+.muted{color:var(--muted)}
+.label{font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+
+/* ---------- splash ---------- */
+.splash{position:fixed;inset:0;display:grid;place-items:center;background:var(--bg)}
+.splash .logo{animation:pulse 1.4s ease-in-out infinite}
+@keyframes pulse{0%,100%{transform:scale(1);opacity:1}50%{transform:scale(.92);opacity:.7}}
+.logo{width:64px;height:64px;border-radius:20px;background:var(--brand);color:var(--bg);display:grid;place-items:center;box-shadow:0 10px 30px rgba(122,82,54,.3)}
+.logo svg{width:34px;height:34px;stroke-width:2.4}
+
+/* ---------- auth ---------- */
+body.auth-on{overflow:hidden;height:100dvh}
+.auth{min-height:100dvh;display:flex;align-items:center;justify-content:center;padding:24px 28px calc(24px + env(safe-area-inset-bottom))}
+.auth-box{width:100%;max-width:320px;display:flex;flex-direction:column;align-items:center;text-align:center;animation:fadeIn .5s ease}
+.logo.sm{width:48px;height:48px;border-radius:15px;box-shadow:none}
+.logo.sm svg{width:24px;height:24px;stroke-width:2.2}
+.auth-box h1{font-size:22px;font-weight:700;letter-spacing:-.02em;margin:14px 0 2px}
+.auth-sub{margin:0 0 24px;color:var(--muted);font-size:14px}
+.auth-fields{width:100%;display:flex;flex-direction:column;gap:10px;margin-bottom:14px}
+.auth-fields .input{height:46px;font-size:15px;border-radius:12px;background:var(--card)}
+.auth .btn{height:46px;font-size:15px}
+.auth-msg{min-height:18px;font-size:13px;color:var(--danger);margin:10px 0 0}
+.auth-msg.ok{color:var(--brand)}
+.auth-links{display:flex;align-items:center;justify-content:center;gap:10px;margin-top:6px;font-size:13px}
+.auth-links button{color:var(--muted);font-weight:500;padding:6px 2px}
+.auth-links button:hover{color:var(--brand)}
+.auth-links .dot{width:3px;height:3px;border-radius:50%;background:var(--line)}
+input.input:-webkit-autofill,input.input:-webkit-autofill:hover,input.input:-webkit-autofill:focus{-webkit-text-fill-color:var(--ink);caret-color:var(--ink);-webkit-box-shadow:0 0 0 1000px var(--card) inset;transition:background-color 99999s ease-in-out 0s}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+@keyframes rise{from{opacity:0;transform:translateY(18px) scale(.98)}to{opacity:1;transform:none}}
+
+/* ---------- fields ---------- */
+.field{display:block;margin-bottom:12px}
+.field>span{display:block;font-size:13px;font-weight:600;color:var(--ink2);margin:0 0 6px 4px}
+.input,.select,textarea.input{width:100%;height:48px;border-radius:14px;border:1px solid var(--line);background:var(--card);padding:0 14px;font-size:16px;outline:none;transition:border-color .2s,box-shadow .2s;appearance:none;-webkit-appearance:none}
+textarea.input{height:auto;min-height:76px;padding:12px 14px;resize:none}
+.select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%238C7D71' stroke-width='2' stroke-linecap='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center;background-size:18px;padding-right:38px}
+.input:focus,.select:focus{border-color:var(--brand2);box-shadow:0 0 0 4px color-mix(in srgb,var(--brand2) 18%,transparent)}
+input[type=date].input{display:flex;align-items:center;line-height:48px}
+.row2{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:10px}
+.row2 .field>span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+input[type=date].input{min-width:0;width:100%}
+
+.btn{white-space:nowrap;height:50px;border-radius:999px;padding:0 22px;display:inline-flex;align-items:center;justify-content:center;gap:8px;font-weight:600;font-size:16px;transition:transform .15s,opacity .2s,background .2s;user-select:none}
+.btn:active{transform:scale(.97)}
+.btn:disabled{opacity:.55;pointer-events:none}
+.btn.primary{background:var(--brand);color:var(--brandInk)}
+.btn.soft{background:var(--soft);color:var(--ink)}
+.btn.danger{background:var(--dangerSoft);color:var(--danger)}
+.btn.block{width:100%}
+.btn.sm{height:38px;padding:0 14px;font-size:14px}
+.iconbtn{width:40px;height:40px;border-radius:50%;display:grid;place-items:center;color:var(--ink);transition:background .2s,transform .15s}
+.iconbtn:active{transform:scale(.92);background:var(--soft)}
+.seg{display:flex;background:var(--soft);border-radius:999px;padding:4px;gap:2px;position:relative}
+.seg button{flex:1;height:36px;border-radius:999px;font-size:14px;font-weight:600;color:var(--muted);position:relative;z-index:1;transition:color .25s}
+.seg button.on{color:var(--ink)}
+.seg .pill{position:absolute;top:4px;bottom:4px;border-radius:999px;background:var(--card);box-shadow:0 1px 3px rgba(0,0,0,.12);transition:left .35s cubic-bezier(.3,1.3,.5,1),width .35s cubic-bezier(.3,1.3,.5,1)}
+
+/* ---------- layout ---------- */
+.top{position:sticky;top:0;z-index:20;padding:calc(10px + env(safe-area-inset-top)) 16px 10px;display:flex;align-items:center;gap:10px;background:color-mix(in srgb,var(--bg) 82%,transparent);backdrop-filter:blur(18px) saturate(1.3);-webkit-backdrop-filter:blur(18px) saturate(1.3)}
+.proj-btn{display:flex;align-items:center;gap:6px;min-width:0;flex:1;text-align:left}
+.proj-btn .t{min-width:0}
+.proj-btn .n{font-size:22px;font-weight:700;letter-spacing:-.02em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.proj-btn .s{font-size:12px;color:var(--muted);font-weight:500}
+.proj-btn svg{color:var(--muted);width:18px;height:18px;margin-top:4px}
+.avatar{width:38px;height:38px;border-radius:50%;background:var(--brand);color:var(--brandInk);display:grid;place-items:center;font-weight:700;font-size:15px;flex:none;transition:transform .15s}
+.avatar:active{transform:scale(.92)}
+.badge{display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;padding:3px 8px;border-radius:999px;background:var(--soft);color:var(--ink2)}
+.badge.owner{background:color-mix(in srgb,var(--brand) 16%,transparent);color:var(--brand)}
+main.view{max-width:720px;margin:0 auto;padding:6px 16px calc(120px + env(safe-area-inset-bottom))}
+.view-anim{animation:viewIn .42s cubic-bezier(.2,.8,.2,1)}
+@keyframes viewIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+.view-back{animation:viewBack .42s cubic-bezier(.2,.8,.2,1)}
+@keyframes viewBack{from{opacity:0;transform:translateX(-24px)}to{opacity:1;transform:none}}
+.view-fwd{animation:viewFwd .42s cubic-bezier(.2,.8,.2,1)}
+@keyframes viewFwd{from{opacity:0;transform:translateX(28px)}to{opacity:1;transform:none}}
+
+.card{background:var(--card);border-radius:var(--r);box-shadow:var(--shadow);border:1px solid color-mix(in srgb,var(--line) 55%,transparent)}
+.section-t{display:flex;align-items:center;justify-content:space-between;margin:22px 4px 10px}
+.section-t h3{margin:0;font-size:17px;letter-spacing:-.01em}
+
+/* summary */
+.summary{padding:18px 18px 16px;display:grid;grid-template-columns:1fr auto;gap:6px 12px;align-items:end;background:linear-gradient(135deg,var(--brand),color-mix(in srgb,var(--brand) 70%,var(--brand2)));color:var(--brandInk);border:0}
+.summary .v{font-size:32px;font-weight:700;letter-spacing:-.03em;line-height:1.05}
+.summary .label{color:color-mix(in srgb,var(--brandInk) 75%,transparent)}
+.summary .side{text-align:right;font-size:13px;opacity:.9;line-height:1.5}
+
+/* house */
+.house{margin-top:18px;position:relative}
+.roof{display:block;width:100%;height:70px;margin-bottom:-2px}
+.roof .r1{fill:var(--card);stroke:color-mix(in srgb,var(--line) 70%,transparent);stroke-width:1}
+.roof .r2{fill:var(--soft)}
+.roof .win{fill:none;stroke:var(--brand2);stroke-width:2.2;stroke-linecap:round}
+.house-body{background:var(--card);border-radius:0 0 26px 26px;padding:14px;box-shadow:var(--shadow);border:1px solid color-mix(in srgb,var(--line) 55%,transparent);border-top:0}
+.rooms{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.room{position:relative;text-align:left;border-radius:18px;padding:14px 14px 13px;background:var(--soft);min-height:118px;display:flex;flex-direction:column;justify-content:space-between;transition:transform .2s cubic-bezier(.3,1.4,.5,1),background .2s;overflow:hidden;animation:tileIn .5s cubic-bezier(.2,.8,.2,1) both}
+.room:active{transform:scale(.95)}
+.room .ic{width:40px;height:40px;border-radius:13px;background:var(--card);display:grid;place-items:center;color:var(--brand)}
+.room .nm{font-weight:650;font-size:15px;margin-top:10px;line-height:1.2}
+.room .vl{font-size:13px;color:var(--muted);margin-top:2px}
+.room .cnt{position:absolute;top:12px;right:12px;font-size:12px;font-weight:700;color:var(--brand);background:var(--card);border-radius:999px;padding:3px 8px}
+.room.add{background:transparent;border:1.5px dashed var(--line);align-items:center;justify-content:center;color:var(--muted);gap:6px;font-weight:600;font-size:14px}
+.room.none{background:color-mix(in srgb,var(--soft) 55%,transparent)}
+.room.wide{grid-column:span 2;min-height:72px;flex-direction:row;align-items:center;justify-content:flex-start;gap:12px}
+.room.wide .nm{margin:0}
+@keyframes tileIn{from{opacity:0;transform:translateY(14px) scale(.96)}to{opacity:1;transform:none}}
+.door{display:flex;justify-content:center;margin-top:12px}
+.door span{width:56px;height:8px;border-radius:999px;background:var(--line)}
+
+/* list */
+.list{display:flex;flex-direction:column}
+.day-h{display:flex;justify-content:space-between;align-items:baseline;margin:18px 6px 8px;font-size:13px;font-weight:600;color:var(--muted)}
+.day-h b{color:var(--ink2);font-weight:600}
+.group{overflow:hidden}
+.it{display:flex;align-items:center;gap:12px;padding:12px 14px;width:100%;text-align:left;transition:background .15s;position:relative}
+.it:active{background:var(--soft)}
+.it+.it::before{content:"";position:absolute;top:0;left:78px;right:0;height:1px;background:var(--line)}
+.thumb{width:52px;height:52px;border-radius:14px;background:var(--soft);display:grid;place-items:center;color:var(--brand2);flex:none;overflow:hidden}
+.thumb img{width:100%;height:100%;object-fit:cover;display:block}
+.it .mid{flex:1;min-width:0}
+.it .nm{font-weight:600;font-size:15px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.it .sub{font-size:13px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:2px}
+.it .val{text-align:right;flex:none}
+.it .val b{display:block;font-size:15px;font-weight:650}
+.it .val small{font-size:12px;color:var(--muted)}
+.empty{text-align:center;padding:36px 20px;color:var(--muted)}
+.empty .logo{margin:0 auto 14px;background:var(--soft);color:var(--brand);box-shadow:none}
+.empty h4{color:var(--ink);font-size:17px;margin:0 0 6px}
+.empty p{margin:0 0 16px;font-size:14px}
+
+.search{position:relative;margin-top:8px}
+.search svg{position:absolute;left:14px;top:50%;transform:translateY(-50%);color:var(--muted);width:19px;height:19px}
+.search .input{padding-left:42px;border-radius:999px;background:var(--card)}
+.chips{display:flex;gap:8px;overflow-x:auto;padding:12px 2px 2px;margin:0 -16px;padding-left:16px;padding-right:16px;scrollbar-width:none}
+.chips::-webkit-scrollbar{display:none}
+.chip{flex:none;height:34px;padding:0 14px;border-radius:999px;background:var(--card);border:1px solid var(--line);font-size:14px;font-weight:600;color:var(--ink2);display:inline-flex;align-items:center;gap:6px;transition:all .2s}
+.chip.on{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.chip svg{width:16px;height:16px}
+
+/* room page */
+.room-hero{display:flex;align-items:center;gap:14px;padding:6px 2px 4px}
+.room-hero .ic{width:58px;height:58px;border-radius:18px;background:var(--card);box-shadow:var(--shadow);display:grid;place-items:center;color:var(--brand)}
+.room-hero .ic svg{width:28px;height:28px}
+.room-hero h2{margin:0;font-size:26px;letter-spacing:-.02em}
+.room-hero p{margin:2px 0 0;color:var(--muted);font-size:14px}
+
+/* dash */
+.kpis{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:12px}
+.kpi{padding:14px 12px}
+.kpi .v{font-size:19px;font-weight:700;letter-spacing:-.02em;margin-top:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.bars{padding:6px 0}
+.bar{display:block;width:100%;text-align:left;padding:12px 16px;transition:background .15s;position:relative}
+.bar:active{background:var(--soft)}
+.bar+.bar::before{content:"";position:absolute;top:0;left:16px;right:16px;height:1px;background:var(--line)}
+.bar .top-l{display:flex;justify-content:space-between;align-items:center;gap:10px;font-size:15px}
+.bar .top-l span{display:flex;align-items:center;gap:8px;min-width:0;font-weight:600}
+.bar .top-l span em{font-style:normal;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-transform:none}
+.bar .top-l b{font-weight:650;flex:none}
+.bar .track{height:8px;border-radius:999px;background:var(--soft);margin-top:9px;overflow:hidden}
+.bar .fill{height:100%;border-radius:999px;background:linear-gradient(90deg,var(--brand2),var(--brand));width:0;transition:width .9s cubic-bezier(.2,.8,.2,1)}
+.bar .meta{font-size:12px;color:var(--muted);margin-top:6px}
+.bar svg{width:18px;height:18px;color:var(--brand)}
+.cols{display:flex;align-items:flex-end;gap:6px;height:150px;padding:16px 14px 8px}
+.col{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;height:100%;gap:6px;min-width:0}
+.col i{display:block;width:100%;max-width:26px;border-radius:8px 8px 4px 4px;background:linear-gradient(180deg,var(--brand2),var(--brand));height:0;transition:height .9s cubic-bezier(.2,.8,.2,1)}
+.col small{font-size:10px;color:var(--muted);white-space:nowrap}
+
+/* stores */
+.store-ic{width:44px;height:44px;border-radius:14px;background:var(--soft);display:grid;place-items:center;color:var(--brand);flex:none}
+
+/* tabbar */
+.tabbar{position:fixed;left:0;right:0;bottom:calc(14px + env(safe-area-inset-bottom));z-index:30;display:flex;justify-content:center;align-items:center;gap:10px;pointer-events:none;padding:0 16px}
+.tabs{pointer-events:auto;position:relative;display:flex;background:var(--glass);backdrop-filter:blur(22px) saturate(1.5);-webkit-backdrop-filter:blur(22px) saturate(1.5);border:1px solid color-mix(in srgb,var(--line) 70%,transparent);border-radius:999px;padding:5px;box-shadow:0 10px 30px rgba(40,25,15,.14)}
+.tabs button{position:relative;z-index:1;width:68px;height:52px;border-radius:999px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;font-size:10.5px;font-weight:600;color:var(--muted);transition:color .25s}
+.tabs button svg{width:22px;height:22px}
+.tabs button.on{color:var(--brand)}
+.tabs .pill{position:absolute;top:5px;height:52px;width:68px;border-radius:999px;background:color-mix(in srgb,var(--brand) 13%,transparent);transition:left .45s cubic-bezier(.3,1.35,.5,1)}
+.fab{pointer-events:auto;width:62px;height:62px;border-radius:50%;background:var(--brand);color:var(--brandInk);display:grid;place-items:center;box-shadow:0 10px 26px rgba(122,82,54,.38);transition:transform .2s cubic-bezier(.3,1.5,.5,1)}
+.fab:active{transform:scale(.9) rotate(90deg)}
+.fab svg{width:26px;height:26px;stroke-width:2.2}
+
+/* sheets */
+#sheets{position:relative;z-index:50}
+.sheet-wrap{position:fixed;inset:0;display:flex;align-items:flex-end;justify-content:center}
+.sheet-bg{position:absolute;inset:0;background:rgba(20,12,8,.38);opacity:0;transition:opacity .3s}
+.sheet{position:relative;width:100%;max-width:560px;max-height:92dvh;overflow-y:auto;overscroll-behavior:contain;background:var(--bg);border-radius:28px 28px 0 0;padding:8px 18px calc(20px + env(safe-area-inset-bottom));transform:translateY(100%);transition:transform .42s cubic-bezier(.2,.9,.2,1);box-shadow:0 -10px 40px rgba(0,0,0,.18)}
+.sheet-wrap.open .sheet-bg{opacity:1}
+.sheet-wrap.open .sheet{transform:translateY(0)}
+.sheet.dragging{transition:none}
+.grab{width:40px;height:5px;border-radius:999px;background:var(--line);margin:4px auto 10px}
+.sheet-h{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:0 0 14px}
+.sheet-h h3{margin:0;font-size:20px;letter-spacing:-.01em}
+.sheet-actions{display:flex;gap:10px;margin-top:16px}
+.sheet-actions .btn{flex:1}
+@media (min-width:600px){.sheet-wrap{align-items:center}.sheet{border-radius:28px;transform:translateY(40px) scale(.96);opacity:0;transition:transform .35s cubic-bezier(.2,.9,.2,1),opacity .25s}.sheet-wrap.open .sheet{transform:none;opacity:1}}
+
+.menu-list{overflow:hidden}
+.menu-list button{display:flex;align-items:center;gap:12px;width:100%;padding:15px 16px;text-align:left;font-size:16px;font-weight:500;position:relative}
+.menu-list button:active{background:var(--soft)}
+.menu-list button+button::before{content:"";position:absolute;top:0;left:50px;right:0;height:1px;background:var(--line)}
+.menu-list button svg{color:var(--brand)}
+.menu-list button .end{margin-left:auto;color:var(--muted);font-size:14px}
+.menu-list button.red,.menu-list button.red svg{color:var(--danger)}
+.me{display:flex;align-items:center;gap:12px;padding:4px 4px 16px}
+.me .avatar{width:48px;height:48px;font-size:18px}
+.me b{display:block;font-size:17px}
+.me small{color:var(--muted);font-size:13px}
+
+/* photo */
+.photo{position:relative;border-radius:20px;overflow:hidden;background:var(--soft);aspect-ratio:4/3;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:12px;color:var(--muted);margin-bottom:14px}
+.photo img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.photo .pbtns{display:flex;gap:8px;position:relative;z-index:1}
+.photo.has .pbtns{position:absolute;bottom:10px;right:10px}
+.photo .pbtns label,.photo .pbtns button{height:38px;padding:0 14px;border-radius:999px;background:var(--card);color:var(--ink);display:inline-flex;align-items:center;gap:6px;font-size:14px;font-weight:600;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,.12)}
+.photo .pbtns svg{width:18px;height:18px}
+.photo.has .pbtns label,.photo.has .pbtns button{background:rgba(20,12,8,.55);color:#fff;backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)}
+.stepper{display:flex;align-items:center;height:48px;border-radius:14px;border:1px solid var(--line);background:var(--card);overflow:hidden}
+.stepper button{width:44px;height:100%;display:grid;place-items:center;color:var(--brand)}
+.stepper input{flex:1;min-width:0;text-align:center;border:0;background:none;outline:none;font-size:16px;font-weight:600;height:100%}
+.total-line{display:flex;justify-content:space-between;align-items:center;padding:12px 16px;border-radius:14px;background:var(--soft);font-size:15px;margin:2px 0 12px}
+.total-line b{font-size:18px}
+.detail-photo{border-radius:22px;overflow:hidden;margin-bottom:14px;background:var(--soft)}
+.detail-photo img{width:100%;display:block;max-height:52dvh;object-fit:cover}
+.kv{overflow:hidden;margin-top:12px}
+.kv div{display:flex;justify-content:space-between;gap:14px;padding:13px 16px;font-size:15px;position:relative}
+.kv div+div::before{content:"";position:absolute;top:0;left:16px;right:0;height:1px;background:var(--line)}
+.kv span{color:var(--muted)}
+.kv b{font-weight:600;text-align:right}
+.icon-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:8px;margin-bottom:12px}
+.icon-grid button{aspect-ratio:1;border-radius:14px;background:var(--card);border:1.5px solid var(--line);display:grid;place-items:center;color:var(--ink2);transition:all .2s}
+.icon-grid button.on{border-color:var(--brand);background:color-mix(in srgb,var(--brand) 12%,var(--card));color:var(--brand)}
+.pick{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px}
+.pick .chip{height:38px}
+.add-inline{display:flex;gap:8px;margin-bottom:12px}
+.add-inline .input{flex:1}
+.member{display:flex;align-items:center;gap:12px;padding:12px 14px;position:relative}
+.member+.member::before{content:"";position:absolute;top:0;left:62px;right:0;height:1px;background:var(--line)}
+.member .avatar{width:36px;height:36px;font-size:14px;background:var(--soft);color:var(--brand)}
+.member .mid{flex:1;min-width:0}
+.member .mid b{display:block;font-size:14px;font-weight:600;word-break:break-all;line-height:1.25}
+.member .mid small{font-size:12px;color:var(--muted)}
+.member .select{height:36px;width:auto;font-size:14px;border-radius:999px;padding:0 32px 0 12px;background-position:right 8px center;background-size:16px}
+.note{font-size:13px;color:var(--muted);padding:10px 4px;line-height:1.45}
+.proj-row{display:flex;align-items:center;gap:12px;padding:13px 14px;width:100%;text-align:left;position:relative}
+.proj-row+.proj-row::before{content:"";position:absolute;top:0;left:62px;right:0;height:1px;background:var(--line)}
+.proj-row .store-ic{width:38px;height:38px}
+.proj-row .mid{flex:1;min-width:0;font-weight:600}
+.proj-row .ok{color:var(--brand)}
+
+#toast{position:fixed;left:50%;top:calc(12px + env(safe-area-inset-top));transform:translate(-50%,-160%);opacity:0;visibility:hidden;z-index:90;background:var(--ink);color:var(--bg);padding:11px 18px;border-radius:999px;font-size:14px;font-weight:600;box-shadow:0 10px 30px rgba(0,0,0,.25);transition:transform .45s cubic-bezier(.3,1.4,.5,1);max-width:calc(100% - 32px);text-align:center}
+#toast.show{transform:translate(-50%,0);opacity:1;visibility:visible}
+#toast{transition:transform .45s cubic-bezier(.3,1.4,.5,1),opacity .3s,visibility .45s}
+#toast.err{background:var(--danger);color:#fff}
+.spin{width:18px;height:18px;border-radius:50%;border:2.5px solid currentColor;border-right-color:transparent;animation:sp .7s linear infinite}
+@keyframes sp{to{transform:rotate(360deg)}}
+@media (prefers-reduced-motion:reduce){*{animation-duration:.01ms!important;transition-duration:.01ms!important}}
+@media (min-width:720px){.rooms{grid-template-columns:repeat(3,1fr)}.room.wide{grid-column:span 3}}
+</style>
+</head>
+<body>
+<div id="app"><div class="splash"><div class="logo"><svg class="i" viewBox="0 0 24 24"><path d="M3 11l9-7 9 7M5 10v10h14V10"/></svg></div></div></div>
+<div id="sheets"></div>
+<div id="toast"></div>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
+<script>
+(function(){
+"use strict";
+
+/* ================= SUPABASE =================
+   Mesmo projeto do Controle e do FLUX (plano gratuito), mas com login próprio:
+   a sessão fica guardada na chave "nossolar-auth", separada dos outros apps. */
+const SUPABASE_URL = "https://ccxiuaqirickchmrowrz.supabase.co";
+const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNjeGl1YXFpcmlja2NobXJvd3J6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODYxMDg2NTQsImV4cCI6MjEwMTY4NDY1NH0.TiInMdno4_yvWK-c8mg6DY7IymPaJKrtN1CwS-8dm8U";
+const BUCKET = "enxoval";
+const DEFAULT_ROOMS = [["Quarto Casal","bed"],["Cozinha","kitchen"],["Escritório","office"],["Sala","sofa"],["Banheiro","bath"]];
+const RECOVERY_AT_LOAD = /type=recovery/.test(location.hash);
+
+/* ================= ÍCONES ================= */
+const P = {
+  bed:"M3 18v-6a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v6M3 18h18M3 18v2M21 18v2M6 10V7.5A1.5 1.5 0 0 1 7.5 6h3A1.5 1.5 0 0 1 12 7.5V10M12 10V7.5A1.5 1.5 0 0 1 13.5 6h3A1.5 1.5 0 0 1 18 7.5V10",
+  kitchen:"M4 10h16v5a5 5 0 0 1-5 5H9a5 5 0 0 1-5-5zM2 10h2M20 10h2M9 7c0-1.2 1-1.2 1-2.5M14 7c0-1.2 1-1.2 1-2.5",
+  office:"M3 5h18v11H3zM8 20h8M12 16v4",
+  sofa:"M5 11V8a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v3M3 13a2 2 0 0 1 4 0v2h10v-2a2 2 0 0 1 4 0v5H3zM5 18v2M19 18v2",
+  bath:"M4 12h16v3a4 4 0 0 1-4 4H8a4 4 0 0 1-4-4zM6 12V6.5a2.5 2.5 0 0 1 4.5-1.5M8 19l-1 2M16 19l1 2",
+  laundry:"M5 3h14v18H5zM5 7h14M12 18a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7zM8 5h.01M11 5h.01",
+  closet:"M5 3h14v18H5zM12 3v18M10 11v2M14 11v2",
+  dining:"M4 10h16M6 10v9M18 10v9M9 6h6M12 6V4",
+  plant:"M12 21v-8M12 13c0-4 3-7 7-7 0 4-3 7-7 7zM12 15c0-3-2-5-5-5 0 3 2 5 5 5zM8 21h8",
+  balcony:"M3 12h18M5 12v8M9 12v8M15 12v8M19 12v8M3 20h18M7 4h10v8H7z",
+  car:"M3 13l2-5h14l2 5v5H3zM6 18v2M18 18v2M7 15h.01M17 15h.01",
+  box:"M3 7l9-4 9 4v10l-9 4-9-4zM3 7l9 4 9-4M12 11v10",
+  home:"M3 11l9-7 9 7M5 10v10h14V10",
+  list:"M8 6h13M8 12h13M8 18h13M3.5 6h.01M3.5 12h.01M3.5 18h.01",
+  chart:"M5 20V11M11 20V5M17 20v-6M3 20h18",
+  store:"M3 9l1.5-5h15L21 9M3 9h18v1.5a3 3 0 0 1-6 0 3 3 0 0 1-6 0 3 3 0 0 1-6 0zM5 13v7h14v-7M10 20v-4h4v4",
+  plus:"M12 5v14M5 12h14", minus:"M5 12h14",
+  back:"M15 18l-6-6 6-6", down:"M6 9l6 6 6-6", right:"M9 6l6 6-6 6",
+  x:"M18 6L6 18M6 6l12 12", check:"M5 12.5l4.5 4.5L19 7",
+  camera:"M4 8h3l2-3h6l2 3h3v11H4zM12 17a4 4 0 1 0 0-8 4 4 0 0 0 0 8z",
+  image:"M4 5h16v14H4zM4 16l5-5 4 4 3-3 4 4M15 9h.01",
+  trash:"M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3",
+  edit:"M4 20h4L19 9l-4-4L4 16zM13 7l4 4",
+  share:"M16 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6zM6 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6zM18 22a3 3 0 1 0 0-6 3 3 0 0 0 0 6zM8.6 13.5l6.8 4M15.4 6.5l-6.8 4",
+  logout:"M15 4h4v16h-4M10 17l5-5-5-5M15 12H3",
+  folder:"M3 6h6l2 2h10v11H3z",
+  gear:"M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6zM4 12h2M18 12h2M12 4v2M12 18v2M6.3 6.3l1.4 1.4M16.3 16.3l1.4 1.4M6.3 17.7l1.4-1.4M16.3 7.7l1.4-1.4",
+  search:"M11 18a7 7 0 1 0 0-14 7 7 0 0 0 0 14zM20 20l-4-4",
+  eye:"M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12zM12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6z",
+  copy:"M9 9h11v11H9zM5 15H4V4h11v1",
+  moon:"M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5z",
+  globe:"M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18zM3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18",
+  pin:"M12 21s-7-6-7-11a7 7 0 0 1 14 0c0 5-7 11-7 11zM12 12a2 2 0 1 0 0-4 2 2 0 0 0 0 4z",
+  more:"M5 12h.01M12 12h.01M19 12h.01",
+  calendar:"M4 6h16v14H4zM4 10h16M8 3v4M16 3v4",
+  users:"M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM2 21a7 7 0 0 1 14 0M16 3.5a4 4 0 0 1 0 7.5M18 14a6 6 0 0 1 4 7",
+  mail:"M3 6h18v12H3zM3 7l9 6 9-6"
+};
+const ROOM_ICONS = ["bed","kitchen","office","sofa","bath","laundry","closet","dining","plant","balcony","car","box"];
+const ic = (n, cls="") => `<svg class="i ${cls}" viewBox="0 0 24 24"><path d="${P[n]||P.box}"/></svg>`;
+
+/* ================= UTILITÁRIOS ================= */
+const $ = (s, el=document) => el.querySelector(s);
+const $$ = (s, el=document) => [...el.querySelectorAll(s)];
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const BRL = new Intl.NumberFormat("pt-BR", { style:"currency", currency:"BRL" });
+const money = v => BRL.format(+v || 0);
+const moneyShort = v => { v = +v || 0; if (v >= 100000) return "R$ " + (v/1000).toLocaleString("pt-BR",{maximumFractionDigits:0}) + " mil"; return BRL.format(v); };
+const pad = n => String(n).padStart(2, "0");
+const todayStr = () => { const d = new Date(); return d.getFullYear() + "-" + pad(d.getMonth()+1) + "-" + pad(d.getDate()); };
+const fmtDate = d => { if (!d) return ""; const [y,m,dd] = d.split("-"); return `${dd}/${m}/${y}`; };
+const dayTitle = d => {
+  if (d === todayStr()) return "Hoje";
+  const y = new Date(); y.setDate(y.getDate()-1);
+  if (d === y.getFullYear()+"-"+pad(y.getMonth()+1)+"-"+pad(y.getDate())) return "Ontem";
+  const t = new Date(d + "T12:00:00").toLocaleDateString("pt-BR", { weekday:"long", day:"numeric", month:"long" });
+  return t.charAt(0).toUpperCase() + t.slice(1);
+};
+const qtyTxt = q => { q = +q || 0; return (Number.isInteger(q) ? q : q.toLocaleString("pt-BR")) + (q === 1 ? " item" : " itens"); };
+const itemTotal = i => (+i.quantity || 0) * (+i.unit_price || 0);
+const uid = () => (crypto.randomUUID ? crypto.randomUUID() : "10000000-1000-4000-8000-100000000000".replace(/[018]/g, c => (c ^ crypto.getRandomValues(new Uint8Array(1))[0] & 15 >> c / 4).toString(16)));
+const lsGet = (k, d=null) => { try { const v = localStorage.getItem(k); return v === null ? d : JSON.parse(v); } catch { return d; } };
+const lsSet = (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} };
+const baseUrl = () => location.origin + location.pathname;
+const initials = s => { s = String(s || "").trim(); if (!s) return "?"; const p = s.split(/[\s@._-]+/).filter(Boolean); return ((p[0]||"")[0] + ((p[1]||"")[0]||"")).toUpperCase(); };
+const ROLE = { owner:"Dono", editor:"Pode editar", viewer:"Só visualizar" };
+
+let toastT = null;
+function toast(msg, err=false){
+  const t = $("#toast"); t.textContent = msg; t.className = err ? "err" : "";
+  requestAnimationFrame(() => t.classList.add("show"));
+  clearTimeout(toastT); toastT = setTimeout(() => t.classList.remove("show"), 2600);
+}
+function friendlyError(e){
+  const m = String((e && (e.message || e.error_description)) || e || "");
+  if (/invalid login/i.test(m)) return "E-mail ou senha incorretos";
+  if (/not confirmed/i.test(m)) return "Confirme seu e-mail pelo link que enviamos antes de entrar";
+  if (/already registered|already been registered/i.test(m)) return "Esse e-mail já tem conta. É só entrar";
+  if (/rate|seconds|too many/i.test(m)) return "Muitas tentativas. Aguarde um pouco e tente de novo";
+  if (/should be different|same password/i.test(m)) return "A nova senha precisa ser diferente da atual";
+  if (/weak|at least/i.test(m)) return "Senha muito fraca. Use pelo menos 6 caracteres";
+  if (/duplicate|23505/i.test(m)) return "Esse e-mail já está no projeto";
+  if (/fetch|network|failed to/i.test(m)) return "Sem conexão. Confira sua internet";
+  if (/row-level security|permission|42501/i.test(m)) return "Você não tem permissão para fazer isso";
+  if (/mime|size|payload|too large/i.test(m)) return "A foto não pôde ser enviada (formato ou tamanho)";
+  return "Não deu certo. Tente de novo";
+}
+
+/* ================= TEMA ================= */
+function applyTheme(){
+  const t = lsGet("nl.theme", "system");
+  if (t === "system") document.documentElement.removeAttribute("data-theme");
+  else document.documentElement.setAttribute("data-theme", t);
+  const dark = t === "dark" || (t === "system" && matchMedia("(prefers-color-scheme: dark)").matches);
+  $("#meta-theme").setAttribute("content", dark ? "#15100D" : "#F7F3EE");
+}
+applyTheme();
+try { matchMedia("(prefers-color-scheme: dark)").addEventListener("change", applyTheme); } catch {}
+
+/* ================= ESTADO ================= */
+const S = {
+  user:null, projects:[], project:null, role:null,
+  rooms:[], stores:[], items:[], members:[], photos:{},
+  tab: lsGet("nl.tab", "casa"), roomId:null,
+  filter:{ room:"all", store:null, q:"" }, dash:"rooms",
+  channel:null, nav:"", recovery:RECOVERY_AT_LOAD, booting:true
+};
+const canEdit = () => S.role === "owner" || S.role === "editor";
+const isOwner = () => S.role === "owner";
+const myEmail = () => String(S.user?.email || "").toLowerCase();
+const myName = () => (S.user?.user_metadata?.nome || "").trim() || myEmail().split("@")[0];
+const roomById = id => S.rooms.find(r => r.id === id);
+const storeById = id => S.stores.find(s => s.id === id);
+
+let sb = null;
+try {
+  sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+    auth: { persistSession:true, autoRefreshToken:true, detectSessionInUrl:true, storageKey:"nossolar-auth" }
+  });
+} catch (e) { console.error(e); }
+
+/* ================= LOGIN ================= */
+function showAuth(mode, keepMsg=""){
+  S.user = mode === "newpass" ? S.user : null;
+  document.body.classList.remove("locked"); $("#sheets").innerHTML = "";
+  const sub = { login:"Entre na sua conta", signup:"Crie sua conta", forgot:"Enviaremos um link para o seu e-mail", newpass:"Crie uma nova senha" };
+  const f = [];
+  if (mode === "signup") f.push(`<input class="input" id="au-n" name="name" autocomplete="name" placeholder="Seu nome" aria-label="Seu nome">`);
+  if (mode !== "newpass") f.push(`<input class="input" id="au-e" name="email" type="email" inputmode="email" autocomplete="${mode==="signup"?"email":"username"}" autocapitalize="off" spellcheck="false" placeholder="E-mail" aria-label="E-mail">`);
+  if (mode !== "forgot") f.push(`<input class="input" id="au-p" name="password" type="password" autocomplete="${mode==="login"?"current-password":"new-password"}" placeholder="${mode==="newpass"?"Nova senha":"Senha"}" aria-label="Senha">`);
+  if (mode === "signup" || mode === "newpass") f.push(`<input class="input" id="au-p2" name="password2" type="password" autocomplete="new-password" placeholder="Confirmar senha" aria-label="Confirmar senha">`);
+  const btn = { login:"Entrar", signup:"Criar conta", forgot:"Enviar link", newpass:"Salvar senha" }[mode];
+  const links = {
+    login:`<button type="button" data-go="forgot">Esqueci a senha</button><span class="dot"></span><button type="button" data-go="signup">Criar conta</button>`,
+    signup:`<button type="button" data-go="login">Já tenho conta</button>`,
+    forgot:`<button type="button" data-go="login">Voltar para entrar</button>`,
+    newpass:``
+  }[mode];
+  document.body.classList.add("auth-on");
+  $("#app").innerHTML = `
+  <div class="auth"><form class="auth-box" id="au-form" method="post" action="#" novalidate>
+    <div class="logo sm">${ic("home")}</div>
+    <h1>Nosso Lar</h1>
+    <p class="auth-sub">${sub[mode]}</p>
+    <div class="auth-fields">${f.join("")}</div>
+    <button class="btn primary block" type="submit" id="au-btn">${btn}</button>
+    <div class="auth-msg ${keepMsg?"ok":""}" id="au-msg">${esc(keepMsg)}</div>
+    <div class="auth-links">${links}</div>
+  </form></div>`;
+  const form = $("#au-form");
+  form.addEventListener("click", e => { const g = e.target.closest("[data-go]"); if (g) { e.preventDefault(); showAuth(g.dataset.go); } });
+  form.addEventListener("submit", async e => {
+    e.preventDefault();
+    const msg = (t, ok=false) => { const m = $("#au-msg"); m.textContent = t; m.classList.toggle("ok", ok); };
+    const email = ($("#au-e")?.value || "").trim().toLowerCase();
+    const pass = $("#au-p")?.value || "", pass2 = $("#au-p2")?.value || "";
+    if (mode !== "newpass" && !/^\S+@\S+\.\S+$/.test(email)) return msg("Confira o e-mail");
+    if (mode !== "forgot" && pass.length < 6) return msg("A senha precisa ter pelo menos 6 caracteres");
+    if ((mode === "signup" || mode === "newpass") && pass !== pass2) return msg("As senhas não são iguais");
+    if (mode === "signup" && !($("#au-n").value || "").trim()) return msg("Informe seu nome");
+    const b = $("#au-btn"); b.disabled = true; const old = b.innerHTML; b.innerHTML = `<span class="spin"></span>`; msg("");
+    try {
+      if (!sb) throw new Error("fetch");
+      if (mode === "login") {
+        const { error } = await sb.auth.signInWithPassword({ email, password:pass }); if (error) throw error;
+      } else if (mode === "signup") {
+        const { data, error } = await sb.auth.signUp({ email, password:pass, options:{ data:{ nome:$("#au-n").value.trim() }, emailRedirectTo:baseUrl() } });
+        if (error) throw error;
+        if (data?.user && Array.isArray(data.user.identities) && data.user.identities.length === 0) throw new Error("already registered");
+        if (!data.session) { showAuth("login", "Conta criada! Confirme pelo link que enviamos para o seu e-mail e depois entre aqui."); return; }
+      } else if (mode === "forgot") {
+        const { error } = await sb.auth.resetPasswordForEmail(email, { redirectTo:baseUrl() }); if (error) throw error;
+        msg("Se esse e-mail tiver conta, o link já está a caminho.", true);
+      } else if (mode === "newpass") {
+        const { error } = await sb.auth.updateUser({ password:pass }); if (error) throw error;
+        S.recovery = false; history.replaceState(null, "", baseUrl());
+        toast("Senha alterada");
+        const { data } = await sb.auth.getSession(); await handleSession(data.session, true);
+        return;
+      }
+    } catch (err) { console.warn(err); msg(friendlyError(err)); }
+    finally { const bb = $("#au-btn"); if (bb) { bb.disabled = false; bb.innerHTML = old; } }
+  });
+}
+
+/* ================= SESSÃO ================= */
+async function handleSession(session, force=false){
+  if (S.recovery) { S.user = session?.user || null; showAuth("newpass"); return; }
+  if (session && session.user) {
+    if (!force && S.user && S.user.id === session.user.id && !S.booting) return;
+    S.user = session.user; S.booting = false; document.body.classList.remove("auth-on");
+    $("#app").innerHTML = `<div class="splash"><div class="logo">${ic("home")}</div></div>`;
+    await loadProjects();
+  } else {
+    S.booting = false; unsubscribe();
+    Object.assign(S, { user:null, projects:[], project:null, role:null, rooms:[], stores:[], items:[], members:[], photos:{} });
+    showAuth("login");
+  }
+}
+if (sb) {
+  sb.auth.onAuthStateChange((ev, session) => {
+    if (ev === "PASSWORD_RECOVERY") { S.recovery = true; setTimeout(() => { S.user = session?.user || null; showAuth("newpass"); }, 0); return; }
+    if (ev === "INITIAL_SESSION" || ev === "SIGNED_IN" || ev === "SIGNED_OUT") setTimeout(() => handleSession(session), 0);
+    if (ev === "USER_UPDATED" && session) S.user = session.user;
+  });
+} else {
+  $("#app").innerHTML = `<div class="auth"><div class="auth-box"><div class="logo sm">${ic("home")}</div><h1>Nosso Lar</h1><p class="auth-sub">Sem conexão. Confira a internet e recarregue a página.</p></div></div>`;
+}
+async function signOut(){
+  unsubscribe();
+  try { await sb.auth.signOut({ scope:"local" }); } catch (e) { console.warn(e); }
+  handleSession(null);
+}
+
+/* ================= DADOS ================= */
+async function loadProjects(preferId){
+  const { data, error } = await sb.from("projects").select("id,name,owner_id,created_at").order("created_at");
+  if (error) { console.warn(error); toast(friendlyError(error), true); S.projects = []; }
+  else S.projects = data || [];
+  const want = preferId || lsGet("nl.project");
+  const p = S.projects.find(x => x.id === want) || S.projects[0] || null;
+  if (p) await openProject(p.id, true);
+  else { S.project = null; unsubscribe(); render(); }
+}
+async function openProject(id, silent=false){
+  S.project = S.projects.find(p => p.id === id) || null;
+  if (!S.project) return render();
+  lsSet("nl.project", id);
+  S.roomId = null; S.filter = { room:"all", store:null, q:"" };
+  S.photos = {};
+  await loadProjectData();
+  subscribe();
+  S.nav = "fade"; render();
+  if (!silent) toast("Projeto: " + S.project.name);
+}
+async function loadProjectData(){
+  if (!S.project) return;
+  const pid = S.project.id;
+  const [r, s, i, m, p] = await Promise.all([
+    sb.from("rooms").select("*").eq("project_id", pid).order("position").order("created_at"),
+    sb.from("stores").select("*").eq("project_id", pid).order("name"),
+    sb.from("items").select("*").eq("project_id", pid).order("purchased_on", { ascending:false }).order("created_at", { ascending:false }),
+    sb.from("project_members").select("*").eq("project_id", pid).order("created_at"),
+    sb.from("projects").select("id,name,owner_id,created_at").eq("id", pid).maybeSingle()
+  ]);
+  const err = [r, s, i, m, p].find(x => x.error);
+  if (err) { console.warn(err.error); toast("Não foi possível carregar tudo. Confira a conexão", true); }
+  if (!p.error && !p.data) { // projeto apagado ou acesso removido
+    toast("Você não tem mais acesso a esse projeto");
+    lsSet("nl.project", null); return loadProjects();
+  }
+  if (p.data) { S.project = p.data; const k = S.projects.findIndex(x => x.id === pid); if (k >= 0) S.projects[k] = p.data; }
+  if (!r.error) S.rooms = r.data || [];
+  if (!s.error) S.stores = s.data || [];
+  if (!i.error) S.items = i.data || [];
+  if (!m.error) S.members = m.data || [];
+  const me = S.members.find(x => String(x.email).toLowerCase() === myEmail());
+  S.role = me ? me.role : (S.project.owner_id === S.user.id ? "owner" : "viewer");
+  await refreshPhotos();
+}
+async function refreshPhotos(){
+  const need = [...new Set(S.items.map(i => i.photo_path).filter(p => p && !S.photos[p]))];
+  if (!need.length) return;
+  try {
+    const { data, error } = await sb.storage.from(BUCKET).createSignedUrls(need, 60 * 60 * 12);
+    if (error) throw error;
+    (data || []).forEach(d => { if (d.signedUrl && d.path) S.photos[d.path] = d.signedUrl; });
+  } catch (e) { console.warn(e); }
+}
+let reloadT = null;
+function scheduleReload(){
+  clearTimeout(reloadT);
+  reloadT = setTimeout(async () => { if (!S.project || document.querySelector(".sheet-wrap form.busy")) return; await loadProjectData(); S.nav = ""; render(); }, 450);
+}
+function subscribe(){
+  unsubscribe();
+  if (!S.project) return;
+  const pid = S.project.id;
+  const ch = sb.channel("nossolar_" + pid);
+  ["items","rooms","stores","project_members"].forEach(t => ch.on("postgres_changes", { event:"*", schema:"public", table:t, filter:"project_id=eq." + pid }, scheduleReload));
+  ch.on("postgres_changes", { event:"*", schema:"public", table:"projects", filter:"id=eq." + pid }, scheduleReload);
+  ch.subscribe();
+  S.channel = ch;
+}
+function unsubscribe(){ if (S.channel && sb) { try { sb.removeChannel(S.channel); } catch {} } S.channel = null; }
+document.addEventListener("visibilitychange", () => { if (document.visibilityState === "visible" && S.user && S.project) scheduleReload(); });
+
+/* ================= FOTOS ================= */
+async function compressImage(file){
+  const url = URL.createObjectURL(file);
+  try {
+    const img = await new Promise((res, rej) => { const i = new Image(); i.onload = () => res(i); i.onerror = rej; i.src = url; });
+    const max = 1400, w = img.naturalWidth, h = img.naturalHeight, k = Math.min(1, max / Math.max(w, h));
+    const c = document.createElement("canvas"); c.width = Math.round(w * k); c.height = Math.round(h * k);
+    const ctx = c.getContext("2d"); ctx.fillStyle = "#fff"; ctx.fillRect(0, 0, c.width, c.height); ctx.drawImage(img, 0, 0, c.width, c.height);
+    const blob = await new Promise(r => c.toBlob(r, "image/jpeg", 0.82));
+    if (!blob) throw new Error("toBlob");
+    return blob;
+  } catch (e) {
+    if (/^image\/(jpeg|png|webp|heic|heif)$/.test(file.type) && file.size <= 5 * 1024 * 1024) return file;
+    throw new Error("mime");
+  } finally { URL.revokeObjectURL(url); }
+}
+async function uploadPhoto(file){
+  const blob = await compressImage(file);
+  const ext = blob.type === "image/png" ? "png" : blob.type === "image/webp" ? "webp" : /hei[cf]/.test(blob.type) ? "heic" : "jpg";
+  const path = `${S.project.id}/${uid()}.${ext}`;
+  const { error } = await sb.storage.from(BUCKET).upload(path, blob, { contentType: blob.type || "image/jpeg", upsert:false, cacheControl:"3600" });
+  if (error) throw error;
+  S.photos[path] = URL.createObjectURL(blob);
+  return path;
+}
+async function removePhotos(paths){
+  paths = paths.filter(Boolean); if (!paths.length) return;
+  try { await sb.storage.from(BUCKET).remove(paths); } catch (e) { console.warn(e); }
+}
+
+/* ================= RENDER ================= */
+let lastKey = "";
+function render(){
+  if (!S.user) return;
+  const app = $("#app");
+  if (!S.project) { app.innerHTML = viewWelcome(); lastKey = "welcome"; return; }
+  const key = S.tab + ":" + (S.tab === "casa" ? (S.roomId || "") : "");
+  const sameView = key === lastKey;
+  const y = window.scrollY;
+  const oldPill = $("#tabpill") ? $("#tabpill").style.left : "";
+  const anim = sameView ? "" : (S.nav === "fwd" ? "view-fwd" : S.nav === "back" ? "view-back" : "view-anim");
+  let body = "";
+  if (S.tab === "casa") body = S.roomId ? viewRoom() : viewHouse();
+  else if (S.tab === "compras") body = viewItems();
+  else if (S.tab === "painel") body = viewDash();
+  else if (S.tab === "lojas") body = viewStores();
+  app.innerHTML = header() + `<main class="view ${anim}" id="view">${body}</main>` + tabbar();
+  if (sameView) window.scrollTo(0, y); else window.scrollTo(0, 0);
+  lastKey = key; S.nav = "";
+  placeTabPill(oldPill);
+  requestAnimationFrame(() => requestAnimationFrame(() => {
+    $$("[data-w]").forEach(el => el.style.width = el.dataset.w + "%");
+    $$("[data-h]").forEach(el => el.style.height = el.dataset.h + "%");
+  }));
+}
+function header(){
+  const role = S.role === "viewer" ? `<span class="badge">${ic("eye")} Só visualizar</span>` : "";
+  return `<header class="top">
+    <button class="proj-btn" data-act="projects" aria-label="Trocar de projeto">
+      <div class="t"><div class="n">${esc(S.project.name)}</div><div class="s">${S.members.length > 1 ? S.members.length + " pessoas" : "Só você"} ${role}</div></div>${ic("down")}
+    </button>
+    <button class="iconbtn" data-act="share" aria-label="Compartilhar">${ic("users")}</button>
+    <button class="avatar" data-act="menu" aria-label="Menu">${esc(initials(myName()))}</button>
+  </header>`;
+}
+const TABS = [["casa","home","Casa"],["compras","list","Compras"],["painel","chart","Painel"],["lojas","store","Lojas"]];
+function tabbar(){
+  return `<nav class="tabbar"><div class="tabs" id="tabs"><span class="pill" id="tabpill"></span>${TABS.map(([k,i,l]) => `<button data-act="tab" data-tab="${k}" class="${S.tab===k?"on":""}">${ic(i)}<span>${l}</span></button>`).join("")}</div>
+  ${canEdit() ? `<button class="fab" data-act="addItem" aria-label="Nova compra">${ic("plus")}</button>` : ""}</nav>`;
+}
+function placeTabPill(fromLeft){
+  const pill = $("#tabpill"), on = $("#tabs button.on"); if (!pill || !on) return;
+  const to = on.offsetLeft + "px";
+  pill.style.transition = "none";
+  pill.style.left = fromLeft || to;
+  pill.getBoundingClientRect();
+  pill.style.transition = "";
+  if (fromLeft && fromLeft !== to) requestAnimationFrame(() => { pill.style.left = to; });
+}
+
+/* ---------- boas-vindas (sem projeto) ---------- */
+function viewWelcome(){
+  return `<header class="top"><div class="proj-btn"><div class="t"><div class="n">Nosso Lar</div><div class="s">Olá, ${esc(myName())}</div></div></div><button class="avatar" data-act="menu">${esc(initials(myName()))}</button></header>
+  <main class="view view-anim"><div class="card empty" style="margin-top:20px">
+    <div class="logo">${ic("home")}</div><h4>Vamos montar o enxoval?</h4>
+    <p>Crie um projeto para o apartamento, escolha os cômodos e comece a registrar as compras. Se alguém compartilhou um projeto com você, ele aparece aqui automaticamente.</p>
+    <button class="btn primary" data-act="newProject">${ic("plus")} Criar projeto</button>
+    <div style="margin-top:10px"><button class="btn soft sm" data-act="reloadProjects">Atualizar</button></div>
+  </div></main>`;
+}
+
+/* ---------- agregações ---------- */
+function totals(list){ return { value: list.reduce((a,i) => a + itemTotal(i), 0), qty: list.reduce((a,i) => a + (+i.quantity||0), 0), count: list.length }; }
+function byKey(list, fn){ const m = new Map(); list.forEach(i => { const k = fn(i) ?? "none"; const t = m.get(k) || { value:0, qty:0, count:0 }; t.value += itemTotal(i); t.qty += +i.quantity||0; t.count++; m.set(k, t); }); return m; }
+
+/* ---------- casa ---------- */
+function viewHouse(){
+  const t = totals(S.items), per = byKey(S.items, i => i.room_id && roomById(i.room_id) ? i.room_id : "none");
+  const none = per.get("none");
+  const tiles = S.rooms.map((r, k) => { const v = per.get(r.id) || { value:0, count:0 };
+    return `<button class="room" data-act="room" data-id="${r.id}" style="animation-delay:${k*45}ms">
+      ${v.count ? `<span class="cnt">${v.count}</span>` : ""}
+      <span class="ic">${ic(r.icon)}</span><span><div class="nm">${esc(r.name)}</div><div class="vl">${v.count ? money(v.value) : "Nenhuma compra"}</div></span></button>`; }).join("");
+  const noneTile = none ? `<button class="room none wide" data-act="room" data-id="none" style="animation-delay:${S.rooms.length*45}ms"><span class="ic">${ic("box")}</span><span><div class="nm">Sem cômodo</div><div class="vl">${none.count} ${none.count===1?"compra":"compras"} · ${money(none.value)}</div></span></button>` : "";
+  const add = canEdit() ? `<button class="room add ${S.rooms.length % 2 === 0 ? "wide" : ""}" data-act="addRoom" style="animation-delay:${(S.rooms.length+1)*45}ms">${ic("plus")} Novo cômodo</button>` : "";
+  return `
+  <div class="card summary">
+    <div><div class="label">Total do enxoval</div><div class="v">${money(t.value)}</div></div>
+    <div class="side">${qtyTxt(t.qty)}<br>${t.count} ${t.count===1?"compra":"compras"}</div>
+  </div>
+  <div class="house">
+    <svg class="roof" viewBox="0 0 400 70" preserveAspectRatio="none" aria-hidden="true">
+      <path class="r1" d="M1 69 L186 6 Q200 1 214 6 L399 69 Z"/>
+      <path class="r2" d="M60 69 L192 24 Q200 21 208 24 L340 69 Z" opacity=".7"/>
+      <rect class="r1" x="300" y="16" width="22" height="30" rx="4"/>
+    </svg>
+    <div class="house-body">
+      ${S.rooms.length || none ? `<div class="rooms">${tiles}${noneTile}${add}</div>` : `<div class="empty"><h4>Nenhum cômodo ainda</h4><p>Adicione os cômodos do apartamento para organizar as compras.</p>${canEdit()?`<button class="btn primary" data-act="addRoom">${ic("plus")} Adicionar cômodo</button>`:""}</div>`}
+      <div class="door"><span></span></div>
+    </div>
+  </div>
+  ${S.items.length ? `<div class="section-t"><h3>Últimas compras</h3><button class="btn soft sm" data-act="tab" data-tab="compras">Ver todas</button></div>
+  <div class="card group">${S.items.slice(0,4).map(itemRow).join("")}</div>` : `<div class="note" style="text-align:center;margin-top:16px">${canEdit() ? "Toque no <b>+</b> para registrar a primeira compra." : "Ainda não há compras registradas."}</div>`}`;
+}
+function itemRow(i){
+  const r = roomById(i.room_id), s = storeById(i.store_id);
+  const sub = [s ? s.name : null, S.tab !== "casa" || !S.roomId ? (r ? r.name : "Sem cômodo") : null].filter(Boolean).join(" · ");
+  const ph = i.photo_path && S.photos[i.photo_path];
+  return `<button class="it" data-act="item" data-id="${i.id}">
+    <span class="thumb">${ph ? `<img src="${esc(ph)}" alt="" loading="lazy">` : ic(r ? r.icon : "box")}</span>
+    <span class="mid"><div class="nm">${esc(i.name)}</div><div class="sub">${esc(sub || fmtDate(i.purchased_on))}</div></span>
+    <span class="val"><b>${money(itemTotal(i))}</b><small>${+i.quantity !== 1 ? `${(+i.quantity).toLocaleString("pt-BR")} × ${money(i.unit_price)}` : fmtDate(i.purchased_on)}</small></span>
+  </button>`;
+}
+function groupedList(list){
+  if (!list.length) return "";
+  const days = new Map(); list.forEach(i => { const d = i.purchased_on; if (!days.has(d)) days.set(d, []); days.get(d).push(i); });
+  return [...days.entries()].map(([d, arr]) => `<div class="day-h"><b>${esc(dayTitle(d))}</b><span>${money(arr.reduce((a,i)=>a+itemTotal(i),0))}</span></div><div class="card group">${arr.map(itemRow).join("")}</div>`).join("");
+}
+
+/* ---------- cômodo ---------- */
+function viewRoom(){
+  const none = S.roomId === "none";
+  const r = none ? { name:"Sem cômodo", icon:"box" } : roomById(S.roomId);
+  if (!r) { S.roomId = null; return viewHouse(); }
+  const list = S.items.filter(i => none ? !(i.room_id && roomById(i.room_id)) : i.room_id === S.roomId);
+  const t = totals(list);
+  return `<div style="display:flex;align-items:center;justify-content:space-between;margin:2px -6px 6px">
+      <button class="iconbtn" data-act="back" aria-label="Voltar">${ic("back")}</button>
+      ${canEdit() && !none ? `<button class="iconbtn" data-act="editRoom" data-id="${r.id}" aria-label="Editar cômodo">${ic("edit")}</button>` : ""}
+    </div>
+    <div class="room-hero"><div class="ic">${ic(r.icon)}</div><div><h2>${esc(r.name)}</h2><p>${money(t.value)} · ${qtyTxt(t.qty)}</p></div></div>
+    ${list.length ? groupedList(list) : `<div class="card empty" style="margin-top:18px"><h4>Nada por aqui ainda</h4><p>${canEdit() ? "Registre as compras deste cômodo." : "Ainda não há compras neste cômodo."}</p>${canEdit() && !none ? `<button class="btn primary" data-act="addItem" data-room="${r.id}">${ic("plus")} Nova compra</button>` : ""}</div>`}`;
+}
+
+/* ---------- compras ---------- */
+function filteredItems(){
+  const f = S.filter, q = f.q.trim().toLowerCase();
+  return S.items.filter(i => {
+    if (f.room === "none" && i.room_id && roomById(i.room_id)) return false;
+    if (f.room !== "all" && f.room !== "none" && i.room_id !== f.room) return false;
+    if (f.store && i.store_id !== f.store) return false;
+    if (q) { const s = storeById(i.store_id), r = roomById(i.room_id); if (![i.name, i.notes, s?.name, r?.name].join(" ").toLowerCase().includes(q)) return false; }
+    return true;
+  });
+}
+function itemsListHtml(){
+  const list = filteredItems(), t = totals(list);
+  if (!S.items.length) return `<div class="card empty" style="margin-top:16px"><div class="logo">${ic("list")}</div><h4>Nenhuma compra ainda</h4><p>${canEdit() ? "Toque no + para registrar a primeira compra do enxoval." : "Quando houver compras, elas aparecem aqui."}</p></div>`;
+  if (!list.length) return `<div class="empty">Nenhuma compra encontrada com esse filtro.</div>`;
+  return `<div class="note" style="padding:14px 6px 0">${list.length} ${list.length===1?"compra":"compras"} · <b style="color:var(--ink)">${money(t.value)}</b></div>` + groupedList(list);
+}
+function viewItems(){
+  const f = S.filter, st = f.store ? storeById(f.store) : null;
+  const hasNone = S.items.some(i => !(i.room_id && roomById(i.room_id)));
+  return `<div class="search">${ic("search")}<input class="input" id="q" type="search" placeholder="Buscar compra, loja ou cômodo" value="${esc(f.q)}" autocomplete="off"></div>
+    <div class="chips">
+      <button class="chip ${f.room==="all"?"on":""}" data-act="fRoom" data-id="all">Todos</button>
+      ${S.rooms.map(r => `<button class="chip ${f.room===r.id?"on":""}" data-act="fRoom" data-id="${r.id}">${ic(r.icon)}${esc(r.name)}</button>`).join("")}
+      ${hasNone ? `<button class="chip ${f.room==="none"?"on":""}" data-act="fRoom" data-id="none">Sem cômodo</button>` : ""}
+    </div>
+    ${st ? `<div class="chips" style="padding-top:8px"><button class="chip on" data-act="fStore" data-id="">${ic("store")}${esc(st.name)} ${ic("x")}</button></div>` : ""}
+    <div id="items-list">${itemsListHtml()}</div>`;
+}
+
+/* ---------- painel ---------- */
+function viewDash(){
+  const t = totals(S.items);
+  const mode = S.dash;
+  const seg = `<div class="seg" id="dash-seg" style="margin-top:18px"><span class="pill"></span>
+    <button data-act="dash" data-mode="rooms" class="${mode==="rooms"?"on":""}">Cômodos</button>
+    <button data-act="dash" data-mode="stores" class="${mode==="stores"?"on":""}">Lojas</button>
+    <button data-act="dash" data-mode="days" class="${mode==="days"?"on":""}">Dias</button></div>`;
+  let inner = "";
+  if (!S.items.length) inner = `<div class="card empty" style="margin-top:14px"><div class="logo">${ic("chart")}</div><h4>Sem dados ainda</h4><p>Os gráficos aparecem assim que houver compras registradas.</p></div>`;
+  else if (mode === "rooms") {
+    const per = byKey(S.items, i => i.room_id && roomById(i.room_id) ? i.room_id : "none");
+    const rows = [...per.entries()].map(([k, v]) => ({ k, v, name: k === "none" ? "Sem cômodo" : roomById(k).name, icon: k === "none" ? "box" : roomById(k).icon })).sort((a,b) => b.v.value - a.v.value);
+    inner = barsCard(rows, t.value, r => `data-act="room" data-id="${r.k}" data-from="painel"`);
+  } else if (mode === "stores") {
+    const per = byKey(S.items, i => i.store_id && storeById(i.store_id) ? i.store_id : "none");
+    const rows = [...per.entries()].map(([k, v]) => { const s = storeById(k); return { k, v, name: s ? s.name : "Sem loja", icon: s ? (s.kind === "online" ? "globe" : "store") : "box" }; }).sort((a,b) => b.v.value - a.v.value);
+    inner = barsCard(rows, t.value, r => r.k === "none" ? "" : `data-act="fStore" data-id="${r.k}" data-go="1"`);
+  } else {
+    const per = byKey(S.items, i => i.purchased_on);
+    const days = [...per.entries()].sort((a,b) => a[0] < b[0] ? 1 : -1);
+    const last = days.slice(0, 10).reverse(), mx = Math.max(...last.map(d => d[1].value), 1);
+    const cols = `<div class="card" style="margin-top:14px"><div class="cols">${last.map(([d, v]) => `<div class="col" title="${fmtDate(d)}: ${money(v.value)}"><i data-h="${Math.max(3, v.value / mx * 100).toFixed(1)}"></i><small>${d.slice(8)}/${d.slice(5,7)}</small></div>`).join("")}</div><div class="note" style="text-align:center;padding-top:0">Últimos ${last.length} dias com compras</div></div>`;
+    const rows = days.map(([d, v]) => ({ k:d, v, name: dayTitle(d), icon:"calendar" }));
+    inner = cols + barsCard(rows, t.value, () => "", true);
+  }
+  return `<div class="card summary" style="margin-top:4px"><div><div class="label">Total gasto</div><div class="v">${money(t.value)}</div></div><div class="side">${S.rooms.length} cômodos<br>${S.stores.length} lojas</div></div>
+  <div class="kpis">
+    <div class="card kpi"><div class="label">Compras</div><div class="v">${t.count}</div></div>
+    <div class="card kpi"><div class="label">Itens</div><div class="v">${(+t.qty).toLocaleString("pt-BR")}</div></div>
+    <div class="card kpi"><div class="label">Média</div><div class="v">${moneyShort(t.count ? t.value / t.count : 0)}</div></div>
+  </div>${seg}${inner}`;
+}
+function barsCard(rows, total, attrs, cap){
+  const mx = Math.max(...rows.map(r => r.v.value), 1);
+  return `<div class="card bars" style="margin-top:14px">${rows.map(r => `<button class="bar" ${attrs(r)}>
+    <div class="top-l"><span>${ic(r.icon)}<em>${esc(r.name)}</em></span><b>${money(r.v.value)}</b></div>
+    <div class="track"><div class="fill" data-w="${(r.v.value / mx * 100).toFixed(1)}"></div></div>
+    <div class="meta">${r.v.count} ${r.v.count===1?"compra":"compras"} · ${qtyTxt(r.v.qty)} · ${total ? Math.round(r.v.value / total * 100) : 0}% do total</div></button>`).join("")}</div>`;
+}
+
+/* ---------- lojas ---------- */
+function viewStores(){
+  const per = byKey(S.items, i => i.store_id);
+  const list = S.stores.map(s => ({ s, v: per.get(s.id) || { value:0, count:0 } })).sort((a,b) => b.v.value - a.v.value || a.s.name.localeCompare(b.s.name));
+  return `<div class="section-t" style="margin-top:8px"><h3>Lojas</h3>${canEdit() ? `<button class="btn soft sm" data-act="addStore">${ic("plus")} Nova loja</button>` : ""}</div>
+  ${list.length ? `<div class="card group">${list.map(({s, v}) => `<button class="it" data-act="store" data-id="${s.id}">
+      <span class="store-ic">${ic(s.kind === "online" ? "globe" : "store")}</span>
+      <span class="mid"><div class="nm">${esc(s.name)}</div><div class="sub">${esc([s.kind === "online" ? "Online" : "Loja física", s.location].filter(Boolean).join(" · "))}</div></span>
+      <span class="val"><b>${money(v.value)}</b><small>${v.count} ${v.count===1?"compra":"compras"}</small></span></button>`).join("")}</div>`
+  : `<div class="card empty"><div class="logo">${ic("store")}</div><h4>Nenhuma loja cadastrada</h4><p>Cadastre as lojas onde vocês compram para saber quanto foi gasto em cada uma.</p>${canEdit() ? `<button class="btn primary" data-act="addStore">${ic("plus")} Cadastrar loja</button>` : ""}</div>`}`;
+}
+
+/* ================= FOLHAS (janelas que sobem de baixo) ================= */
+function openSheet(html, onMount){
+  const w = document.createElement("div");
+  w.className = "sheet-wrap";
+  w.innerHTML = `<div class="sheet-bg" data-close></div><div class="sheet" role="dialog" aria-modal="true"><div class="grab"></div>${html}</div>`;
+  $("#sheets").appendChild(w);
+  document.body.classList.add("locked");
+  requestAnimationFrame(() => requestAnimationFrame(() => w.classList.add("open")));
+  w.addEventListener("click", e => { if (e.target.closest("[data-close]")) { e.preventDefault(); closeSheet(w); } });
+  enableDrag(w);
+  if (onMount) onMount(w);
+  return w;
+}
+function closeSheet(w){
+  w = w || $$("#sheets .sheet-wrap").pop(); if (!w || w.closing) return;
+  w.closing = true; w.classList.remove("open");
+  if (w.onClose) w.onClose();
+  setTimeout(() => { w.remove(); if (!$("#sheets .sheet-wrap")) document.body.classList.remove("locked"); }, 380);
+}
+function closeAllSheets(){ $$("#sheets .sheet-wrap").forEach(w => closeSheet(w)); }
+function enableDrag(w){
+  const sh = $(".sheet", w); let y0 = null, dy = 0;
+  sh.addEventListener("touchstart", e => { if (sh.scrollTop > 0 || e.target.closest("input,textarea,select,.icon-grid,.chips")) { y0 = null; return; } y0 = e.touches[0].clientY; dy = 0; }, { passive:true });
+  sh.addEventListener("touchmove", e => { if (y0 === null) return; dy = Math.max(0, e.touches[0].clientY - y0); if (dy > 4) { sh.classList.add("dragging"); sh.style.transform = `translateY(${dy}px)`; } }, { passive:true });
+  sh.addEventListener("touchend", () => { if (y0 === null) return; sh.classList.remove("dragging"); sh.style.transform = ""; if (dy > 110) closeSheet(w); y0 = null; });
+}
+function confirmBox({ title, text, ok="Confirmar", danger=false }){
+  return new Promise(res => {
+    let done = false;
+    const w = openSheet(`<div class="sheet-h"><h3>${esc(title)}</h3></div><p class="note" style="font-size:15px;padding-top:0">${text}</p>
+      <div class="sheet-actions"><button class="btn soft" data-no>Cancelar</button><button class="btn ${danger?"danger":"primary"}" data-yes>${esc(ok)}</button></div>`, w => {
+      $("[data-no]", w).onclick = () => { done = true; res(false); closeSheet(w); };
+      $("[data-yes]", w).onclick = () => { done = true; res(true); closeSheet(w); };
+    });
+    w.onClose = () => { if (!done) res(false); };
+  });
+}
+function busy(btn, on){
+  if (!btn) return;
+  if (on) { btn.dataset.html = btn.innerHTML; btn.disabled = true; btn.innerHTML = `<span class="spin"></span>`; btn.closest("form")?.classList.add("busy"); }
+  else { btn.disabled = false; if (btn.dataset.html) btn.innerHTML = btn.dataset.html; btn.closest("form")?.classList.remove("busy"); }
+}
+function segHtml(name, opts, val){
+  return `<div class="seg" data-seg="${name}"><span class="pill"></span>${opts.map(([v,l]) => `<button type="button" data-v="${v}" class="${v===val?"on":""}">${l}</button>`).join("")}</div>`;
+}
+function wireSeg(root){
+  $$(".seg", root).forEach(seg => {
+    const place = anim => { const on = $("button.on", seg), pill = $(".pill", seg); if (!on || !pill) return; if (!anim) pill.style.transition = "none"; pill.style.left = on.offsetLeft + "px"; pill.style.width = on.offsetWidth + "px"; if (!anim) requestAnimationFrame(() => pill.style.transition = ""); };
+    requestAnimationFrame(() => place(false));
+    if (seg.dataset.seg) seg.addEventListener("click", e => { const b = e.target.closest("button[data-v]"); if (!b) return; $$("button", seg).forEach(x => x.classList.toggle("on", x === b)); seg.dataset.value = b.dataset.v; place(true); seg.dispatchEvent(new Event("change")); });
+    seg.dataset.value = $("button.on", seg)?.dataset.v || "";
+  });
+}
+/* máscara de dinheiro: digita só números, o app coloca vírgula e milhar */
+function moneyMask(input){
+  const fmt = cents => (cents / 100).toLocaleString("pt-BR", { minimumFractionDigits:2, maximumFractionDigits:2 });
+  input.addEventListener("input", () => { const d = input.value.replace(/\D/g, "").replace(/^0+/, "").slice(0, 11); input.value = d ? fmt(+d) : ""; input.dispatchEvent(new Event("money")); });
+}
+const parseMoney = s => { const d = String(s || "").replace(/\D/g, ""); return d ? +d / 100 : 0; };
+
+/* ================= COMPRA: formulário ================= */
+function itemForm(item, preset={}){
+  if (!canEdit()) return;
+  const isNew = !item;
+  const it = item || { name:"", room_id: preset.room || (S.roomId && S.roomId !== "none" ? S.roomId : (S.filter.room !== "all" && S.filter.room !== "none" ? S.filter.room : null)), store_id:null, quantity:1, unit_price:0, purchased_on:todayStr(), notes:"", photo_path:null };
+  let newFile = null, removePhoto = false;
+  const curPhoto = () => newFile ? URL.createObjectURL(newFile) : (!removePhoto && it.photo_path ? S.photos[it.photo_path] : null);
+  const photoHtml = () => { const src = curPhoto(); return `<div class="photo ${src?"has":""}" id="ph">${src ? `<img src="${esc(src)}" alt="">` : `${ic("image")}<span style="font-size:14px">Adicione uma foto do produto</span>`}
+      <div class="pbtns"><label>${ic("camera")} Câmera<input type="file" accept="image/*" capture="environment" hidden data-file></label><label>${ic("image")} Galeria<input type="file" accept="image/*" hidden data-file></label>${src ? `<button type="button" data-rmph aria-label="Remover foto">${ic("trash")}</button>` : ""}</div></div>`; };
+  const storeOpts = () => `<option value="">Sem loja</option>` + S.stores.map(s => `<option value="${s.id}" ${s.id===it.store_id?"selected":""}>${esc(s.name)}</option>`).join("") + `<option value="__new">+ Cadastrar nova loja</option>`;
+  const priceStr = it.unit_price ? (+it.unit_price).toLocaleString("pt-BR", { minimumFractionDigits:2, maximumFractionDigits:2 }) : "";
+  openSheet(`<form id="itf" novalidate>
+    <div class="sheet-h"><h3>${isNew ? "Nova compra" : "Editar compra"}</h3><button type="button" class="iconbtn" data-close aria-label="Fechar">${ic("x")}</button></div>
+    <div id="phw">${photoHtml()}</div>
+    <label class="field"><span>Nome do produto</span><input class="input" name="name" value="${esc(it.name)}" placeholder="Ex.: Jogo de panelas" maxlength="120" autocomplete="off"></label>
+    <div class="row2">
+      <label class="field"><span>Cômodo</span><select class="select" name="room"><option value="">Sem cômodo</option>${S.rooms.map(r => `<option value="${r.id}" ${r.id===it.room_id?"selected":""}>${esc(r.name)}</option>`).join("")}</select></label>
+      <label class="field"><span>Data da compra</span><input class="input" type="date" name="date" value="${esc(it.purchased_on)}"></label>
+    </div>
+    <label class="field"><span>Loja</span><select class="select" name="store">${storeOpts()}</select></label>
+    <div class="row2">
+      <label class="field"><span>Quantidade</span><div class="stepper"><button type="button" data-q="-1" aria-label="Diminuir">${ic("minus")}</button><input name="qty" inputmode="numeric" value="${+it.quantity || 1}"><button type="button" data-q="1" aria-label="Aumentar">${ic("plus")}</button></div></label>
+      <label class="field"><span>Valor unitário (R$)</span><input class="input" name="price" inputmode="numeric" placeholder="0,00" value="${priceStr}"></label>
+    </div>
+    <div class="total-line"><span class="muted">Total</span><b id="tot">${money(itemTotal(it))}</b></div>
+    <label class="field"><span>Observações (opcional)</span><textarea class="input" name="notes" rows="2" maxlength="500" placeholder="Cor, tamanho, garantia, entrega...">${esc(it.notes || "")}</textarea></label>
+    <div class="sheet-actions">${!isNew ? `<button type="button" class="btn danger" data-del style="flex:0 0 auto;width:50px;padding:0" aria-label="Excluir">${ic("trash")}</button>` : ""}<button class="btn primary" type="submit" id="its">${isNew ? "Salvar compra" : "Salvar alterações"}</button></div>
+  </form>`, w => {
+    const f = $("#itf", w);
+    const qty = () => Math.max(1, parseInt(f.qty.value.replace(/\D/g, ""), 10) || 1);
+    const upd = () => { $("#tot", w).textContent = money(qty() * parseMoney(f.price.value)); };
+    moneyMask(f.price); f.price.addEventListener("money", upd);
+    f.qty.addEventListener("input", () => { f.qty.value = f.qty.value.replace(/\D/g, "").slice(0, 4); upd(); });
+    f.qty.addEventListener("blur", () => { f.qty.value = qty(); upd(); });
+    $$("[data-q]", w).forEach(b => b.onclick = () => { f.qty.value = Math.max(1, qty() + +b.dataset.q); upd(); });
+    f.store.addEventListener("change", () => { if (f.store.value !== "__new") return; f.store.value = it.store_id || ""; storeForm(null, s => { it.store_id = s.id; f.store.innerHTML = storeOpts(); f.store.value = s.id; }); });
+    const wirePhoto = () => {
+      $$("[data-file]", w).forEach(inp => inp.onchange = () => { const file = inp.files && inp.files[0]; if (!file) return; if (!/^image\//.test(file.type) && !/\.(heic|heif)$/i.test(file.name)) return toast("Escolha uma imagem", true); newFile = file; removePhoto = false; $("#phw", w).innerHTML = photoHtml(); wirePhoto(); });
+      const rm = $("[data-rmph]", w); if (rm) rm.onclick = () => { newFile = null; removePhoto = true; $("#phw", w).innerHTML = photoHtml(); wirePhoto(); };
+    };
+    wirePhoto();
+    const del = $("[data-del]", w); if (del) del.onclick = () => deleteItem(it, w);
+    f.addEventListener("submit", async e => {
+      e.preventDefault();
+      const name = f.name.value.trim();
+      if (!name) { f.name.focus(); return toast("Informe o nome do produto", true); }
+      if (!f.date.value) return toast("Informe a data da compra", true);
+      const btn = $("#its", w); busy(btn, true);
+      let uploaded = null;
+      try {
+        const row = { name, room_id: f.room.value || null, store_id: (f.store.value && f.store.value !== "__new") ? f.store.value : null, quantity: qty(), unit_price: parseMoney(f.price.value), purchased_on: f.date.value, notes: f.notes.value.trim() || null };
+        const oldPath = it.photo_path || null;
+        if (newFile) { uploaded = await uploadPhoto(newFile); row.photo_path = uploaded; }
+        else if (removePhoto) row.photo_path = null;
+        if (isNew) { const { error } = await sb.from("items").insert({ ...row, project_id: S.project.id }); if (error) throw error; }
+        else { const { error } = await sb.from("items").update(row).eq("id", it.id); if (error) throw error; }
+        if (oldPath && (newFile || removePhoto)) removePhotos([oldPath]);
+        closeAllSheets(); toast(isNew ? "Compra registrada" : "Compra atualizada");
+        await loadProjectData(); render();
+      } catch (err) { console.warn(err); if (uploaded) removePhotos([uploaded]); toast(friendlyError(err), true); busy(btn, false); }
+    });
+  });
+}
+async function deleteItem(it, formSheet){
+  if (!(await confirmBox({ title:"Excluir compra?", text:`<b>${esc(it.name)}</b> será removida do enxoval.`, ok:"Excluir", danger:true }))) return;
+  const { error } = await sb.from("items").delete().eq("id", it.id);
+  if (error) return toast(friendlyError(error), true);
+  if (it.photo_path) removePhotos([it.photo_path]);
+  closeAllSheets(); toast("Compra excluída");
+  await loadProjectData(); render();
+}
+
+/* ================= COMPRA: detalhes ================= */
+function itemDetail(id){
+  const it = S.items.find(i => i.id === id); if (!it) return;
+  const r = roomById(it.room_id), s = storeById(it.store_id), ph = it.photo_path && S.photos[it.photo_path];
+  openSheet(`<div class="sheet-h"><h3>${esc(it.name)}</h3><button class="iconbtn" data-close aria-label="Fechar">${ic("x")}</button></div>
+    ${ph ? `<div class="detail-photo"><img src="${esc(ph)}" alt=""></div>` : ""}
+    <div class="card summary" style="padding:16px 18px"><div><div class="label">Total</div><div class="v" style="font-size:28px">${money(itemTotal(it))}</div></div><div class="side">${(+it.quantity).toLocaleString("pt-BR")} × ${money(it.unit_price)}</div></div>
+    <div class="card kv">
+      <div><span>Cômodo</span><b>${esc(r ? r.name : "Sem cômodo")}</b></div>
+      <div><span>Loja</span><b>${esc(s ? s.name : "Sem loja")}</b></div>
+      <div><span>Data da compra</span><b>${fmtDate(it.purchased_on)}</b></div>
+      ${it.created_by_email ? `<div><span>Registrado por</span><b>${esc(it.created_by_email)}</b></div>` : ""}
+      ${it.notes ? `<div style="display:block"><span>Observações</span><p style="margin:6px 0 0;white-space:pre-wrap">${esc(it.notes)}</p></div>` : ""}
+    </div>
+    ${canEdit() ? `<div class="sheet-actions"><button class="btn danger" data-del style="flex:0 0 auto;width:50px;padding:0" aria-label="Excluir">${ic("trash")}</button><button class="btn primary" data-edit>${ic("edit")} Editar</button></div>` : ""}`, w => {
+    const e = $("[data-edit]", w); if (e) e.onclick = () => { closeSheet(w); setTimeout(() => itemForm(it), 150); };
+    const d = $("[data-del]", w); if (d) d.onclick = () => deleteItem(it);
+  });
+}
+
+/* ================= CÔMODO ================= */
+function roomForm(room){
+  if (!canEdit()) return;
+  const isNew = !room; let icon = room ? room.icon : "box";
+  openSheet(`<form id="rf" novalidate><div class="sheet-h"><h3>${isNew ? "Novo cômodo" : "Editar cômodo"}</h3><button type="button" class="iconbtn" data-close aria-label="Fechar">${ic("x")}</button></div>
+    <label class="field"><span>Nome</span><input class="input" name="name" value="${esc(room ? room.name : "")}" placeholder="Ex.: Lavanderia" maxlength="40"></label>
+    <div class="field"><span>Ícone</span></div>
+    <div class="icon-grid">${ROOM_ICONS.map(n => `<button type="button" data-ic="${n}" class="${n===icon?"on":""}" aria-label="${n}">${ic(n)}</button>`).join("")}</div>
+    <div class="sheet-actions">${!isNew ? `<button type="button" class="btn danger" data-del style="flex:0 0 auto;width:50px;padding:0" aria-label="Excluir">${ic("trash")}</button>` : ""}<button class="btn primary" type="submit" id="rs">Salvar</button></div></form>`, w => {
+    const f = $("#rf", w);
+    $$("[data-ic]", w).forEach(b => b.onclick = () => { icon = b.dataset.ic; $$("[data-ic]", w).forEach(x => x.classList.toggle("on", x === b)); });
+    f.addEventListener("submit", async e => {
+      e.preventDefault(); const name = f.name.value.trim(); if (!name) return toast("Informe o nome do cômodo", true);
+      const btn = $("#rs", w); busy(btn, true);
+      const q = isNew ? sb.from("rooms").insert({ project_id:S.project.id, name, icon, position: S.rooms.length ? Math.max(...S.rooms.map(r => r.position || 0)) + 1 : 0 }) : sb.from("rooms").update({ name, icon }).eq("id", room.id);
+      const { error } = await q;
+      if (error) { busy(btn, false); return toast(friendlyError(error), true); }
+      closeSheet(w); toast(isNew ? "Cômodo criado" : "Cômodo atualizado"); await loadProjectData(); render();
+    });
+    const d = $("[data-del]", w);
+    if (d) d.onclick = async () => {
+      const n = S.items.filter(i => i.room_id === room.id).length;
+      if (!(await confirmBox({ title:"Excluir cômodo?", text: n ? `As ${n} compras de <b>${esc(room.name)}</b> não serão apagadas, elas passam para "Sem cômodo".` : `<b>${esc(room.name)}</b> será removido da casa.`, ok:"Excluir", danger:true }))) return;
+      const { error } = await sb.from("rooms").delete().eq("id", room.id);
+      if (error) return toast(friendlyError(error), true);
+      closeAllSheets(); S.roomId = null; S.nav = "back"; toast("Cômodo excluído"); await loadProjectData(); render();
+    };
+  });
+}
+
+/* ================= LOJA ================= */
+function storeForm(store, onSaved){
+  if (!canEdit()) return;
+  const isNew = !store, st = store || { name:"", kind:"fisica", location:"", notes:"" };
+  openSheet(`<form id="sf" novalidate><div class="sheet-h"><h3>${isNew ? "Nova loja" : "Editar loja"}</h3><button type="button" class="iconbtn" data-close aria-label="Fechar">${ic("x")}</button></div>
+    <label class="field"><span>Nome da loja</span><input class="input" name="name" value="${esc(st.name)}" placeholder="Ex.: Tok&amp;Stok" maxlength="60" autocomplete="off"></label>
+    <div class="field"><span>Tipo</span>${segHtml("kind", [["fisica","Loja física"],["online","Online"]], st.kind)}</div>
+    <label class="field"><span id="loc-l">${st.kind === "online" ? "Site" : "Endereço ou shopping"} (opcional)</span><input class="input" name="location" value="${esc(st.location || "")}" maxlength="120" autocomplete="off"></label>
+    <label class="field"><span>Observações (opcional)</span><textarea class="input" name="notes" rows="2" maxlength="300">${esc(st.notes || "")}</textarea></label>
+    <div class="sheet-actions">${!isNew ? `<button type="button" class="btn danger" data-del style="flex:0 0 auto;width:50px;padding:0" aria-label="Excluir">${ic("trash")}</button>` : ""}<button class="btn primary" type="submit" id="ss">Salvar</button></div></form>`, w => {
+    wireSeg(w);
+    const f = $("#sf", w), seg = $("[data-seg=kind]", w);
+    seg.addEventListener("change", () => { $("#loc-l", w).textContent = (seg.dataset.value === "online" ? "Site" : "Endereço ou shopping") + " (opcional)"; });
+    f.addEventListener("submit", async e => {
+      e.preventDefault(); const name = f.name.value.trim(); if (!name) return toast("Informe o nome da loja", true);
+      if (isNew && S.stores.some(s => s.name.toLowerCase() === name.toLowerCase())) return toast("Já existe uma loja com esse nome", true);
+      const btn = $("#ss", w); busy(btn, true);
+      const row = { name, kind: seg.dataset.value || "fisica", location: f.location.value.trim() || null, notes: f.notes.value.trim() || null };
+      const q = isNew ? sb.from("stores").insert({ ...row, project_id:S.project.id }).select().single() : sb.from("stores").update(row).eq("id", store.id).select().single();
+      const { data, error } = await q;
+      if (error) { busy(btn, false); return toast(friendlyError(error), true); }
+      const k = S.stores.findIndex(s => s.id === data.id); if (k >= 0) S.stores[k] = data; else S.stores.push(data);
+      S.stores.sort((a,b) => a.name.localeCompare(b.name));
+      closeSheet(w); toast(isNew ? "Loja cadastrada" : "Loja atualizada");
+      if (onSaved) onSaved(data); else { await loadProjectData(); render(); }
+    });
+    const d = $("[data-del]", w);
+    if (d) d.onclick = async () => {
+      const n = S.items.filter(i => i.store_id === store.id).length;
+      if (!(await confirmBox({ title:"Excluir loja?", text: n ? `As ${n} compras feitas na <b>${esc(store.name)}</b> não serão apagadas, só ficam sem loja.` : `<b>${esc(store.name)}</b> será removida.`, ok:"Excluir", danger:true }))) return;
+      const { error } = await sb.from("stores").delete().eq("id", store.id);
+      if (error) return toast(friendlyError(error), true);
+      closeAllSheets(); toast("Loja excluída"); await loadProjectData(); render();
+    };
+  });
+}
+function storeDetail(id){
+  const s = storeById(id); if (!s) return;
+  const list = S.items.filter(i => i.store_id === id), t = totals(list);
+  openSheet(`<div class="sheet-h"><h3>${esc(s.name)}</h3><button class="iconbtn" data-close aria-label="Fechar">${ic("x")}</button></div>
+    <div class="card summary" style="padding:16px 18px"><div><div class="label">Gasto nesta loja</div><div class="v" style="font-size:28px">${money(t.value)}</div></div><div class="side">${t.count} ${t.count===1?"compra":"compras"}<br>${qtyTxt(t.qty)}</div></div>
+    <div class="card kv"><div><span>Tipo</span><b>${s.kind === "online" ? "Online" : "Loja física"}</b></div>${s.location ? `<div><span>${s.kind === "online" ? "Site" : "Local"}</span><b>${esc(s.location)}</b></div>` : ""}${s.notes ? `<div style="display:block"><span>Observações</span><p style="margin:6px 0 0;white-space:pre-wrap">${esc(s.notes)}</p></div>` : ""}</div>
+    <div class="sheet-actions">${list.length ? `<button class="btn soft" data-see>Ver compras</button>` : ""}${canEdit() ? `<button class="btn primary" data-edit>${ic("edit")} Editar</button>` : ""}</div>`, w => {
+    const see = $("[data-see]", w); if (see) see.onclick = () => { closeSheet(w); S.filter = { room:"all", store:id, q:"" }; S.tab = "compras"; lsSet("nl.tab", S.tab); S.nav = "fwd"; render(); };
+    const e = $("[data-edit]", w); if (e) e.onclick = () => { closeSheet(w); setTimeout(() => storeForm(s), 150); };
+  });
+}
+
+/* ================= PROJETOS ================= */
+function newProjectForm(){
+  const picked = new Set(DEFAULT_ROOMS.map(r => r[0]));
+  const extra = [];
+  const chips = () => [...DEFAULT_ROOMS, ...extra].map(([n, i]) => `<button type="button" class="chip ${picked.has(n)?"on":""}" data-room="${esc(n)}">${ic(i)}${esc(n)}</button>`).join("");
+  openSheet(`<form id="pf" novalidate><div class="sheet-h"><h3>Novo projeto</h3><button type="button" class="iconbtn" data-close aria-label="Fechar">${ic("x")}</button></div>
+    <label class="field"><span>Nome do projeto</span><input class="input" name="name" placeholder="Ex.: Nosso Apê" maxlength="50" autocomplete="off"></label>
+    <div class="field"><span>Cômodos do apartamento</span></div>
+    <div class="pick" id="pick">${chips()}</div>
+    <div class="add-inline"><input class="input" id="newroom" placeholder="Outro cômodo (ex.: Lavanderia)" maxlength="40"><button type="button" class="btn soft" id="addroom" style="height:48px">${ic("plus")}</button></div>
+    <p class="note" style="padding-top:0">Toque para marcar ou desmarcar. Depois dá para adicionar, renomear ou excluir cômodos.</p>
+    <div class="sheet-actions"><button class="btn primary" type="submit" id="ps">Criar projeto</button></div></form>`, w => {
+    const f = $("#pf", w);
+    const redraw = () => { $("#pick", w).innerHTML = chips(); };
+    $("#pick", w).addEventListener("click", e => { const b = e.target.closest("[data-room]"); if (!b) return; const n = b.dataset.room; picked.has(n) ? picked.delete(n) : picked.add(n); b.classList.toggle("on"); });
+    const addR = () => { const n = $("#newroom", w).value.trim(); if (!n) return; if ([...DEFAULT_ROOMS, ...extra].some(r => r[0].toLowerCase() === n.toLowerCase())) return toast("Esse cômodo já está na lista", true); extra.push([n, "box"]); picked.add(n); $("#newroom", w).value = ""; redraw(); };
+    $("#addroom", w).onclick = addR;
+    $("#newroom", w).addEventListener("keydown", e => { if (e.key === "Enter") { e.preventDefault(); addR(); } });
+    f.addEventListener("submit", async e => {
+      e.preventDefault(); const name = f.name.value.trim(); if (!name) { f.name.focus(); return toast("Dê um nome ao projeto", true); }
+      const btn = $("#ps", w); busy(btn, true);
+      try {
+        const { data: proj, error } = await sb.from("projects").insert({ name }).select().single();
+        if (error) throw error;
+        const rooms = [...DEFAULT_ROOMS, ...extra].filter(r => picked.has(r[0])).map(([n, i], k) => ({ project_id: proj.id, name: n, icon: i, position: k }));
+        if (rooms.length) { const { error: e2 } = await sb.from("rooms").insert(rooms); if (e2) throw e2; }
+        closeAllSheets(); S.tab = "casa"; lsSet("nl.tab", "casa");
+        await loadProjects(proj.id); toast("Projeto criado");
+      } catch (err) { console.warn(err); toast(friendlyError(err), true); busy(btn, false); }
+    });
+  });
+}
+function projectsSheet(){
+  openSheet(`<div class="sheet-h"><h3>Meus projetos</h3><button class="iconbtn" data-close aria-label="Fechar">${ic("x")}</button></div>
+    <div class="card group">${S.projects.map(p => { const mine = p.owner_id === S.user.id; return `<button class="proj-row" data-pid="${p.id}"><span class="store-ic">${ic("home")}</span><span class="mid">${esc(p.name)}<div class="muted" style="font-size:12px;font-weight:500">${mine ? "Criado por você" : "Compartilhado com você"}</div></span>${S.project && p.id === S.project.id ? `<span class="ok">${ic("check")}</span>` : ""}</button>`; }).join("")}</div>
+    <div class="sheet-actions"><button class="btn soft" data-new>${ic("plus")} Novo projeto</button>${S.project ? `<button class="btn soft" data-set>${ic("gear")} Configurar</button>` : ""}</div>`, w => {
+    $$("[data-pid]", w).forEach(b => b.onclick = async () => { closeSheet(w); if (b.dataset.pid !== S.project?.id) { S.tab = "casa"; await openProject(b.dataset.pid); } });
+    $("[data-new]", w).onclick = () => { closeSheet(w); setTimeout(newProjectForm, 150); };
+    const st = $("[data-set]", w); if (st) st.onclick = () => { closeSheet(w); setTimeout(projectSettings, 150); };
+  });
+}
+function projectSettings(){
+  const p = S.project; if (!p) return;
+  openSheet(`<form id="psf" novalidate><div class="sheet-h"><h3>Configurar projeto</h3><button type="button" class="iconbtn" data-close aria-label="Fechar">${ic("x")}</button></div>
+    <label class="field"><span>Nome do projeto</span><input class="input" name="name" value="${esc(p.name)}" maxlength="50" ${isOwner() ? "" : "disabled"}></label>
+    ${isOwner() ? `<button class="btn primary block" type="submit" id="pss">Salvar nome</button>` : `<p class="note">Só quem criou o projeto pode mudar o nome.</p>`}
+    <div class="section-t"><h3>Cômodos</h3>${canEdit() ? `<button type="button" class="btn soft sm" data-addroom>${ic("plus")} Adicionar</button>` : ""}</div>
+    <div class="card group">${S.rooms.length ? S.rooms.map(r => `<button type="button" class="proj-row" data-room="${r.id}"><span class="store-ic">${ic(r.icon)}</span><span class="mid">${esc(r.name)}</span>${canEdit() ? `<span class="muted">${ic("edit")}</span>` : ""}</button>`).join("") : `<div class="empty">Nenhum cômodo</div>`}</div>
+    <div class="section-t"><h3>Acesso</h3></div>
+    <div class="card menu-list">
+      <button type="button" data-share>${ic("users")} Pessoas com acesso<span class="end">${S.members.length}</span></button>
+      ${isOwner() ? `<button type="button" class="red" data-delp>${ic("trash")} Excluir projeto</button>` : `<button type="button" class="red" data-leave>${ic("logout")} Sair do projeto</button>`}
+    </div></form>`, w => {
+    const f = $("#psf", w);
+    f.addEventListener("submit", async e => {
+      e.preventDefault(); if (!isOwner()) return; const name = f.name.value.trim(); if (!name) return toast("Informe o nome", true);
+      const btn = $("#pss", w); busy(btn, true);
+      const { error } = await sb.from("projects").update({ name }).eq("id", p.id);
+      busy(btn, false); if (error) return toast(friendlyError(error), true);
+      toast("Nome atualizado"); await loadProjectData(); render();
+    });
+    const ar = $("[data-addroom]", w); if (ar) ar.onclick = () => { closeSheet(w); setTimeout(() => roomForm(null), 150); };
+    $$("[data-room]", w).forEach(b => b.onclick = () => { if (!canEdit()) return; const r = roomById(b.dataset.room); closeSheet(w); setTimeout(() => roomForm(r), 150); });
+    $("[data-share]", w).onclick = () => { closeSheet(w); setTimeout(shareSheet, 150); };
+    const dp = $("[data-delp]", w);
+    if (dp) dp.onclick = async () => {
+      if (!(await confirmBox({ title:"Excluir projeto?", text:`Tudo de <b>${esc(p.name)}</b> será apagado: cômodos, lojas, compras e fotos. Quem tem acesso também perde o projeto.`, ok:"Excluir projeto", danger:true }))) return;
+      try {
+        const { data: files } = await sb.storage.from(BUCKET).list(p.id, { limit:1000 });
+        if (files && files.length) await removePhotos(files.map(x => `${p.id}/${x.name}`));
+        const { error } = await sb.from("projects").delete().eq("id", p.id); if (error) throw error;
+        closeAllSheets(); lsSet("nl.project", null); toast("Projeto excluído"); await loadProjects();
+      } catch (err) { toast(friendlyError(err), true); }
+    };
+    const lv = $("[data-leave]", w);
+    if (lv) lv.onclick = async () => {
+      if (!(await confirmBox({ title:"Sair do projeto?", text:`Você deixa de ver <b>${esc(p.name)}</b>. Para voltar, o dono precisa compartilhar de novo.`, ok:"Sair do projeto", danger:true }))) return;
+      const me = S.members.find(m => String(m.email).toLowerCase() === myEmail());
+      const { error } = await sb.from("project_members").delete().eq("id", me?.id);
+      if (error) return toast(friendlyError(error), true);
+      closeAllSheets(); lsSet("nl.project", null); toast("Você saiu do projeto"); await loadProjects();
+    };
+  });
+}
+
+/* ================= COMPARTILHAR ================= */
+function shareSheet(){
+  const draw = () => S.members.map(m => {
+    const me = String(m.email).toLowerCase() === myEmail();
+    const ctrl = isOwner() && m.role !== "owner"
+      ? `<select class="select" data-role="${m.id}"><option value="editor" ${m.role==="editor"?"selected":""}>Pode editar</option><option value="viewer" ${m.role==="viewer"?"selected":""}>Só visualizar</option></select><button type="button" class="iconbtn" data-rm="${m.id}" aria-label="Remover">${ic("x")}</button>`
+      : `<span class="badge ${m.role==="owner"?"owner":""}">${ROLE[m.role] || m.role}</span>`;
+    return `<div class="member"><span class="avatar">${esc(initials(m.email))}</span><span class="mid"><b>${esc(m.email)}${me ? " (você)" : ""}</b><small>${m.role === "owner" ? "Criou o projeto" : "Convidado"}</small></span>${ctrl}</div>`;
+  }).join("");
+  openSheet(`<div class="sheet-h"><h3>Compartilhar</h3><button class="iconbtn" data-close aria-label="Fechar">${ic("x")}</button></div>
+    ${isOwner() ? `<form id="shf" novalidate>
+      <label class="field"><span>E-mail da pessoa</span><input class="input" name="email" type="email" inputmode="email" autocapitalize="off" placeholder="pessoa@email.com" autocomplete="off"></label>
+      <div class="field"><span>Permissão</span>${segHtml("role", [["editor","Pode editar"],["viewer","Só visualizar"]], "editor")}</div>
+      <button class="btn primary block" type="submit" id="shs">${ic("mail")} Dar acesso</button>
+    </form>
+    <p class="note">A pessoa entra no Nosso Lar com esse mesmo e-mail (criando a conta, se ainda não tiver) e o projeto aparece para ela. Envie o link do app para ela:</p>
+    <button class="btn soft block" data-copy>${ic("copy")} Copiar link do app</button>` : `<p class="note" style="padding-top:0">Só quem criou o projeto pode convidar pessoas ou mudar permissões.</p>`}
+    <div class="section-t"><h3>Pessoas com acesso</h3></div>
+    <div class="card group" id="mlist">${draw()}</div>`, w => {
+    wireSeg(w);
+    const cp = $("[data-copy]", w);
+    if (cp) cp.onclick = async () => { try { await navigator.clipboard.writeText(baseUrl()); toast("Link copiado"); } catch { toast(baseUrl()); } };
+    const redraw = () => { $("#mlist", w).innerHTML = draw(); };
+    const f = $("#shf", w);
+    if (f) f.addEventListener("submit", async e => {
+      e.preventDefault(); const email = f.email.value.trim().toLowerCase();
+      if (!/^\S+@\S+\.\S+$/.test(email)) return toast("Confira o e-mail", true);
+      if (S.members.some(m => String(m.email).toLowerCase() === email)) return toast("Esse e-mail já está no projeto", true);
+      const role = $("[data-seg=role]", w).dataset.value || "editor";
+      const btn = $("#shs", w); busy(btn, true);
+      const { error } = await sb.from("project_members").insert({ project_id:S.project.id, email, role });
+      busy(btn, false);
+      if (error) return toast(friendlyError(error), true);
+      f.email.value = ""; toast("Acesso liberado para " + email);
+      await loadProjectData(); redraw(); render();
+    });
+    $("#mlist", w).addEventListener("change", async e => {
+      const s = e.target.closest("[data-role]"); if (!s) return;
+      const { error } = await sb.from("project_members").update({ role:s.value }).eq("id", s.dataset.role);
+      if (error) { toast(friendlyError(error), true); } else toast("Permissão atualizada");
+      await loadProjectData(); redraw(); render();
+    });
+    $("#mlist", w).addEventListener("click", async e => {
+      const b = e.target.closest("[data-rm]"); if (!b) return;
+      const m = S.members.find(x => x.id === b.dataset.rm); if (!m) return;
+      if (!(await confirmBox({ title:"Remover acesso?", text:`<b>${esc(m.email)}</b> deixa de ver este projeto.`, ok:"Remover", danger:true }))) return;
+      const { error } = await sb.from("project_members").delete().eq("id", m.id);
+      if (error) return toast(friendlyError(error), true);
+      toast("Acesso removido"); await loadProjectData(); redraw(); render();
+    });
+  });
+}
+
+/* ================= MENU ================= */
+function menuSheet(){
+  const th = lsGet("nl.theme", "system");
+  openSheet(`<div class="me"><span class="avatar">${esc(initials(myName()))}</span><div><b>${esc(myName())}</b><small>${esc(myEmail())}</small></div></div>
+    <div class="card menu-list">
+      <button data-m="projects">${ic("folder")} Meus projetos<span class="end">${S.projects.length}</span></button>
+      ${S.project ? `<button data-m="share">${ic("users")} Compartilhar projeto</button><button data-m="settings">${ic("gear")} Configurar projeto</button>` : ""}
+      <button data-m="name">${ic("edit")} Alterar meu nome</button>
+    </div>
+    <div class="section-t"><h3>Aparência</h3></div>
+    ${segHtml("theme", [["system","Seguir o sistema"],["light","Claro"],["dark","Escuro"]], th)}
+    <div class="card menu-list" style="margin-top:22px"><button class="red" data-m="logout">${ic("logout")} Sair</button></div>`, w => {
+    wireSeg(w);
+    $("[data-seg=theme]", w).addEventListener("change", e => { lsSet("nl.theme", e.currentTarget.dataset.value); applyTheme(); });
+    $$("[data-m]", w).forEach(b => b.onclick = async () => {
+      const m = b.dataset.m; closeSheet(w);
+      if (m === "logout") return signOut();
+      setTimeout(() => ({ projects: projectsSheet, share: shareSheet, settings: projectSettings, name: nameForm })[m](), 150);
+    });
+  });
+}
+function nameForm(){
+  openSheet(`<form id="nf" novalidate><div class="sheet-h"><h3>Seu nome</h3><button type="button" class="iconbtn" data-close aria-label="Fechar">${ic("x")}</button></div>
+    <label class="field"><span>Nome</span><input class="input" name="nome" value="${esc(S.user?.user_metadata?.nome || "")}" maxlength="40"></label>
+    <div class="sheet-actions"><button class="btn primary" type="submit" id="nfs">Salvar</button></div></form>`, w => {
+    const f = $("#nf", w);
+    f.addEventListener("submit", async e => {
+      e.preventDefault(); const nome = f.nome.value.trim(); if (!nome) return toast("Informe seu nome", true);
+      const btn = $("#nfs", w); busy(btn, true);
+      const { data, error } = await sb.auth.updateUser({ data:{ nome } });
+      busy(btn, false); if (error) return toast(friendlyError(error), true);
+      if (data?.user) S.user = data.user;
+      closeSheet(w); toast("Nome atualizado"); render();
+    });
+  });
+}
+
+/* ================= CLIQUES ================= */
+const ACT = {
+  tab: d => { if (S.tab === d.tab && !S.roomId) { window.scrollTo({ top:0, behavior:"smooth" }); return; } const order = TABS.map(t => t[0]); S.nav = order.indexOf(d.tab) > order.indexOf(S.tab) ? "fwd" : "back"; S.tab = d.tab; S.roomId = null; lsSet("nl.tab", S.tab); render(); },
+  room: d => { S.tab = "casa"; lsSet("nl.tab", "casa"); S.roomId = d.id; S.nav = "fwd"; S.roomFrom = d.from || null; render(); },
+  back: () => { S.roomId = null; S.nav = "back"; if (S.roomFrom) { S.tab = S.roomFrom; S.roomFrom = null; lsSet("nl.tab", S.tab); } render(); },
+  addItem: d => itemForm(null, { room: d.room || null }),
+  item: d => itemDetail(d.id),
+  addRoom: () => roomForm(null),
+  editRoom: d => roomForm(roomById(d.id)),
+  addStore: () => storeForm(null),
+  store: d => storeDetail(d.id),
+  fRoom: d => { S.filter.room = d.id; const el = $("#items-list"); if (el) { $$(".chips [data-act=fRoom]").forEach(c => c.classList.toggle("on", c.dataset.id === d.id)); el.innerHTML = itemsListHtml(); } else render(); },
+  fStore: d => { S.filter.store = d.id || null; if (d.go) { S.filter.room = "all"; S.filter.q = ""; S.tab = "compras"; lsSet("nl.tab", S.tab); S.nav = "fwd"; } render(); },
+  dash: d => { S.dash = d.mode; render(); },
+  projects: () => projectsSheet(),
+  share: () => shareSheet(),
+  menu: () => menuSheet(),
+  newProject: () => newProjectForm(),
+  reloadProjects: () => loadProjects()
+};
+document.addEventListener("click", e => {
+  const a = e.target.closest("[data-act]"); if (!a || a.closest(".sheet-wrap")) return;
+  const fn = ACT[a.dataset.act]; if (fn) { e.preventDefault(); fn(a.dataset, a); }
+});
+document.addEventListener("input", e => {
+  if (e.target.id === "q") { S.filter.q = e.target.value; const el = $("#items-list"); if (el) el.innerHTML = itemsListHtml(); }
+});
+window.addEventListener("resize", () => placeTabPill(""));
+new MutationObserver(() => { const seg = $("#dash-seg"); if (seg && !seg.dataset.wired) { seg.dataset.wired = "1"; wireSeg(seg.parentElement); } }).observe($("#app"), { childList:true, subtree:false });
+document.addEventListener("keydown", e => { if (e.key === "Escape") closeSheet(); });
+
+})();
+</script>
+</body>
+</html>
