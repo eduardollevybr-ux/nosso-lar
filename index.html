@@ -175,12 +175,12 @@ input[type=date].input{display:flex;align-items:center;line-height:var(--h-ctl);
 .tabs .pill{position:absolute;top:4px;bottom:4px;border-radius:var(--r-in);background:var(--card);box-shadow:0 1px 3px rgba(0,0,0,.1);transition:left .4s cubic-bezier(.3,1.3,.5,1),width .4s cubic-bezier(.3,1.3,.5,1)}
 /* celular e tablet: barra de navegação fixa na parte de baixo */
 @media (max-width:899px){
-  .tabs{position:fixed;left:var(--pad);right:var(--pad);bottom:calc(12px + env(safe-area-inset-bottom));z-index:30;max-width:560px;margin:0 auto;padding:5px;background:var(--glass);backdrop-filter:blur(22px) saturate(1.5);-webkit-backdrop-filter:blur(22px) saturate(1.5);border:1px solid color-mix(in srgb,var(--line) 70%,transparent);box-shadow:0 10px 30px rgba(40,25,15,.14)}
-  .tabs{padding:6px;border-radius:22px;background:color-mix(in srgb,var(--card) 96%,transparent)}
-  .tabs .pill{top:6px;bottom:6px;border-radius:16px}
+  /* barra de navegação presa na borda de baixo da tela, de ponta a ponta */
+  .tabs{position:fixed;left:0;right:0;bottom:0;z-index:30;margin:0;gap:4px;border-radius:0;padding:6px max(10px,calc((100vw - 560px)/2)) calc(6px + env(safe-area-inset-bottom));background:var(--card);border:0;border-top:1px solid var(--line);box-shadow:0 -6px 24px rgba(40,25,15,.07)}
+  .tabs .pill{top:6px;bottom:calc(6px + env(safe-area-inset-bottom));border-radius:16px;background:var(--soft);box-shadow:none}
   .tabs button{height:62px;border-radius:16px;font-size:12.5px;gap:4px}
   .tabs button svg{width:25px;height:25px}
-  body main.view{padding-bottom:calc(120px + env(safe-area-inset-bottom))}
+  body main.view{padding-bottom:calc(104px + env(safe-area-inset-bottom))}
 }
 @media (min-width:600px){
   .tabs button{flex-direction:row;gap:8px;height:40px;font-size:14px;padding:0 14px}
@@ -427,13 +427,13 @@ button.it:active,button.proj-row:active{background:var(--soft)}
 #toast .t-ic svg{width:15px;height:15px;stroke-width:2.6}
 
 /* botão flutuante de nova compra (celular e tablet) */
-.fab{position:fixed;z-index:31;right:max(var(--pad),calc((100vw - 560px)/2));bottom:calc(100px + env(safe-area-inset-bottom));width:60px;height:60px;border-radius:20px;background:var(--brand);color:var(--brandInk);display:grid;place-items:center;box-shadow:0 12px 28px -6px color-mix(in srgb,var(--brand) 70%,transparent),0 2px 6px rgba(0,0,0,.12);transition:transform .2s cubic-bezier(.3,1.4,.5,1);animation:fabIn .5s cubic-bezier(.3,1.4,.5,1) both}
+.fab{position:fixed;z-index:31;right:max(var(--pad),calc((100vw - 560px)/2));bottom:calc(92px + env(safe-area-inset-bottom));width:60px;height:60px;border-radius:20px;background:var(--brand);color:var(--brandInk);display:grid;place-items:center;box-shadow:0 12px 28px -6px color-mix(in srgb,var(--brand) 70%,transparent),0 2px 6px rgba(0,0,0,.12);transition:transform .2s cubic-bezier(.3,1.4,.5,1);animation:fabIn .5s cubic-bezier(.3,1.4,.5,1) both}
 .fab svg{width:26px;height:26px;stroke-width:2.4}
 .fab:active{transform:scale(.9)}
 @keyframes fabIn{from{opacity:0;transform:scale(.4) rotate(-45deg)}to{opacity:1;transform:none}}
 @media (max-width:899px){.top-act .add-btn{display:none}}
 @media (min-width:900px){.fab{display:none}}
-@media (max-width:899px){body main.view.has-fab{padding-bottom:calc(184px + env(safe-area-inset-bottom))}}
+@media (max-width:899px){body main.view.has-fab{padding-bottom:calc(170px + env(safe-area-inset-bottom))}}
 
 /* ordenação da lista de compras */
 .list-bar{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:16px 6px 0}
