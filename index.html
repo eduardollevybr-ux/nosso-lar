@@ -512,9 +512,10 @@ a.btn{text-decoration:none}
 .detail-photo{cursor:zoom-in;position:relative}
 .detail-photo .zoom{position:absolute;right:10px;bottom:10px;width:36px;height:36px;border-radius:50%;display:grid;place-items:center;background:rgba(20,12,8,.5);color:#fff;backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px)}
 .detail-photo .zoom svg{width:18px;height:18px}
-.lightbox{position:fixed;inset:0;z-index:95;background:rgba(10,6,4,.92);display:grid;place-items:center;padding:calc(16px + env(safe-area-inset-top)) 16px calc(16px + env(safe-area-inset-bottom));opacity:0;transition:opacity .25s;cursor:zoom-out}
+.lightbox{position:fixed;inset:0;z-index:95;background:rgba(10,6,4,.92);display:grid;grid-template:minmax(0,1fr)/minmax(0,1fr);place-items:center;padding:calc(16px + env(safe-area-inset-top)) 16px calc(16px + env(safe-area-inset-bottom));opacity:0;transition:opacity .25s;cursor:zoom-out}
 .lightbox.show{opacity:1}
-.lightbox img{max-width:100%;max-height:100%;border-radius:var(--r-md);object-fit:contain;transform:scale(.94);transition:transform .35s var(--ease)}
+/* a foto sempre cabe inteira na tela (largura e altura), sem precisar tirar o zoom */
+.lightbox img{display:block;width:auto;height:auto;max-width:calc(100vw - 32px);max-height:calc(100vh - 32px - env(safe-area-inset-top) - env(safe-area-inset-bottom));max-height:calc(100dvh - 32px - env(safe-area-inset-top) - env(safe-area-inset-bottom));border-radius:var(--r-md);object-fit:contain;transform:scale(.94);transition:transform .35s var(--ease)}
 .lightbox.show img{transform:none}
 .lightbox .iconbtn{position:absolute;top:calc(12px + env(safe-area-inset-top));right:12px;color:#fff;background:rgba(255,255,255,.12)}
 .spin{width:18px;height:18px;border-radius:50%;border:2.5px solid currentColor;border-right-color:transparent;animation:sp .7s linear infinite}
