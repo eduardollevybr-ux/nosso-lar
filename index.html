@@ -11,6 +11,9 @@
 <title>Nosso Lar</title>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='16' fill='%237A5236'/%3E%3Cpath d='M14 31 32 16l18 15M19 28v19h26V28' fill='none' stroke='%23F7F3EE' stroke-width='4.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3Cpath d='M28 47v-9h8v9' fill='none' stroke='%23F7F3EE' stroke-width='4.5' stroke-linejoin='round'/%3E%3C/svg%3E">
 <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 180 180'%3E%3Crect width='180' height='180' fill='%237A5236'/%3E%3Cpath d='M44 88 90 50l46 38M57 80v50h66V80' fill='none' stroke='%23F7F3EE' stroke-width='11' stroke-linecap='round' stroke-linejoin='round'/%3E%3Cpath d='M79 130v-24h22v24' fill='none' stroke='%23F7F3EE' stroke-width='11' stroke-linejoin='round'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
 :root{
   --bg:#F7F3EE; --bg2:#EFE7DD; --card:#FFFFFF; --ink:#2B211B; --ink2:#5A4A3F; --muted:#8C7D71;
@@ -26,7 +29,9 @@
   --r-in:10px;  /* marcador interno das abas */
   --h-ctl:48px; --h-sm:38px; --lead:44px;
   --pad:16px; --maxw:1200px;
-  --font:-apple-system,BlinkMacSystemFont,"SF Pro Text","SF Pro Display","Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+  --font:"Plus Jakarta Sans",-apple-system,BlinkMacSystemFont,"SF Pro Text","SF Pro Display","Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+  --display:"Fraunces",Georgia,"Times New Roman",serif;
+  --ease:cubic-bezier(.2,.8,.2,1);
   color-scheme:light;
 }
 @media (prefers-color-scheme:dark){
@@ -46,7 +51,13 @@
 @media (min-width:900px){:root{--pad:28px}}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html,body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--font);font-size:16px;line-height:1.35;-webkit-font-smoothing:antialiased;-webkit-text-size-adjust:100%}
-body{min-height:100dvh;overscroll-behavior-y:none}
+body{min-height:100dvh;overscroll-behavior-y:none;background:radial-gradient(900px 520px at 105% -8%,color-mix(in srgb,var(--accent) 16%,transparent),transparent 70%),radial-gradient(700px 480px at -10% 110%,color-mix(in srgb,var(--brand2) 9%,transparent),transparent 70%),var(--bg);background-attachment:fixed}
+.v,.kpi .v,.it .val b,.bar .top-l b,.total-line b,.room .vl,.day-h span,.list-note b{font-variant-numeric:tabular-nums}
+/* títulos com fonte de destaque */
+.auth-box h1,.page-t h2,.room-hero h2,.proj-btn .n,.empty h4,.sheet-h h3{font-family:var(--display);font-weight:600;letter-spacing:-.01em}
+/* foco visível para quem usa teclado */
+button:focus-visible,label:focus-visible,.chip:focus-visible{outline:2.5px solid var(--brand2);outline-offset:2px}
+img{transition:opacity .35s}
 body.locked{overflow:hidden}
 button,input,select,textarea{font:inherit;color:inherit}
 button{cursor:pointer;border:0;background:none;padding:0}
@@ -132,7 +143,10 @@ input[type=date].input{display:flex;align-items:center;line-height:var(--h-ctl);
 .seg .pill{position:absolute;top:4px;bottom:4px;border-radius:var(--r-in);background:var(--card);box-shadow:0 1px 3px rgba(0,0,0,.12);transition:left .35s cubic-bezier(.3,1.3,.5,1),width .35s cubic-bezier(.3,1.3,.5,1)}
 
 /* ---------- topo com navegação ---------- */
-.top{position:sticky;top:0;z-index:20;border-bottom:1px solid color-mix(in srgb,var(--line) 70%,transparent)}
+.top{position:sticky;top:0;z-index:20;border-bottom:1px solid transparent;transition:border-color .25s,box-shadow .25s}
+.top::before{opacity:0;transition:opacity .25s}
+.top.scrolled::before{opacity:1}
+.top.scrolled{border-bottom-color:color-mix(in srgb,var(--line) 70%,transparent);box-shadow:0 6px 24px rgba(40,25,15,.06)}
 .top::before{content:"";position:absolute;inset:0;z-index:-1;background:color-mix(in srgb,var(--bg) 84%,transparent);backdrop-filter:blur(18px) saturate(1.3);-webkit-backdrop-filter:blur(18px) saturate(1.3)}
 .top-in{max-width:var(--maxw);margin:0 auto;padding:calc(10px + env(safe-area-inset-top)) var(--pad) 12px;display:grid;grid-template-columns:minmax(0,1fr) auto;grid-template-areas:"proj act";gap:10px 12px;align-items:center}
 .proj-btn{grid-area:proj;display:flex;align-items:center;gap:6px;min-width:0;text-align:left;justify-self:start;max-width:100%}
@@ -188,7 +202,9 @@ main.view{max-width:var(--maxw);margin:0 auto;padding:16px var(--pad) calc(40px 
 .page-t h2{margin:0;font-size:24px;font-weight:700;letter-spacing:-.02em}
 
 /* resumo (mesmo formato em todas as telas) */
-.summary{padding:18px 20px;display:grid;grid-template-columns:1fr auto;gap:6px 12px;align-items:end;background:linear-gradient(135deg,var(--brand),color-mix(in srgb,var(--brand) 70%,var(--brand2)));color:var(--brandInk);border:0}
+.summary{position:relative;overflow:hidden;isolation:isolate;padding:18px 20px;display:grid;grid-template-columns:1fr auto;gap:6px 12px;align-items:end;background:radial-gradient(120% 140% at 0% 0%,color-mix(in srgb,var(--brand2) 55%,var(--brand)) 0%,var(--brand) 55%,color-mix(in srgb,var(--brand) 82%,#000) 100%);color:var(--brandInk);border:0;box-shadow:0 14px 34px -12px color-mix(in srgb,var(--brand) 60%,transparent)}
+.summary::after{content:"";position:absolute;z-index:-1;right:-28px;bottom:-40px;width:170px;height:170px;opacity:.13;background:no-repeat center/contain url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='1.4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M3 11l9-7 9 7M5 10v10h14V10M10 20v-5h4v5'/%3E%3C/svg%3E")}
+.summary::before{content:"";position:absolute;z-index:-1;inset:0;background:linear-gradient(180deg,rgba(255,255,255,.10),transparent 45%);pointer-events:none}
 .summary .v{font-size:32px;font-weight:700;letter-spacing:-.03em;line-height:1.05;margin-top:4px}
 .summary .label{color:color-mix(in srgb,var(--brandInk) 75%,transparent)}
 .summary .side{text-align:right;font-size:13px;opacity:.9;line-height:1.5}
@@ -219,6 +235,9 @@ main.view{max-width:var(--maxw);margin:0 auto;padding:16px var(--pad) calc(40px 
 .room{position:relative;text-align:left;border-radius:var(--r-md);padding:14px;background:var(--soft);min-height:120px;display:flex;flex-direction:column;justify-content:space-between;transition:transform .2s cubic-bezier(.3,1.4,.5,1),background .2s;overflow:hidden;animation:tileIn .5s cubic-bezier(.2,.8,.2,1) both}
 @media (min-width:900px){.room{min-height:140px}}
 .room:hover{background:color-mix(in srgb,var(--soft) 70%,var(--line))}
+@media (hover:hover){.room:not(.add):hover{transform:translateY(-3px);box-shadow:0 10px 24px -10px rgba(60,40,25,.25)}}
+.room .share{display:block;height:4px;border-radius:999px;background:color-mix(in srgb,var(--card) 80%,transparent);margin-top:10px;overflow:hidden}
+.room .share i{display:block;height:100%;width:0;border-radius:999px;background:linear-gradient(90deg,var(--brand2),var(--brand));transition:width 1s var(--ease)}
 .room:active{transform:scale(.95)}
 .room .ic{width:40px;height:40px;border-radius:var(--r-sm);background:var(--card);display:grid;place-items:center;color:var(--brand)}
 .room .nm{font-weight:600;font-size:15px;margin-top:10px;line-height:1.2}
@@ -286,7 +305,9 @@ button.it:active,button.proj-row:active{background:var(--soft)}
 .dash-top{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
 .dash-top>.summary{grid-column:1/-1}
 @media (min-width:900px){.dash-top{grid-template-columns:minmax(0,2fr) repeat(3,minmax(0,1fr));gap:16px}.dash-top>.summary{grid-column:auto;padding:24px}.dash-top>.summary .v{font-size:36px}}
-.kpi{padding:14px 12px;display:flex;flex-direction:column;justify-content:flex-end}
+.kpi{padding:14px 12px;display:flex;flex-direction:column;justify-content:flex-end;gap:2px}
+.kpi .k-ic{width:30px;height:30px;border-radius:var(--r-in);background:var(--soft);color:var(--brand);display:grid;place-items:center;margin-bottom:8px}
+.kpi .k-ic svg{width:17px;height:17px}
 .kpi .v{font-size:18px;font-weight:700;letter-spacing:-.02em;margin-top:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 @media (min-width:900px){.kpi{padding:20px}.kpi .v{font-size:28px}}
 .dash-seg{margin-top:20px}
@@ -381,9 +402,37 @@ button.it:active,button.proj-row:active{background:var(--soft)}
 .proj-row .mid small{display:block;font-size:12px;font-weight:500;color:var(--muted)}
 .proj-row .ok{color:var(--brand)}
 
-#toast{position:fixed;left:50%;top:calc(12px + env(safe-area-inset-top));transform:translate(-50%,-160%);opacity:0;visibility:hidden;z-index:90;background:var(--ink);color:var(--bg);padding:11px 18px;border-radius:999px;font-size:14px;font-weight:600;box-shadow:0 10px 30px rgba(0,0,0,.25);transition:transform .45s cubic-bezier(.3,1.4,.5,1),opacity .3s,visibility .45s;max-width:calc(100% - 32px);text-align:center}
+#toast{display:flex;align-items:center;gap:8px;position:fixed;left:50%;top:calc(12px + env(safe-area-inset-top));transform:translate(-50%,-160%);opacity:0;visibility:hidden;z-index:90;background:var(--ink);color:var(--bg);padding:10px 18px 10px 12px;border-radius:999px;font-size:14px;font-weight:600;box-shadow:0 10px 30px rgba(0,0,0,.25);transition:transform .45s cubic-bezier(.3,1.4,.5,1),opacity .3s,visibility .45s;max-width:calc(100% - 32px);text-align:center}
 #toast.show{transform:translate(-50%,0);opacity:1;visibility:visible}
 #toast.err{background:var(--danger);color:#fff}
+#toast .t-ic{width:24px;height:24px;border-radius:50%;display:grid;place-items:center;background:color-mix(in srgb,currentColor 18%,transparent);flex:none}
+#toast .t-ic svg{width:15px;height:15px;stroke-width:2.6}
+
+/* botão flutuante de nova compra (celular e tablet) */
+.fab{position:fixed;z-index:31;right:max(var(--pad),calc((100vw - 560px)/2));bottom:calc(86px + env(safe-area-inset-bottom));width:58px;height:58px;border-radius:20px;background:var(--brand);color:var(--brandInk);display:grid;place-items:center;box-shadow:0 12px 28px -6px color-mix(in srgb,var(--brand) 70%,transparent),0 2px 6px rgba(0,0,0,.12);transition:transform .2s cubic-bezier(.3,1.4,.5,1);animation:fabIn .5s cubic-bezier(.3,1.4,.5,1) both}
+.fab svg{width:26px;height:26px;stroke-width:2.4}
+.fab:active{transform:scale(.9)}
+@keyframes fabIn{from{opacity:0;transform:scale(.4) rotate(-45deg)}to{opacity:1;transform:none}}
+@media (max-width:899px){.top-act .add-btn{display:none}}
+@media (min-width:900px){.fab{display:none}}
+@media (max-width:899px){body main.view.has-fab{padding-bottom:calc(170px + env(safe-area-inset-bottom))}}
+
+/* ordenação da lista de compras */
+.list-bar{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:16px 6px 0}
+.list-bar .list-note{padding:0}
+.sort-w{flex:none}
+.sort-w .select{height:36px;border-radius:999px;font-size:13.5px;font-weight:600;padding:0 32px 0 12px;width:auto;background-color:var(--card);background-position:right 10px center;background-size:16px}
+.sort-w .dd-btn>svg{width:16px;height:16px}
+
+/* foto em tela cheia */
+.detail-photo{cursor:zoom-in;position:relative}
+.detail-photo .zoom{position:absolute;right:10px;bottom:10px;width:36px;height:36px;border-radius:50%;display:grid;place-items:center;background:rgba(20,12,8,.5);color:#fff;backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px)}
+.detail-photo .zoom svg{width:18px;height:18px}
+.lightbox{position:fixed;inset:0;z-index:95;background:rgba(10,6,4,.92);display:grid;place-items:center;padding:calc(16px + env(safe-area-inset-top)) 16px calc(16px + env(safe-area-inset-bottom));opacity:0;transition:opacity .25s;cursor:zoom-out}
+.lightbox.show{opacity:1}
+.lightbox img{max-width:100%;max-height:100%;border-radius:var(--r-md);object-fit:contain;transform:scale(.94);transition:transform .35s var(--ease)}
+.lightbox.show img{transform:none}
+.lightbox .iconbtn{position:absolute;top:calc(12px + env(safe-area-inset-top));right:12px;color:#fff;background:rgba(255,255,255,.12)}
 .spin{width:18px;height:18px;border-radius:50%;border:2.5px solid currentColor;border-right-color:transparent;animation:sp .7s linear infinite}
 @keyframes sp{to{transform:rotate(360deg)}}
 @media (prefers-reduced-motion:reduce){*{animation-duration:.01ms!important;transition-duration:.01ms!important}}
@@ -445,7 +494,11 @@ const P = {
   more:"M5 12h.01M12 12h.01M19 12h.01",
   calendar:"M4 6h16v14H4zM4 10h16M8 3v4M16 3v4",
   users:"M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM2 21a7 7 0 0 1 14 0M16 3.5a4 4 0 0 1 0 7.5M18 14a6 6 0 0 1 4 7",
-  mail:"M3 6h18v12H3zM3 7l9 6 9-6"
+  mail:"M3 6h18v12H3zM3 7l9 6 9-6",
+  sort:"M7 4v16M3 16l4 4 4-4M17 20V4M13 8l4-4 4 4",
+  expand:"M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7",
+  bag:"M5 8h14l-1 12H6zM9 8V6a3 3 0 0 1 6 0v2",
+  alert:"M12 8v5M12 16.5h.01M10.3 3.9L2.4 18a2 2 0 0 0 1.7 3h15.8a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"
 };
 const ROOM_ICONS = ["bed","kitchen","office","sofa","bath","laundry","closet","dining","plant","balcony","car","box"];
 const ic = (n, cls="") => `<svg class="i ${cls}" viewBox="0 0 24 24"><path d="${P[n]||P.box}"/></svg>`;
@@ -480,7 +533,8 @@ const nameFromEmail = e => firstName(String(e || "").split("@")[0].split(/[._\-+
 
 let toastT = null;
 function toast(msg, err=false){
-  const t = $("#toast"); t.textContent = msg; t.className = err ? "err" : "";
+  const t = $("#toast"); t.innerHTML = `<span class="t-ic">${ic(err ? "alert" : "check")}</span><span>${esc(msg)}</span>`; t.className = err ? "err" : "";
+  try { if (navigator.vibrate) navigator.vibrate(err ? [20, 40, 20] : 12); } catch {}
   requestAnimationFrame(() => t.classList.add("show"));
   clearTimeout(toastT); toastT = setTimeout(() => t.classList.remove("show"), 2600);
 }
@@ -515,7 +569,7 @@ const S = {
   user:null, projects:[], project:null, role:null,
   rooms:[], stores:[], items:[], members:[], photos:{},
   tab: lsGet("nl.tab", "casa"), roomId:null,
-  filter:{ room:"all", store:null, q:"" }, dash:"rooms",
+  filter:{ room:"all", store:null, q:"" }, dash:"rooms", sort: lsGet("nl.sort", "recent"),
   channel:null, nav:"", recovery:RECOVERY_AT_LOAD, booting:true
 };
 const canEdit = () => S.role === "owner" || S.role === "editor";
@@ -744,14 +798,35 @@ function render(){
   else if (S.tab === "compras") body = viewItems();
   else if (S.tab === "painel") body = viewDash();
   else if (S.tab === "lojas") body = viewStores();
-  app.innerHTML = header() + `<main class="view ${anim}" id="view">${body}</main>`;
+  const fab = canEdit() ? `<button class="fab" data-act="addItem" aria-label="Nova compra">${ic("plus")}</button>` : "";
+  app.innerHTML = header() + `<main class="view ${anim} ${fab ? "has-fab" : ""}" id="view">${body}</main>` + fab;
   if (sameView) window.scrollTo(0, y); else window.scrollTo(0, 0);
+  markScrolled();
   lastKey = key; S.nav = "";
   placeTabPill(oldPill);
+  if (!sameView) countUp();
   requestAnimationFrame(() => requestAnimationFrame(() => {
     $$("[data-w]").forEach(el => el.style.width = el.dataset.w + "%");
     $$("[data-h]").forEach(el => el.style.height = el.dataset.h + "%");
   }));
+}
+/* sombra no topo quando a página rola */
+function markScrolled(){ const t = $(".top"); if (t) t.classList.toggle("scrolled", window.scrollY > 4); }
+window.addEventListener("scroll", markScrolled, { passive:true });
+/* valores principais "sobem" do zero ao abrir a tela */
+function countUp(){
+  if (matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+  $$("[data-count]").forEach(el => {
+    const to = +el.dataset.count || 0; if (to <= 0) return;
+    const t0 = performance.now(), dur = 900;
+    const step = now => {
+      if (!el.isConnected) return;
+      const k = Math.min(1, (now - t0) / dur), e = 1 - Math.pow(1 - k, 3);
+      el.textContent = money(to * e);
+      if (k < 1) requestAnimationFrame(step); else el.textContent = money(to);
+    };
+    requestAnimationFrame(step);
+  });
 }
 function peopleLine(){
   const others = S.members.filter(m => String(m.email).toLowerCase() !== myEmail()).map(m => nameFromEmail(m.email));
@@ -809,12 +884,12 @@ function viewHouse(){
   const tiles = S.rooms.map((r, k) => { const v = per.get(r.id) || { value:0, count:0 };
     return `<button class="room" data-act="room" data-id="${r.id}" style="animation-delay:${k*45}ms">
       ${v.count ? `<span class="cnt">${v.count}</span>` : ""}
-      <span class="ic">${ic(r.icon)}</span><span><div class="nm">${esc(r.name)}</div><div class="vl">${v.count ? money(v.value) : "Nenhuma compra"}</div></span></button>`; }).join("");
+      <span class="ic">${ic(r.icon)}</span><span><div class="nm">${esc(r.name)}</div><div class="vl">${v.count ? money(v.value) : "Nenhuma compra"}</div><span class="share" title="${t.value ? Math.round(v.value / t.value * 100) : 0}% do total"><i data-w="${t.value ? (v.value / t.value * 100).toFixed(1) : 0}"></i></span></span></button>`; }).join("");
   const noneTile = none ? `<button class="room none wide" data-act="room" data-id="none" style="animation-delay:${S.rooms.length*45}ms"><span class="ic">${ic("box")}</span><span><div class="nm">Sem cômodo</div><div class="vl">${none.count} ${none.count===1?"compra":"compras"} · ${money(none.value)}</div></span></button>` : "";
   const add = canEdit() ? `<button class="room add" data-act="addRoom" style="animation-delay:${(S.rooms.length+1)*45}ms">${ic("plus")} Novo cômodo</button>` : "";
   return `<div class="home">
   <div class="card summary">
-    <div><div class="label">Total do enxoval</div><div class="v">${money(t.value)}</div></div>
+    <div><div class="label">Total do enxoval</div><div class="v" data-count="${t.value}">${money(t.value)}</div></div>
     <div class="side">${qtyTxt(t.qty)}<br>${t.count} ${t.count===1?"compra":"compras"}</div>
   </div>
   <div class="house">
@@ -880,7 +955,13 @@ function itemsListHtml(){
   const list = filteredItems(), t = totals(list);
   if (!S.items.length) return `<div class="card empty" style="margin-top:16px"><div class="logo">${ic("list")}</div><h4>Nenhuma compra ainda</h4><p>${canEdit() ? "Toque em + no topo para registrar a primeira compra do enxoval." : "Quando houver compras, elas aparecem aqui."}</p></div>`;
   if (!list.length) return `<div class="card empty" style="margin-top:16px"><p>Nenhuma compra encontrada com esse filtro.</p></div>`;
-  return `<div class="list-note">${list.length} ${list.length===1?"compra":"compras"} · <b>${money(t.value)}</b></div>` + groupedList(list);
+  const SORTS = [["recent","Mais recentes","calendar"],["value","Maior valor","chart"],["name","Nome (A a Z)","list"]];
+  const sortSel = `<div class="sort-w"><select class="select" id="sort" aria-label="Ordenar compras">${SORTS.map(([v,l,i]) => `<option value="${v}" data-icon="${i}" ${S.sort===v?"selected":""}>${l}</option>`).join("")}</select></div>`;
+  let body;
+  if (S.sort === "value") body = `<div class="card group" style="margin-top:12px">${[...list].sort((a,b) => itemTotal(b) - itemTotal(a)).map(itemRow).join("")}</div>`;
+  else if (S.sort === "name") body = `<div class="card group" style="margin-top:12px">${[...list].sort((a,b) => String(a.name).localeCompare(String(b.name), "pt-BR")).map(itemRow).join("")}</div>`;
+  else body = groupedList(list);
+  return `<div class="list-bar"><div class="list-note">${list.length} ${list.length===1?"compra":"compras"} · <b>${money(t.value)}</b></div>${sortSel}</div>` + body;
 }
 function viewItems(){
   const f = S.filter, st = f.store ? storeById(f.store) : null;
@@ -922,10 +1003,10 @@ function viewDash(){
     inner = `<div class="dash-days">${cols}${barsCard(rows, t.value, () => "", false)}</div>`;
   }
   return `<div class="dash-top">
-    <div class="card summary"><div><div class="label">Total gasto</div><div class="v">${money(t.value)}</div></div><div class="side">${S.rooms.length} ${S.rooms.length===1?"cômodo":"cômodos"}<br>${S.stores.length} ${S.stores.length===1?"loja":"lojas"}</div></div>
-    <div class="card kpi"><div class="label">Compras</div><div class="v">${t.count}</div></div>
-    <div class="card kpi"><div class="label">Itens</div><div class="v">${(+t.qty).toLocaleString("pt-BR")}</div></div>
-    <div class="card kpi"><div class="label">Média</div><div class="v">${moneyShort(t.count ? t.value / t.count : 0)}</div></div>
+    <div class="card summary"><div><div class="label">Total gasto</div><div class="v" data-count="${t.value}">${money(t.value)}</div></div><div class="side">${S.rooms.length} ${S.rooms.length===1?"cômodo":"cômodos"}<br>${S.stores.length} ${S.stores.length===1?"loja":"lojas"}</div></div>
+    <div class="card kpi"><span class="k-ic">${ic("bag")}</span><div class="label">Compras</div><div class="v">${t.count}</div></div>
+    <div class="card kpi"><span class="k-ic">${ic("box")}</span><div class="label">Itens</div><div class="v">${(+t.qty).toLocaleString("pt-BR")}</div></div>
+    <div class="card kpi"><span class="k-ic">${ic("chart")}</span><div class="label">Média</div><div class="v">${moneyShort(t.count ? t.value / t.count : 0)}</div></div>
   </div>${seg}<div class="dash-body">${inner}</div>`;
 }
 function barsCard(rows, total, attrs, two){
@@ -1045,6 +1126,17 @@ function confirmBox({ title, text, ok="Confirmar", danger=false }){
     w.onClose = () => { if (!done) res(false); };
   });
 }
+function openLightbox(src){
+  if (!src) return;
+  const lb = document.createElement("div"); lb.className = "lightbox"; lb.setAttribute("role", "dialog"); lb.setAttribute("aria-label", "Foto");
+  lb.innerHTML = `<img src="${esc(src)}" alt=""><button class="iconbtn" aria-label="Fechar">${ic("x")}</button>`;
+  const close = () => { lb.classList.remove("show"); document.removeEventListener("keydown", onKey, true); setTimeout(() => lb.remove(), 260); };
+  const onKey = e => { if (e.key === "Escape") { e.preventDefault(); e.stopImmediatePropagation(); close(); } };
+  lb.addEventListener("click", close);
+  document.addEventListener("keydown", onKey, true);
+  document.body.appendChild(lb);
+  requestAnimationFrame(() => lb.classList.add("show"));
+}
 function busy(btn, on){
   if (!btn) return;
   if (on) { btn.dataset.html = btn.innerHTML; btn.disabled = true; btn.innerHTML = `<span class="spin"></span>`; btn.closest("form")?.classList.add("busy"); }
@@ -1072,7 +1164,8 @@ const parseMoney = s => { const d = String(s || "").replace(/\D/g, ""); return d
 function itemForm(item, preset={}){
   if (!canEdit()) return;
   const isNew = !item;
-  const it = item || { name:"", room_id: preset.room || (S.roomId && S.roomId !== "none" ? S.roomId : (S.filter.room !== "all" && S.filter.room !== "none" ? S.filter.room : null)), store_id:null, quantity:1, unit_price:0, purchased_on:todayStr(), notes:"", photo_path:null };
+  const cp = preset.copy;
+  const it = item || (cp ? { name:cp.name, room_id:cp.room_id, store_id:cp.store_id, quantity:cp.quantity, unit_price:cp.unit_price, purchased_on:todayStr(), notes:cp.notes || "", photo_path:null } : null) || { name:"", room_id: preset.room || (S.roomId && S.roomId !== "none" ? S.roomId : (S.filter.room !== "all" && S.filter.room !== "none" ? S.filter.room : null)), store_id:null, quantity:1, unit_price:0, purchased_on:todayStr(), notes:"", photo_path:null };
   let newFile = null, removePhoto = false;
   const curPhoto = () => newFile ? URL.createObjectURL(newFile) : (!removePhoto && it.photo_path ? S.photos[it.photo_path] : null);
   const photoHtml = () => { const src = curPhoto(); return `<div class="photo ${src?"has":""}" id="ph">${src ? `<img src="${esc(src)}" alt="">` : `${ic("image")}<span style="font-size:14px">Adicione uma foto do produto</span>`}
@@ -1145,7 +1238,7 @@ function itemDetail(id){
   const it = S.items.find(i => i.id === id); if (!it) return;
   const r = roomById(it.room_id), s = storeById(it.store_id), ph = it.photo_path && S.photos[it.photo_path];
   openSheet(`<div class="sheet-h"><h3>${esc(it.name)}</h3><button class="iconbtn" data-close aria-label="Fechar">${ic("x")}</button></div>
-    ${ph ? `<div class="detail-photo"><img src="${esc(ph)}" alt=""></div>` : ""}
+    ${ph ? `<div class="detail-photo" data-zoom role="button" aria-label="Ver foto em tela cheia"><img src="${esc(ph)}" alt=""><span class="zoom">${ic("expand")}</span></div>` : ""}
     <div class="card summary compact"><div><div class="label">Total</div><div class="v">${money(itemTotal(it))}</div></div><div class="side">${(+it.quantity).toLocaleString("pt-BR")} × ${money(it.unit_price)}</div></div>
     <div class="card kv">
       <div><span>Cômodo</span><b>${esc(r ? r.name : "Sem cômodo")}</b></div>
@@ -1154,8 +1247,10 @@ function itemDetail(id){
       ${it.created_by_email ? `<div><span>Registrado por</span><b>${esc(it.created_by_email)}</b></div>` : ""}
       ${it.notes ? `<div class="block"><span>Observações</span><p>${esc(it.notes)}</p></div>` : ""}
     </div>
-    ${canEdit() ? `<div class="sheet-actions"><button class="btn danger icon" data-del aria-label="Excluir">${ic("trash")}</button><button class="btn primary" data-edit>${ic("edit")} Editar</button></div>` : ""}`, w => {
+    ${canEdit() ? `<div class="sheet-actions"><button class="btn danger icon" data-del aria-label="Excluir">${ic("trash")}</button><button class="btn soft" data-dup>${ic("copy")} Duplicar</button><button class="btn primary" data-edit>${ic("edit")} Editar</button></div>` : ""}`, w => {
     const e = $("[data-edit]", w); if (e) e.onclick = () => { closeSheet(w); setTimeout(() => itemForm(it), 150); };
+    const du = $("[data-dup]", w); if (du) du.onclick = () => { closeSheet(w); setTimeout(() => itemForm(null, { copy: it }), 150); };
+    const z = $("[data-zoom]", w); if (z) z.onclick = () => openLightbox(ph);
     const d = $("[data-del]", w); if (d) d.onclick = () => deleteItem(it);
   });
 }
@@ -1436,6 +1531,9 @@ const ACT = {
 document.addEventListener("click", e => {
   const a = e.target.closest("[data-act]"); if (!a || a.closest(".sheet-wrap")) return;
   const fn = ACT[a.dataset.act]; if (fn) { e.preventDefault(); fn(a.dataset, a); }
+});
+document.addEventListener("change", e => {
+  if (e.target.id === "sort") { S.sort = e.target.value; lsSet("nl.sort", S.sort); const el = $("#items-list"); if (el) el.innerHTML = itemsListHtml(); }
 });
 document.addEventListener("input", e => {
   if (e.target.id === "q") { S.filter.q = e.target.value; const el = $("#items-list"); if (el) el.innerHTML = itemsListHtml(); }
