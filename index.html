@@ -271,6 +271,10 @@ main.view{max-width:var(--maxw);margin:0 auto;padding:16px var(--pad) calc(40px 
 .day{break-inside:avoid;padding-bottom:2px}
 .day-h{display:flex;justify-content:space-between;align-items:baseline;margin:0 6px 8px;padding-top:18px;font-size:13px;font-weight:600;color:var(--muted)}
 .day-h b{color:var(--ink2);font-weight:600}
+button.day-h{display:flex;width:calc(100% - 12px);text-align:left;cursor:pointer;border-radius:8px;transition:color .15s}
+.day-h.go b{display:inline-flex;align-items:center;gap:3px}
+.day-h.go b svg{width:15px;height:15px;color:var(--muted)}
+@media (hover:hover){.day-h.go:hover b,.day-h.go:hover b svg{color:var(--brand)}}
 .group{overflow:hidden}
 .it,.proj-row,.member{display:flex;align-items:center;gap:12px;padding:12px 14px;width:100%;text-align:left;position:relative}
 button.it,button.proj-row{transition:background .15s}
@@ -401,6 +405,16 @@ button.it:active,button.proj-row:active{background:var(--soft)}
 .kv div.block{display:block}
 .kv div.block p{margin:6px 0 0;white-space:pre-wrap}
 .kv span{color:var(--muted)}
+/* linhas e blocos que abrem uma tela de detalhe: seta discreta + toque */
+.kv div.go{cursor:pointer;transition:background .15s}
+.kv div.go:hover{background:color-mix(in srgb,var(--soft) 50%,transparent)}
+.kv div.go:active{background:var(--soft)}
+.kv div.go b,.bar .top-l b{display:inline-flex;align-items:center;gap:4px}
+.kv div.go b svg,.bar .top-l b svg{width:16px;height:16px;color:var(--muted);flex:none}
+.col{cursor:pointer;border-radius:8px;padding:0;transition:background .15s}
+.col:hover{background:color-mix(in srgb,var(--soft) 60%,transparent)}
+.col:active{background:var(--soft)}
+@media (hover:hover){.bar:hover{background:color-mix(in srgb,var(--soft) 50%,transparent)}}
 .kv b{font-weight:600;text-align:right}
 .icon-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:8px;margin-bottom:var(--sp)}
 .icon-grid button{aspect-ratio:1;border-radius:var(--r-sm);background:var(--card);border:1.5px solid var(--line);display:grid;place-items:center;color:var(--ink2);transition:all .2s}
@@ -657,7 +671,7 @@ try { matchMedia("(prefers-color-scheme: dark)").addEventListener("change", appl
 const S = {
   user:null, projects:[], project:null, role:null,
   rooms:[], stores:[], items:[], wish:[], members:[], photos:{}, hasPlanned:false, list: lsGet("nl.list", "bought"),
-  tab: lsGet("nl.tab", "casa"), roomId:null,
+  tab: lsGet("nl.tab", "casa"), roomId:null, pages:[],
   filter:{ room:"all", store:null, q:"" }, dash:"rooms", sort: lsGet("nl.sort", "recent"),
   channel:null, nav:"", recovery:RECOVERY_AT_LOAD, booting:true
 };
@@ -900,7 +914,7 @@ async function openProject(id, silent=false){
   S.project = S.projects.find(p => p.id === id) || null;
   if (!S.project) return render();
   lsSet("nl.project", id);
-  S.roomId = null; S.filter = { room:"all", store:null, q:"" };
+  S.roomId = null; S.pages = []; S.filter = { room:"all", store:null, q:"" };
   S.photos = {}; S.photosAt = 0;
   await loadProjectData();
   if (!NET.offline) subscribe();
@@ -1010,16 +1024,13 @@ function render(){
   if (!S.user) return;
   const app = $("#app");
   if (!S.project) { app.innerHTML = viewWelcome(); lastKey = "welcome"; return; }
-  const key = S.tab + ":" + (S.tab === "casa" ? (S.roomId || "") : "");
+  const pg = curPage();
+  const key = S.tab + ":" + (S.tab === "casa" ? (S.roomId || "") : "") + ":" + (pg && S.pages.length ? pg.kind + "=" + pg.id : "");
   const sameView = key === lastKey;
   const y = window.scrollY;
   const oldPill = $("#tabpill") ? { left: $("#tabpill").style.left, width: $("#tabpill").style.width } : null;
   const anim = sameView ? "" : (S.nav === "fwd" ? "view-fwd" : S.nav === "back" ? "view-back" : "view-anim");
-  let body = "";
-  if (S.tab === "casa") body = S.roomId ? viewRoom() : viewHouse();
-  else if (S.tab === "compras") body = viewItems();
-  else if (S.tab === "painel") body = viewDash();
-  else if (S.tab === "lojas") body = viewStores();
+  const body = S.pages.length ? viewPage() : tabBody();
   const fabWish = S.tab === "compras" && S.list === "wish";
   const fab = canEdit() ? `<button class="fab" data-act="addItem" ${fabWish ? `data-planned="1" aria-label="Adicionar à lista"` : `aria-label="Nova compra"`}>${ic("plus")}</button>` : "";
   app.innerHTML = header() + `<main class="view ${anim} ${fab ? "has-fab" : ""}" id="view">${body}</main>` + fab;
@@ -1033,6 +1044,69 @@ function render(){
     $$("[data-w]").forEach(el => el.style.width = el.dataset.w + "%");
     $$("[data-h]").forEach(el => el.style.height = el.dataset.h + "%");
   }));
+}
+function tabBody(){
+  if (S.tab === "casa") return S.roomId ? viewRoom(S.roomId) : viewHouse();
+  if (S.tab === "compras") return viewItems();
+  if (S.tab === "painel") return viewDash();
+  return viewStores();
+}
+/* ================= TELAS DE DETALHE (mesmo padrão para cômodo, loja e dia) =================
+   Qualquer bloco que representa um cômodo, uma loja ou um dia abre a tela só com aquelas compras.
+   As telas ficam empilhadas por cima da aba atual: o voltar retorna para a tela anterior. */
+function curPage(){
+  if (S.pages.length) return S.pages[S.pages.length - 1];
+  if (S.tab === "casa" && S.roomId) return { kind:"room", id:S.roomId };
+  return null;
+}
+function openPage(kind, id){
+  const cur = curPage(); if (cur && cur.kind === kind && cur.id === id) return;
+  if (kind === "room" && S.tab === "casa" && !S.pages.length && !S.roomId) S.roomId = id;
+  else S.pages.push({ kind, id });
+  S.nav = "fwd"; render();
+}
+function viewPage(){
+  const pg = S.pages[S.pages.length - 1];
+  const html = pg.kind === "room" ? viewRoom(pg.id) : pg.kind === "store" ? viewStore(pg.id) : viewDay(pg.id);
+  if (html) return html;
+  S.pages.pop(); return S.pages.length ? viewPage() : tabBody(); /* o registro foi excluído: volta um nível */
+}
+function pageHead(icon, title, line, editAct){
+  return `<div class="room-top">
+      <button class="iconbtn" data-act="back" aria-label="Voltar">${ic("back")}</button>
+      ${editAct ? `<button class="iconbtn" ${editAct} aria-label="Editar">${ic("edit")}</button>` : ""}
+    </div>
+    <div class="room-hero"><div class="ic">${ic(icon)}</div><div><h2>${esc(title)}</h2><p>${line}</p></div></div>`;
+}
+function wishSection(wl, addAttrs){
+  if (!wl.length && !(canEdit() && addAttrs)) return "";
+  return `<div class="section-t wish-h"><h3>${ic("bookmark")} Quero comprar</h3>${wl.length ? `<span class="muted">${wl.length} ${wl.length===1?"item":"itens"}</span>` : ""}</div>
+    ${wl.length ? `<div class="card group">${wl.map(wishRow).join("")}</div>` : ""}
+    ${canEdit() && addAttrs ? `<button class="wish-add" data-act="addItem" ${addAttrs} data-planned="1">${ic("plus")} Adicionar algo que quero comprar</button>` : ""}`;
+}
+function viewStore(id){
+  const none = id === "none";
+  const st = none ? { name:"Sem loja", kind:"" } : storeById(id);
+  if (!st) return "";
+  const match = i => none ? !(i.store_id && storeById(i.store_id)) : i.store_id === id;
+  const list = S.items.filter(match), wl = S.wish.filter(match), t = totals(list);
+  const kind = none ? "" : (st.kind === "online" ? "Online" : "Loja física");
+  const line = [money(t.value), qtyTxt(t.qty), wl.length ? `${wl.length} para comprar` : "", kind, st.location ? esc(st.location) : ""].filter(Boolean).join(" · ");
+  return pageHead(none ? "box" : (st.kind === "online" ? "globe" : "store"), st.name, line, canEdit() && !none ? `data-act="editStore" data-id="${id}"` : "")
+    + (st.notes ? `<p class="note">${esc(st.notes)}</p>` : "")
+    + (list.length ? groupedList(list) : `<div class="card empty ${wl.length ? "slim " : ""}mt"><p>Nenhuma compra registrada ${none ? "sem loja" : "nesta loja"}.</p></div>`)
+    + wishSection(wl, !none ? `data-store="${id}"` : "");
+}
+function viewDay(d){
+  const list = S.items.filter(i => i.purchased_on === d);
+  if (!list.length) return "";
+  const t = totals(list);
+  const groups = new Map(); list.forEach(i => { const k = i.room_id && roomById(i.room_id) ? i.room_id : "none"; if (!groups.has(k)) groups.set(k, []); groups.get(k).push(i); });
+  const order = [...S.rooms.map(r => r.id), "none"].filter(k => groups.has(k));
+  const title = dayTitle(d), line = [title === "Hoje" || title === "Ontem" ? fmtDate(d) : "", money(t.value), qtyTxt(t.qty), `${t.count} ${t.count===1?"compra":"compras"}`].filter(Boolean).join(" · ");
+  return pageHead("calendar", title, line, "")
+    + `<div class="days">` + order.map(k => { const arr = groups.get(k), r = roomById(k);
+      return `<div class="day">${groupHead("room", k, r ? r.name : "Sem cômodo", money(arr.reduce((a,i)=>a+itemTotal(i),0)))}<div class="card group">${arr.map(itemRow).join("")}</div></div>`; }).join("") + `</div>`;
 }
 /* sombra no topo quando a página rola */
 function markScrolled(){ const t = $(".top"); if (t) t.classList.toggle("scrolled", window.scrollY > 4); }
@@ -1137,7 +1211,8 @@ function viewHouse(){
 }
 function wishRow(i){
   const r = roomById(i.room_id), s = storeById(i.store_id);
-  const sub = [+i.unit_price ? money(itemTotal(i)) : null, s ? s.name : null, !(S.tab === "casa" && S.roomId) && !(S.tab === "compras" && S.list === "wish") ? (r ? r.name : "Sem cômodo") : null].filter(Boolean).join(" · ");
+  const pg = curPage();
+  const sub = [+i.unit_price ? money(itemTotal(i)) : null, s && pg?.kind !== "store" ? s.name : null, pg?.kind !== "room" && !(!pg && S.tab === "compras" && S.list === "wish") ? (r ? r.name : "Sem cômodo") : null].filter(Boolean).join(" · ");
   const ph = i.photo_path && S.photos[i.photo_path];
   return `<div class="it wish" data-act="item" data-id="${i.id}" role="button" tabindex="0">
     <span class="thumb">${ph ? `<img src="${esc(ph)}" alt="" loading="lazy">` : ic(r ? r.icon : "bookmark")}</span>
@@ -1148,7 +1223,8 @@ function wishRow(i){
 function itemRow(i){
   if (i.planned) return wishRow(i);
   const r = roomById(i.room_id), s = storeById(i.store_id);
-  const sub = [s ? s.name : null, S.tab !== "casa" || !S.roomId ? (r ? r.name : "Sem cômodo") : null].filter(Boolean).join(" · ");
+  const pg = curPage();
+  const sub = [s && pg?.kind !== "store" ? s.name : null, pg?.kind !== "room" && pg?.kind !== "day" ? (r ? r.name : "Sem cômodo") : null].filter(Boolean).join(" · ");
   const ph = i.photo_path && S.photos[i.photo_path];
   return `<button class="it" data-act="item" data-id="${i.id}">
     <span class="thumb">${ph ? `<img src="${esc(ph)}" alt="" loading="lazy">` : ic(r ? r.icon : "box")}</span>
@@ -1156,30 +1232,28 @@ function itemRow(i){
     <span class="val"><b>${money(itemTotal(i))}</b><small>${+i.quantity !== 1 ? `${(+i.quantity).toLocaleString("pt-BR")} × ${money(i.unit_price)}` : fmtDate(i.purchased_on)}</small></span>
   </button>`;
 }
+/* título de grupo (dia ou cômodo) que também abre a tela daquele dia/cômodo */
+function groupHead(kind, id, title, right){
+  const cur = curPage();
+  if (cur && cur.kind === kind && cur.id === id) return `<div class="day-h"><b>${esc(title)}</b><span>${right}</span></div>`;
+  return `<button class="day-h go" data-act="page" data-kind="${kind}" data-id="${esc(id)}"><b>${esc(title)}${ic("right")}</b><span>${right}</span></button>`;
+}
 function groupedList(list){
   if (!list.length) return "";
   const days = new Map(); list.forEach(i => { const d = i.purchased_on; if (!days.has(d)) days.set(d, []); days.get(d).push(i); });
-  return `<div class="days">` + [...days.entries()].map(([d, arr]) => `<div class="day"><div class="day-h"><b>${esc(dayTitle(d))}</b><span>${money(arr.reduce((a,i)=>a+itemTotal(i),0))}</span></div><div class="card group">${arr.map(itemRow).join("")}</div></div>`).join("") + `</div>`;
+  return `<div class="days">` + [...days.entries()].map(([d, arr]) => `<div class="day">${groupHead("day", d, dayTitle(d), money(arr.reduce((a,i)=>a+itemTotal(i),0)))}<div class="card group">${arr.map(itemRow).join("")}</div></div>`).join("") + `</div>`;
 }
 
 /* ---------- cômodo ---------- */
-function viewRoom(){
-  const none = S.roomId === "none";
-  const r = none ? { name:"Sem cômodo", icon:"box" } : roomById(S.roomId);
-  if (!r) { S.roomId = null; return viewHouse(); }
-  const list = S.items.filter(i => none ? !(i.room_id && roomById(i.room_id)) : i.room_id === S.roomId);
-  const t = totals(list);
-  const wl = S.wish.filter(i => none ? !(i.room_id && roomById(i.room_id)) : i.room_id === S.roomId);
-  const wishSec = (wl.length || (canEdit() && !none)) ? `<div class="section-t wish-h"><h3>${ic("bookmark")} Quero comprar</h3>${wl.length ? `<span class="muted">${wl.length} ${wl.length===1?"item":"itens"}</span>` : ""}</div>
-    ${wl.length ? `<div class="card group">${wl.map(wishRow).join("")}</div>` : ""}
-    ${canEdit() && !none ? `<button class="wish-add" data-act="addItem" data-room="${r.id}" data-planned="1">${ic("plus")} Adicionar algo que quero comprar</button>` : ""}` : "";
-  return `<div class="room-top">
-      <button class="iconbtn" data-act="back" aria-label="Voltar">${ic("back")}</button>
-      ${canEdit() && !none ? `<button class="iconbtn" data-act="editRoom" data-id="${r.id}" aria-label="Editar cômodo">${ic("edit")}</button>` : ""}
-    </div>
-    <div class="room-hero"><div class="ic">${ic(r.icon)}</div><div><h2>${esc(r.name)}</h2><p>${money(t.value)} · ${qtyTxt(t.qty)}${wl.length ? ` · ${wl.length} para comprar` : ""}</p></div></div>
-    ${list.length ? groupedList(list) : wl.length ? `<div class="card empty slim mt"><p>Nenhuma compra registrada ainda neste cômodo.</p></div>` : `<div class="card empty mt"><h4>Nada por aqui ainda</h4><p>${canEdit() ? "Registre as compras deste cômodo." : "Ainda não há compras neste cômodo."}</p>${canEdit() && !none ? `<button class="btn primary" data-act="addItem" data-room="${r.id}">${ic("plus")} Nova compra</button>` : ""}</div>`}
-    ${wishSec}`;
+function viewRoom(id){
+  const none = id === "none";
+  const r = none ? { name:"Sem cômodo", icon:"box" } : roomById(id);
+  if (!r) { if (S.roomId === id) { S.roomId = null; return viewHouse(); } return ""; }
+  const match = i => none ? !(i.room_id && roomById(i.room_id)) : i.room_id === id;
+  const list = S.items.filter(match), wl = S.wish.filter(match), t = totals(list);
+  return pageHead(r.icon, r.name, `${money(t.value)} · ${qtyTxt(t.qty)}${wl.length ? ` · ${wl.length} para comprar` : ""}`, canEdit() && !none ? `data-act="editRoom" data-id="${r.id}"` : "")
+    + (list.length ? groupedList(list) : wl.length ? `<div class="card empty slim mt"><p>Nenhuma compra registrada ainda neste cômodo.</p></div>` : `<div class="card empty mt"><h4>Nada por aqui ainda</h4><p>${canEdit() ? "Registre as compras deste cômodo." : "Ainda não há compras neste cômodo."}</p>${canEdit() && !none ? `<button class="btn primary" data-act="addItem" data-room="${r.id}">${ic("plus")} Nova compra</button>` : ""}</div>`)
+    + wishSection(wl, !none ? `data-room="${r.id}"` : "");
 }
 
 /* ---------- compras ---------- */
@@ -1200,7 +1274,7 @@ function wishListHtml(){
   const groups = new Map(); list.forEach(i => { const k = i.room_id && roomById(i.room_id) ? i.room_id : "none"; if (!groups.has(k)) groups.set(k, []); groups.get(k).push(i); });
   const order = [...S.rooms.map(r => r.id), "none"].filter(k => groups.has(k));
   return `<div class="list-bar"><div class="list-note">${list.length} ${list.length===1?"item":"itens"} na lista · não entram no total</div></div><div class="days">` + order.map(k => { const arr = groups.get(k), r = roomById(k);
-    return `<div class="day"><div class="day-h"><b>${esc(r ? r.name : "Sem cômodo")}</b><span>${arr.length} ${arr.length===1?"item":"itens"}</span></div><div class="card group">${arr.map(wishRow).join("")}</div></div>`; }).join("") + `</div>`;
+    return `<div class="day">${groupHead("room", k, r ? r.name : "Sem cômodo", `${arr.length} ${arr.length===1?"item":"itens"}`)}<div class="card group">${arr.map(wishRow).join("")}</div></div>`; }).join("") + `</div>`;
 }
 function itemsListHtml(){
   if (S.list === "wish") return wishListHtml();
@@ -1245,18 +1319,18 @@ function viewDash(){
   else if (mode === "rooms") {
     const per = byKey(S.items, i => i.room_id && roomById(i.room_id) ? i.room_id : "none");
     const rows = [...per.entries()].map(([k, v]) => ({ k, v, name: k === "none" ? "Sem cômodo" : roomById(k).name, icon: k === "none" ? "box" : roomById(k).icon })).sort((a,b) => b.v.value - a.v.value);
-    inner = barsCard(rows, t.value, r => `data-act="room" data-id="${r.k}" data-from="painel"`, true);
+    inner = barsCard(rows, t.value, r => `data-act="page" data-kind="room" data-id="${r.k}"`, true);
   } else if (mode === "stores") {
     const per = byKey(S.items, i => i.store_id && storeById(i.store_id) ? i.store_id : "none");
     const rows = [...per.entries()].map(([k, v]) => { const s = storeById(k); return { k, v, name: s ? s.name : "Sem loja", icon: s ? (s.kind === "online" ? "globe" : "store") : "box" }; }).sort((a,b) => b.v.value - a.v.value);
-    inner = barsCard(rows, t.value, r => r.k === "none" ? "" : `data-act="fStore" data-id="${r.k}" data-go="1"`, true);
+    inner = barsCard(rows, t.value, r => `data-act="page" data-kind="store" data-id="${r.k}"`, true);
   } else {
     const per = byKey(S.items, i => i.purchased_on);
     const days = [...per.entries()].sort((a,b) => a[0] < b[0] ? 1 : -1);
     const last = days.slice(0, 10).reverse(), mx = Math.max(...last.map(d => d[1].value), 1);
-    const cols = `<div class="card"><div class="cols">${last.map(([d, v]) => `<div class="col" title="${fmtDate(d)}: ${money(v.value)}"><i data-h="${Math.max(3, v.value / mx * 100).toFixed(1)}"></i><small>${d.slice(8)}/${d.slice(5,7)}</small></div>`).join("")}</div><div class="chart-note">Últimos ${last.length} dias com compras</div></div>`;
+    const cols = `<div class="card"><div class="cols">${last.map(([d, v]) => `<button class="col" data-act="page" data-kind="day" data-id="${d}" title="${fmtDate(d)}: ${money(v.value)}" aria-label="${fmtDate(d)}: ${money(v.value)}"><i data-h="${Math.max(3, v.value / mx * 100).toFixed(1)}"></i><small>${d.slice(8)}/${d.slice(5,7)}</small></button>`).join("")}</div><div class="chart-note">Últimos ${last.length} dias com compras</div></div>`;
     const rows = days.map(([d, v]) => ({ k:d, v, name: dayTitle(d), icon:"calendar" }));
-    inner = `<div class="dash-days">${cols}${barsCard(rows, t.value, () => "", false)}</div>`;
+    inner = `<div class="dash-days">${cols}${barsCard(rows, t.value, r => `data-act="page" data-kind="day" data-id="${r.k}"`, false)}</div>`;
   }
   return `<div class="dash-top">
     <div class="card summary"><div><div class="label">Total gasto</div><div class="v" data-count="${t.value}">${money(t.value)}</div></div><div class="side">${S.rooms.length} ${S.rooms.length===1?"cômodo":"cômodos"}<br>${S.stores.length} ${S.stores.length===1?"loja":"lojas"}</div></div>
@@ -1268,7 +1342,7 @@ function viewDash(){
 function barsCard(rows, total, attrs, two){
   const mx = Math.max(...rows.map(r => r.v.value), 1);
   return `<div class="card bars ${two && rows.length > 1 ? "two" : ""}">${rows.map(r => `<button class="bar" ${attrs(r)}>
-    <div class="top-l"><span>${ic(r.icon)}<em>${esc(r.name)}</em></span><b>${money(r.v.value)}</b></div>
+    <div class="top-l"><span>${ic(r.icon)}<em>${esc(r.name)}</em></span><b>${money(r.v.value)}${ic("right")}</b></div>
     <div class="track"><div class="fill" data-w="${(r.v.value / mx * 100).toFixed(1)}"></div></div>
     <div class="meta">${r.v.count} ${r.v.count===1?"compra":"compras"} · ${qtyTxt(r.v.qty)} · ${total ? Math.round(r.v.value / total * 100) : 0}% do total</div></button>`).join("")}</div>`;
 }
@@ -1425,7 +1499,7 @@ function itemForm(item, preset={}){
   if (offlineBlock()) return;
   const isNew = !item;
   const cp = preset.copy;
-  const it = item ? { ...item } : (cp ? { name:cp.name, room_id:cp.room_id, store_id:cp.store_id, quantity:cp.quantity, unit_price:cp.unit_price, purchased_on:todayStr(), notes:cp.notes || "", photo_path:null, planned:!!cp.planned, link:cp.link || "" } : null) || { name:"", room_id: preset.room || (S.roomId && S.roomId !== "none" ? S.roomId : (S.filter.room !== "all" && S.filter.room !== "none" ? S.filter.room : null)), store_id:null, quantity:1, unit_price:0, purchased_on:todayStr(), notes:"", photo_path:null, planned:!!preset.planned, link:"" };
+  const it = item ? { ...item } : (cp ? { name:cp.name, room_id:cp.room_id, store_id:cp.store_id, quantity:cp.quantity, unit_price:cp.unit_price, purchased_on:todayStr(), notes:cp.notes || "", photo_path:null, planned:!!cp.planned, link:cp.link || "" } : null) || { name:"", room_id: preset.room || (curPage()?.kind === "room" && curPage().id !== "none" ? curPage().id : (!curPage() && S.tab === "compras" && S.filter.room !== "all" && S.filter.room !== "none" ? S.filter.room : null)), store_id: preset.store || (curPage()?.kind === "store" && curPage().id !== "none" ? curPage().id : null), quantity:1, unit_price:0, purchased_on: curPage()?.kind === "day" ? curPage().id : todayStr(), notes:"", photo_path:null, planned:!!preset.planned, link:"" };
   const wasPlanned = !!(item && item.planned);
   /* "Marcar como comprado": abre o mesmo item já como compra, com a data de hoje */
   if (preset.buy) { it.planned = false; it.purchased_on = todayStr(); }
@@ -1529,9 +1603,9 @@ function itemDetail(id){
     ${ph ? `<div class="detail-photo" data-zoom role="button" aria-label="Ver foto em tela cheia"><img src="${esc(ph)}" alt=""><span class="zoom">${ic("expand")}</span></div>` : ""}
     <div class="card summary compact ${wish ? "ghost" : ""}"><div><div class="label">${wish ? "Valor estimado" : "Total"}</div><div class="v">${money(itemTotal(it))}</div></div><div class="side">${(+it.quantity).toLocaleString("pt-BR")} × ${money(it.unit_price)}</div></div>
     <div class="card kv">
-      <div><span>Cômodo</span><b>${esc(r ? r.name : "Sem cômodo")}</b></div>
-      <div><span>${wish ? "Onde comprar" : "Loja"}</span><b>${esc(s ? s.name : wish ? "Não definido" : "Sem loja")}</b></div>
-      ${wish ? (it.link ? `<div><span>Link</span><b><a class="kv-link" href="${esc(it.link)}" target="_blank" rel="noopener">${esc(linkHost(it.link))} ${ic("external")}</a></b></div>` : "") : `<div><span>Data da compra</span><b>${fmtDate(it.purchased_on)}</b></div>`}
+      ${kvGo("room", r ? r.id : "none", "Cômodo", r ? r.name : "Sem cômodo")}
+      ${kvGo("store", s ? s.id : "none", wish ? "Onde comprar" : "Loja", s ? s.name : wish ? "Não definido" : "Sem loja")}
+      ${wish ? (it.link ? `<div><span>Link</span><b><a class="kv-link" href="${esc(it.link)}" target="_blank" rel="noopener">${esc(linkHost(it.link))} ${ic("external")}</a></b></div>` : "") : kvGo("day", it.purchased_on, "Data da compra", fmtDate(it.purchased_on))}
       ${it.created_by_email ? `<div><span>Registrado por</span><b>${esc(it.created_by_email)}</b></div>` : ""}
       ${it.notes ? `<div class="block"><span>Observações</span><p>${esc(it.notes)}</p></div>` : ""}
     </div>
@@ -1541,7 +1615,15 @@ function itemDetail(id){
     const by = $("[data-buy]", w); if (by) by.onclick = () => { closeSheet(w); setTimeout(() => itemForm(it, { buy:true }), 150); };
     const z = $("[data-zoom]", w); if (z) z.onclick = () => openLightbox(ph);
     const d = $("[data-del]", w); if (d) d.onclick = () => deleteItem(it);
+    $$("[data-go]", w).forEach(g => { const go = () => { closeAllSheets(); setTimeout(() => openPage(g.dataset.go, g.dataset.id), 150); };
+      g.onclick = go; g.onkeydown = ev => { if (ev.key === "Enter" || ev.key === " ") { ev.preventDefault(); go(); } }; });
   });
+}
+/* linha dos detalhes que abre a tela daquele cômodo, loja ou dia (se já não for a tela aberta) */
+function kvGo(kind, id, label, value){
+  const cur = curPage(), same = cur && cur.kind === kind && cur.id === id;
+  if (same) return `<div><span>${label}</span><b>${esc(value)}</b></div>`;
+  return `<div class="go" data-go="${kind}" data-id="${esc(id)}" role="button" tabindex="0" aria-label="Ver compras de ${esc(value)}"><span>${label}</span><b>${esc(value)}${ic("right")}</b></div>`;
 }
 
 /* ================= CÔMODO ================= */
@@ -1569,7 +1651,7 @@ function roomForm(room){
       if (offlineBlock()) return; if (!(await confirmBox({ title:"Excluir cômodo?", text: n ? `As ${n} compras de <b>${esc(room.name)}</b> não serão apagadas, elas passam para "Sem cômodo".` : `<b>${esc(room.name)}</b> será removido da casa.`, ok:"Excluir", danger:true }))) return;
       const { error } = await sb.from("rooms").delete().eq("id", room.id);
       if (error) return toast(friendlyError(error), true);
-      closeAllSheets(); S.roomId = null; S.nav = "back"; toast("Cômodo excluído"); await loadProjectData(); render();
+      closeAllSheets(); if (S.roomId === room.id) S.roomId = null; S.pages = S.pages.filter(x => !(x.kind === "room" && x.id === room.id)); S.nav = "back"; toast("Cômodo excluído"); await loadProjectData(); render();
     };
   });
 }
@@ -1607,22 +1689,10 @@ function storeForm(store, onSaved){
       if (offlineBlock()) return; if (!(await confirmBox({ title:"Excluir loja?", text: n ? `As ${n} compras feitas na <b>${esc(store.name)}</b> não serão apagadas, só ficam sem loja.` : `<b>${esc(store.name)}</b> será removida.`, ok:"Excluir", danger:true }))) return;
       const { error } = await sb.from("stores").delete().eq("id", store.id);
       if (error) return toast(friendlyError(error), true);
-      closeAllSheets(); toast("Loja excluída"); await loadProjectData(); render();
+      closeAllSheets(); S.pages = S.pages.filter(x => !(x.kind === "store" && x.id === store.id)); S.nav = "back"; toast("Loja excluída"); await loadProjectData(); render();
     };
   });
 }
-function storeDetail(id){
-  const s = storeById(id); if (!s) return;
-  const list = S.items.filter(i => i.store_id === id), t = totals(list);
-  openSheet(`<div class="sheet-h"><h3>${esc(s.name)}</h3><button class="iconbtn" data-close aria-label="Fechar">${ic("x")}</button></div>
-    <div class="card summary compact"><div><div class="label">Gasto nesta loja</div><div class="v">${money(t.value)}</div></div><div class="side">${t.count} ${t.count===1?"compra":"compras"}<br>${qtyTxt(t.qty)}</div></div>
-    <div class="card kv"><div><span>Tipo</span><b>${s.kind === "online" ? "Online" : "Loja física"}</b></div>${s.location ? `<div><span>${s.kind === "online" ? "Site" : "Local"}</span><b>${esc(s.location)}</b></div>` : ""}${s.notes ? `<div class="block"><span>Observações</span><p>${esc(s.notes)}</p></div>` : ""}</div>
-    <div class="sheet-actions">${list.length ? `<button class="btn soft" data-see>Ver compras</button>` : ""}${canEdit() ? `<button class="btn primary" data-edit>${ic("edit")} Editar</button>` : ""}</div>`, w => {
-    const see = $("[data-see]", w); if (see) see.onclick = () => { closeSheet(w); S.filter = { room:"all", store:id, q:"" }; S.tab = "compras"; lsSet("nl.tab", S.tab); S.nav = "fwd"; render(); };
-    const e = $("[data-edit]", w); if (e) e.onclick = () => { closeSheet(w); setTimeout(() => storeForm(s), 150); };
-  });
-}
-
 /* ================= PROJETOS ================= */
 function newProjectForm(){
   if (offlineBlock()) return;
@@ -1802,17 +1872,19 @@ function nameForm(){
 
 /* ================= CLIQUES ================= */
 const ACT = {
-  tab: d => { if (S.tab === d.tab && !S.roomId) { window.scrollTo({ top:0, behavior:"smooth" }); return; } const order = TABS.map(t => t[0]); S.nav = order.indexOf(d.tab) > order.indexOf(S.tab) ? "fwd" : "back"; S.tab = d.tab; S.roomId = null; lsSet("nl.tab", S.tab); render(); },
-  room: d => { S.tab = "casa"; lsSet("nl.tab", "casa"); S.roomId = d.id; S.nav = "fwd"; S.roomFrom = d.from || null; render(); },
-  back: () => { S.roomId = null; S.nav = "back"; if (S.roomFrom) { S.tab = S.roomFrom; S.roomFrom = null; lsSet("nl.tab", S.tab); } render(); },
-  addItem: d => itemForm(null, { room: d.room || null, planned: !!d.planned }),
+  tab: d => { if (S.tab === d.tab && !S.roomId && !S.pages.length) { window.scrollTo({ top:0, behavior:"smooth" }); return; } const order = TABS.map(t => t[0]); S.nav = order.indexOf(d.tab) > order.indexOf(S.tab) ? "fwd" : "back"; S.tab = d.tab; S.roomId = null; S.pages = []; lsSet("nl.tab", S.tab); render(); },
+  room: d => openPage("room", d.id),
+  page: d => openPage(d.kind, d.id),
+  back: () => { if (S.pages.length) S.pages.pop(); else S.roomId = null; S.nav = "back"; render(); },
+  addItem: d => itemForm(null, { room: d.room || null, store: d.store || null, planned: !!d.planned }),
   buy: d => { const it = S.wish.find(i => i.id === d.id); if (it) itemForm(it, { buy:true }); },
   list: d => { if (S.list === d.mode) return; S.list = d.mode; lsSet("nl.list", S.list); S.filter.store = null; render(); },
   item: d => itemDetail(d.id),
   addRoom: () => roomForm(null),
   editRoom: d => roomForm(roomById(d.id)),
   addStore: () => storeForm(null),
-  store: d => storeDetail(d.id),
+  store: d => openPage("store", d.id),
+  editStore: d => { const st = storeById(d.id); if (st) storeForm(st); },
   fRoom: d => { S.filter.room = d.id; const el = $("#items-list"); if (el) { $$(".chips [data-act=fRoom]").forEach(c => c.classList.toggle("on", c.dataset.id === d.id)); el.innerHTML = itemsListHtml(); } else render(); },
   fStore: d => { S.filter.store = d.id || null; if (d.go) { S.filter.room = "all"; S.filter.q = ""; S.tab = "compras"; lsSet("nl.tab", S.tab); S.nav = "fwd"; } render(); },
   dash: d => { S.dash = d.mode; render(); },
@@ -1842,7 +1914,7 @@ function backLayer(){
   if (ddOpen) return { kind:"dd" };
   const lb = [...document.querySelectorAll(".lightbox.show")].pop(); if (lb) return { kind:"photo", el:lb };
   const w = $$("#sheets .sheet-wrap").filter(x => !x.closing).pop(); if (w) return { kind:"sheet", el:w };
-  if (S.user && S.project && S.tab === "casa" && S.roomId && $("#view")) return { kind:"room", el:$("#view") };
+  if (S.user && S.project && (S.pages.length || (S.tab === "casa" && S.roomId)) && $("#view")) return { kind:"room", el:$("#view") };
   return null;
 }
 function doBack(layer){
