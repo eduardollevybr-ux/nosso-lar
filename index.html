@@ -1010,6 +1010,7 @@ function render(){
   if (sameView) window.scrollTo(0, y); else window.scrollTo(0, 0);
   markScrolled();
   lastKey = key; S.nav = "";
+  syncBackGuard();
   placeTabPill(oldPill);
   if (!sameView) countUp();
   requestAnimationFrame(() => requestAnimationFrame(() => {
@@ -1339,6 +1340,7 @@ function openSheet(html, onMount){
   w.addEventListener("click", e => { if (e.target.closest("[data-close]")) { e.preventDefault(); closeSheet(w); } });
   enableDrag(w);
   if (onMount) onMount(w);
+  syncBackGuard();
   return w;
 }
 function closeSheet(w){
@@ -1371,10 +1373,12 @@ function openLightbox(src){
   lb.innerHTML = `<img src="${esc(src)}" alt=""><button class="iconbtn" aria-label="Fechar">${ic("x")}</button>`;
   const close = () => { lb.classList.remove("show"); document.removeEventListener("keydown", onKey, true); setTimeout(() => lb.remove(), 260); };
   const onKey = e => { if (e.key === "Escape") { e.preventDefault(); e.stopImmediatePropagation(); close(); } };
+  lb._close = close;
   lb.addEventListener("click", close);
   document.addEventListener("keydown", onKey, true);
   document.body.appendChild(lb);
   requestAnimationFrame(() => lb.classList.add("show"));
+  syncBackGuard();
 }
 function busy(btn, on){
   if (!btn) return;
@@ -1817,6 +1821,97 @@ document.addEventListener("input", e => {
 });
 window.addEventListener("resize", () => placeTabPill(null));
 new MutationObserver(() => { ["#dash-seg", "#list-seg"].forEach(id => { const seg = $(id); if (seg && !seg.dataset.wired) { seg.dataset.wired = "1"; wireSeg(seg.parentElement); } }); }).observe($("#app"), { childList:true, subtree:false });
+
+/* ================= VOLTAR (arrastar da esquerda para a direita + botão voltar do celular) ================= */
+/* o que dá para "voltar", do mais por cima para o mais por baixo: lista aberta, foto, janela, cômodo */
+function backLayer(){
+  if (ddOpen) return { kind:"dd" };
+  const lb = [...document.querySelectorAll(".lightbox.show")].pop(); if (lb) return { kind:"photo", el:lb };
+  const w = $$("#sheets .sheet-wrap").filter(x => !x.closing).pop(); if (w) return { kind:"sheet", el:w };
+  if (S.user && S.project && S.tab === "casa" && S.roomId && $("#view")) return { kind:"room", el:$("#view") };
+  return null;
+}
+function doBack(layer){
+  layer = layer || backLayer(); if (!layer) return false;
+  if (layer.kind === "dd") closeDropdown();
+  else if (layer.kind === "photo") layer.el._close();
+  else if (layer.kind === "sheet") { if ($("form.busy", layer.el)) return true; closeSheet(layer.el); }
+  else if (layer.kind === "room") ACT.back();
+  return true;
+}
+/* uma entrada extra no histórico enquanto houver algo para voltar: assim o gesto/botão voltar do
+   Android e do Safari fecha a janela ou volta ao início, em vez de sair do app */
+function syncBackGuard(){
+  try { if (backLayer() && !(history.state && history.state.nlBack)) history.pushState({ nlBack:1 }, ""); } catch (e) {}
+}
+let guardSkip = false;
+window.addEventListener("popstate", () => {
+  if (guardSkip) { guardSkip = false; return; }
+  if (doBack()) setTimeout(syncBackGuard, 60);
+  else { try { history.back(); } catch (e) {} } /* nada para fechar: segue a saída normal */
+});
+
+/* gesto: encostar o dedo na borda esquerda e arrastar para a direita */
+(() => {
+  const ios = /iP(hone|ad|od)/.test(navigator.userAgent) || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+  const standalone = (window.matchMedia && matchMedia("(display-mode: standalone)").matches) || navigator.standalone === true;
+  if (ios && !standalone) return; /* no Safari comum o próprio navegador já faz esse gesto */
+  const EDGE = 32, DONE = 90;
+  let g = null;
+  const target = l => l.kind === "sheet" ? $(".sheet", l.el) : l.kind === "photo" ? $("img", l.el) : l.el;
+  const paint = dx => {
+    const el = target(g.layer), w = window.innerWidth, k = Math.min(1, dx / w);
+    el.style.transition = "none"; el.style.transform = `translateX(${dx}px)`;
+    if (g.layer.kind === "room") el.style.opacity = String(1 - k * .6);
+    if (g.layer.kind === "photo") g.layer.el.style.opacity = String(1 - k * .7);
+    if (g.layer.kind === "sheet") { const bg = $(".sheet-bg", g.layer.el); bg.style.transition = "none"; bg.style.opacity = String(1 - k); }
+  };
+  const reset = el => { el.style.transition = ""; el.style.transform = ""; el.style.opacity = ""; };
+  document.addEventListener("touchstart", e => {
+    g = null;
+    if (e.touches.length !== 1) return;
+    const t = e.touches[0]; if (t.clientX > EDGE) return;
+    const layer = backLayer(); if (!layer || layer.kind === "dd") return;
+    if (e.target.closest && e.target.closest('input[type="range"]')) return;
+    g = { layer, x0:t.clientX, y0:t.clientY, dx:0, on:false, lx:t.clientX, lt:e.timeStamp, v:0 };
+  }, { passive:true, capture:true });
+  document.addEventListener("touchmove", e => {
+    if (!g) return;
+    const t = e.touches[0], dx = t.clientX - g.x0, dy = t.clientY - g.y0;
+    if (!g.on) {
+      if (Math.abs(dy) > 10 && Math.abs(dy) > Math.abs(dx)) { g = null; return; } /* era rolagem */
+      if (dx < 10 || dx < Math.abs(dy) * 1.2) return;
+      g.on = true; if (g.layer.kind === "sheet") $(".sheet", g.layer.el).classList.remove("dragging");
+    }
+    e.preventDefault(); e.stopPropagation();
+    const dt = e.timeStamp - g.lt; if (dt > 0) g.v = (t.clientX - g.lx) / dt;
+    g.lx = t.clientX; g.lt = e.timeStamp; g.dx = Math.max(0, dx);
+    paint(g.dx);
+  }, { passive:false, capture:true });
+  const end = e => {
+    if (!g) return; const cur = g; g = null;
+    if (!cur.on) return;
+    e.stopPropagation();
+    const el = target(cur.layer), go = cur.dx > DONE || (cur.v > .45 && cur.dx > 30);
+    if (!go || e.type === "touchcancel") {
+      el.style.transition = "transform .25s cubic-bezier(.2,.9,.2,1), opacity .25s"; el.style.transform = "translateX(0)";
+      if (cur.layer.kind === "room") el.style.opacity = "1";
+      if (cur.layer.kind === "photo") cur.layer.el.style.opacity = "";
+      if (cur.layer.kind === "sheet") { const bg = $(".sheet-bg", cur.layer.el); bg.style.transition = ""; bg.style.opacity = ""; }
+      setTimeout(() => reset(el), 260);
+      return;
+    }
+    el.style.transition = "transform .2s ease-out, opacity .2s ease-out";
+    el.style.transform = `translateX(${window.innerWidth}px)`;
+    if (cur.layer.kind === "room") { el.style.opacity = "0"; setTimeout(() => { doBack(cur.layer); syncAfter(); }, 170); return; }
+    if (cur.layer.kind === "sheet") { const bg = $(".sheet-bg", cur.layer.el); bg.style.transition = "opacity .2s"; bg.style.opacity = "0"; }
+    doBack(cur.layer); syncAfter();
+  };
+  /* o gesto já voltou: tira a entrada extra do histórico se não houver mais nada para voltar */
+  const syncAfter = () => setTimeout(() => { if (!backLayer() && history.state && history.state.nlBack) { guardSkip = true; history.back(); setTimeout(() => { guardSkip = false; }, 400); } }, 60);
+  document.addEventListener("touchend", end, { capture:true });
+  document.addEventListener("touchcancel", end, { capture:true });
+})();
 /* ================= INÍCIO ================= */
 renderNet();
 if (!RECOVERY_AT_LOAD) bootFromCache();
