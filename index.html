@@ -147,7 +147,7 @@ input[type=date].input{display:flex;align-items:center;line-height:var(--h-ctl);
 .iconbtn:hover{background:var(--soft)}
 .iconbtn:active{transform:scale(.92);background:var(--soft)}
 .seg{display:flex;background:var(--soft);border-radius:var(--r-ctl);padding:4px;gap:2px;position:relative}
-.seg button{flex:1;height:40px;border-radius:var(--r-in);font-size:14px;font-weight:600;color:var(--muted);position:relative;z-index:1;transition:color .25s}
+.seg button{flex:1;min-width:0;height:40px;padding:0 12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;border-radius:var(--r-in);font-size:14px;font-weight:600;color:var(--muted);position:relative;z-index:1;transition:color .25s}
 .seg button.on{color:var(--ink)}
 .seg .pill{position:absolute;top:4px;bottom:4px;border-radius:var(--r-in);background:var(--card);box-shadow:0 1px 3px rgba(0,0,0,.12);transition:left .35s cubic-bezier(.3,1.3,.5,1),width .35s cubic-bezier(.3,1.3,.5,1)}
 
@@ -466,6 +466,9 @@ a.btn{text-decoration:none}
 .is-wish .wish-only{grid-template-rows:1fr;opacity:1}
 .is-wish .bought-only{display:none}
 .is-wish #row-rd{grid-template-columns:minmax(0,1fr)}
+#row-rd{row-gap:0}
+/* celular: cômodo e data um embaixo do outro, para o nome do cômodo não ficar cortado */
+@media (max-width:419px){#row-rd{grid-template-columns:minmax(0,1fr)}}
 .link-in{position:relative}
 .link-in>svg{position:absolute;left:14px;top:50%;transform:translateY(-50%);color:var(--muted);width:19px;height:19px}
 .link-in .input{padding-left:42px}
@@ -498,7 +501,10 @@ a.btn{text-decoration:none}
 .kv-link svg{width:15px;height:15px}
 .list-seg{margin-bottom:var(--sp)}
 .list-seg button{display:flex;align-items:center;justify-content:center;gap:7px}
-.list-seg button svg{width:17px;height:17px}
+.list-seg button svg{width:17px;height:17px;flex:none}
+.list-seg .seg-n{flex:none}
+/* celulares estreitos: tira o ícone para o texto não encostar na borda */
+@media (max-width:374px){.list-seg button{gap:6px;padding:0 8px;font-size:13.5px}.list-seg button svg{display:none}}
 .seg-n{font-size:11px;font-weight:700;min-width:20px;height:20px;padding:0 6px;border-radius:999px;background:color-mix(in srgb,var(--brand) 15%,transparent);color:var(--brand);display:inline-grid;place-items:center}
 @media (min-width:900px){.list-seg{max-width:420px}}
 
@@ -1573,7 +1579,7 @@ function storeForm(store, onSaved){
   if (offlineBlock()) return;
   const isNew = !store, st = store || { name:"", kind:"fisica", location:"", notes:"" };
   openSheet(`<form id="sf" novalidate><div class="sheet-h"><h3>${isNew ? "Nova loja" : "Editar loja"}</h3><button type="button" class="iconbtn" data-close aria-label="Fechar">${ic("x")}</button></div>
-    <label class="field"><span>Nome da loja</span><input class="input" name="name" value="${esc(st.name)}" placeholder="Ex.: Amazon, Mercado Livre, Magazine Luiza" maxlength="60" autocomplete="off"></label>
+    <label class="field"><span>Nome da loja</span><input class="input" name="name" value="${esc(st.name)}" placeholder="Ex.: Amazon, Magazine Luiza" maxlength="60" autocomplete="off"></label>
     <div class="field"><span>Tipo</span>${segHtml("kind", [["fisica","Loja física"],["online","Online"]], st.kind)}</div>
     <label class="field"><span id="loc-l">${st.kind === "online" ? "Site" : "Endereço"} (opcional)</span><input class="input" name="location" value="${esc(st.location || "")}" maxlength="120" autocomplete="off"></label>
     <label class="field"><span>Observações (opcional)</span><textarea class="input" name="notes" rows="2" maxlength="300">${esc(st.notes || "")}</textarea></label>
@@ -1765,7 +1771,7 @@ function menuSheet(){
       <button data-m="name">${ic("edit")} Alterar meu nome</button>
     </div>
     <div class="section-t"><h3>Aparência</h3></div>
-    ${segHtml("theme", [["system","Seguir o sistema"],["light","Claro"],["dark","Escuro"]], th)}
+    ${segHtml("theme", [["system","Sistema"],["light","Claro"],["dark","Escuro"]], th)}
     <div class="card menu-list mt-lg"><button class="red" data-m="logout">${ic("logout")} Sair</button></div>`, w => {
     wireSeg(w);
     $("[data-seg=theme]", w).addEventListener("change", e => { lsSet("nl.theme", e.currentTarget.dataset.value); applyTheme(); });
