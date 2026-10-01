@@ -1,5 +1,5 @@
 /* Nosso Lar: guarda uma cópia do app no aparelho para abrir e consultar sem internet */
-const VERSION = "nossolar-v1";
+const VERSION = "nossolar-v2";
 const PHOTOS = "nossolar-fotos-v1"; // fotos já vistas (fica entre versões)
 const PHOTOS_MAX = 400;
 const SHELL = ["./", "./index.html", "./manifest.json", "./icon-192.png", "./icon-512.png",
