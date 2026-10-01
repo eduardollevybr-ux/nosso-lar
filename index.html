@@ -333,9 +333,11 @@ button.it:active,button.proj-row:active{background:var(--soft)}
 .dash-body{margin-top:14px}
 .dash-days{display:grid;gap:14px;grid-template-columns:minmax(0,1fr)}
 @media (min-width:900px){.dash-days{grid-template-columns:minmax(0,1fr) minmax(0,1fr);align-items:start}}
-.bars{padding:6px 0}
+/* o bloco recorta o fundo das linhas: ao passar o mouse, a linha preenche o pedaço inteiro, seguindo as bordas arredondadas */
+.card.bars{overflow:hidden}
+.bars{padding:0}
 @media (min-width:900px){.bars.two{display:grid;grid-template-columns:1fr 1fr}.bars.two>.bar:nth-child(2)::before{display:none}}
-.bar{display:block;width:100%;text-align:left;padding:12px 16px;transition:background .15s;position:relative}
+.bar{display:block;width:100%;text-align:left;padding:14px 16px;transition:background .15s;position:relative}
 .bar:active{background:var(--soft)}
 .bar+.bar::before{content:"";position:absolute;top:0;left:16px;right:16px;height:1px;background:var(--line)}
 .bar .top-l{display:flex;justify-content:space-between;align-items:center;gap:10px;font-size:15px}
@@ -534,6 +536,25 @@ a.btn{text-decoration:none}
 .lightbox .iconbtn{position:absolute;top:calc(12px + env(safe-area-inset-top));right:12px;color:#fff;background:rgba(255,255,255,.12)}
 .spin{width:18px;height:18px;border-radius:50%;border:2.5px solid currentColor;border-right-color:transparent;animation:sp .7s linear infinite}
 @keyframes sp{to{transform:rotate(360deg)}}
+/* passar o mouse: mesmo retorno visual em todo o site (só em computador, para não "grudar" no toque) */
+@media (hover:hover){
+  .input:not(:focus):not(:disabled):hover,.select:not(.open):hover,.stepper:hover{border-color:color-mix(in srgb,var(--brand2) 45%,var(--line))}
+  .btn.primary:hover{background:color-mix(in srgb,var(--brand) 88%,#000)}
+  .btn.soft:hover{background:color-mix(in srgb,var(--soft) 80%,var(--line))}
+  .btn.danger:hover{background:color-mix(in srgb,var(--dangerSoft) 80%,var(--danger))}
+  .chip:not(.on):hover{border-color:color-mix(in srgb,var(--brand2) 50%,var(--line));color:var(--ink)}
+  .seg button:not(.on):hover,.tabs button:not(.on):hover{color:var(--ink)}
+  .w-btn:hover{background:color-mix(in srgb,var(--brand) 22%,transparent)}
+  .stepper button:hover{background:var(--soft)}
+  .icon-grid button:not(.on):hover{border-color:color-mix(in srgb,var(--brand2) 50%,var(--line));color:var(--brand)}
+  .switch-row:hover{border-color:color-mix(in srgb,var(--brand2) 45%,var(--line))}
+  .photo .pbtns label:hover,.photo .pbtns button:hover{background:var(--soft)}
+  .photo.has .pbtns label:hover,.photo.has .pbtns button:hover{background:rgba(20,12,8,.72)}
+  button.avatar:hover{background:color-mix(in srgb,var(--brand) 88%,#000)}
+  .proj-btn:hover .n{color:var(--brand)}
+  .detail-photo:hover .zoom{background:rgba(20,12,8,.72)}
+  .lightbox .iconbtn:hover{background:rgba(255,255,255,.22)}
+}
 @media (prefers-reduced-motion:reduce){*{animation-duration:.01ms!important;transition-duration:.01ms!important}}
 </style>
 </head>
