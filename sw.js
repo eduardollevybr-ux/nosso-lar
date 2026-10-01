@@ -9,8 +9,9 @@ const SHELL = ["./", "./index.html", "./manifest.json", "./icon-192.png", "./ico
 self.addEventListener("install", e => {
   e.waitUntil(caches.open(VERSION).then(c => Promise.all(SHELL.map(u => c.add(u).catch(() => null)))).then(() => self.skipWaiting()));
 });
+// só apaga versões antigas do próprio Nosso Lar (FLUX e Controle usam o mesmo endereço e têm cópias próprias)
 self.addEventListener("activate", e => {
-  e.waitUntil(caches.keys().then(ks => Promise.all(ks.filter(k => k !== VERSION && k !== PHOTOS).map(k => caches.delete(k)))).then(() => self.clients.claim()));
+  e.waitUntil(caches.keys().then(ks => Promise.all(ks.filter(k => k.startsWith("nossolar-") && k !== VERSION && k !== PHOTOS).map(k => caches.delete(k)))).then(() => self.clients.claim()));
 });
 
 async function trimPhotos(){
