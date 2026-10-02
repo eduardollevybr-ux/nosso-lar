@@ -60,7 +60,7 @@ html,body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--font)
 body{min-height:100dvh;overscroll-behavior-y:none;background:var(--bg)}
 .v,.kpi .v,.it .val b,.bar .top-l b,.total-line b,.room .vl,.day-h span,.list-note b{font-variant-numeric:tabular-nums}
 /* foco visível para quem usa teclado */
-button:focus-visible,label:focus-visible,.chip:focus-visible{outline:2.5px solid var(--brand2);outline-offset:2px}
+button:focus-visible,a:focus-visible,label:focus-visible,[tabindex]:focus-visible,.chip:focus-visible{outline:2.5px solid var(--brand2);outline-offset:2px}
 img{transition:opacity .35s}
 body.locked{overflow:hidden}
 button,input,select,textarea{font:inherit;color:inherit}
@@ -165,7 +165,7 @@ input[type=date].input{display:flex;align-items:center;line-height:var(--h-ctl);
 .btn.add-btn{width:40px;height:40px;border-radius:50%;padding:0;margin-right:2px}
 .add-btn span{display:none}
 .tabs{grid-area:nav;position:relative;display:flex;background:var(--soft);border-radius:var(--r-ctl);padding:4px;gap:2px}
-.tabs button{flex:1;min-width:0;position:relative;z-index:1;height:48px;border-radius:var(--r-in);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;font-size:11.5px;font-weight:600;color:var(--muted);transition:color .25s}
+.tabs button{flex:1;min-width:0;position:relative;z-index:1;height:48px;border-radius:var(--r-in);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;font-size:12px;font-weight:600;color:var(--muted);transition:color .25s}
 .tabs button svg{width:20px;height:20px}
 .tabs button.on{color:var(--brand)}
 .tabs .pill{position:absolute;top:4px;bottom:4px;border-radius:var(--r-in);background:var(--card);box-shadow:0 1px 3px rgba(0,0,0,.1);transition:left .4s cubic-bezier(.3,1.3,.5,1),width .4s cubic-bezier(.3,1.3,.5,1)}
@@ -173,8 +173,8 @@ input[type=date].input{display:flex;align-items:center;line-height:var(--h-ctl);
 @media (max-width:899px){
   /* barra de navegação presa na borda de baixo da tela, de ponta a ponta */
   .tabs{position:fixed;left:0;right:0;bottom:0;z-index:30;margin:0;gap:4px;border-radius:0;padding:6px max(10px,calc((100vw - 560px)/2)) calc(6px + env(safe-area-inset-bottom));background:var(--card);border:0;border-top:1px solid var(--line);box-shadow:0 -6px 24px rgba(40,25,15,.07)}
-  .tabs .pill{top:6px;bottom:calc(6px + env(safe-area-inset-bottom));border-radius:16px;background:var(--soft);box-shadow:none}
-  .tabs button{height:62px;border-radius:16px;font-size:12.5px;gap:4px}
+  .tabs .pill{top:6px;bottom:calc(6px + env(safe-area-inset-bottom));border-radius:var(--r-md);background:var(--soft);box-shadow:none}
+  .tabs button{height:62px;border-radius:var(--r-md);font-size:13px;gap:4px}
   .tabs button svg{width:25px;height:25px}
   body main.view{padding-bottom:calc(104px + env(safe-area-inset-bottom))}
 }
@@ -212,8 +212,10 @@ main.view{max-width:var(--maxw);margin:0 auto;padding:16px var(--pad) calc(40px 
 .section-t{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:24px 4px 10px}
 .section-t:first-child{margin-top:0}
 .section-t h3{margin:0;font-size:17px;font-weight:700;letter-spacing:-.01em}
-.page-t{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:0 4px 14px}
-.page-t h2{margin:0;font-size:24px;font-weight:700;letter-spacing:-.02em}
+.page-t{display:flex;align-items:center;justify-content:space-between;gap:10px;min-height:var(--h-sm);margin:0 4px 16px}
+.page-t h2{margin:0;font-size:26px;font-weight:700;letter-spacing:-.02em}
+.page-t p{margin:2px 0 0;color:var(--muted);font-size:14px}
+@media (min-width:900px){.page-t{margin-bottom:20px}}
 
 /* resumo (mesmo formato em todas as telas) */
 .summary{position:relative;overflow:hidden;isolation:isolate;padding:18px 20px;display:grid;grid-template-columns:1fr auto;gap:6px 12px;align-items:end;background:radial-gradient(120% 140% at 0% 0%,color-mix(in srgb,var(--brand2) 55%,var(--brand)) 0%,var(--brand) 55%,color-mix(in srgb,var(--brand) 82%,#000) 100%);color:var(--brandInk);border:0;box-shadow:0 14px 34px -12px color-mix(in srgb,var(--brand) 60%,transparent)}
@@ -269,9 +271,9 @@ main.view{max-width:var(--maxw);margin:0 auto;padding:16px var(--pad) calc(40px 
 /* listas (mesma linha em compras, lojas, projetos e pessoas) */
 .days{columns:2 440px;column-gap:24px}
 .day{break-inside:avoid;padding-bottom:2px}
-.day-h{display:flex;justify-content:space-between;align-items:baseline;margin:0 6px 8px;padding-top:18px;font-size:13px;font-weight:600;color:var(--muted)}
+.day-h{display:flex;justify-content:space-between;align-items:baseline;margin:0 4px 8px;padding-top:18px;font-size:13px;font-weight:600;color:var(--muted)}
 .day-h b{color:var(--ink2);font-weight:600}
-button.day-h{display:flex;width:calc(100% - 12px);text-align:left;cursor:pointer;border-radius:8px;transition:color .15s}
+button.day-h{display:flex;width:calc(100% - 8px);text-align:left;cursor:pointer;border-radius:var(--r-in);transition:color .15s}
 .day-h.go b{display:inline-flex;align-items:center;gap:3px}
 .day-h.go b svg{width:15px;height:15px;color:var(--muted)}
 @media (hover:hover){.day-h.go:hover b,.day-h.go:hover b svg{color:var(--brand)}}
@@ -296,7 +298,7 @@ button.it:active,button.proj-row:active{background:var(--soft)}
 .empty h4{color:var(--ink);font-size:17px;margin:0 0 6px}
 .empty p{margin:0 0 16px;font-size:14px}
 .empty p:last-child{margin-bottom:0}
-.list-note{font-size:13px;color:var(--muted);padding:16px 6px 0}
+.list-note{font-size:13px;color:var(--muted);padding:16px 4px 0}
 .list-note b{color:var(--ink)}
 
 /* filtros */
@@ -307,8 +309,8 @@ button.it:active,button.proj-row:active{background:var(--soft)}
 .chips{display:flex;gap:8px;overflow-x:auto;margin:0 calc(-1 * var(--pad));padding:2px var(--pad);scrollbar-width:none}
 .chips::-webkit-scrollbar{display:none}
 @media (min-width:900px){.filters{flex-direction:row;align-items:center;gap:16px}.search{flex:0 0 360px}.chips{flex-wrap:wrap;overflow:visible;margin:0;padding:0}}
-.chip{flex:none;height:36px;padding:0 14px;border-radius:999px;background:var(--card);border:1px solid var(--line);font-size:14px;font-weight:600;color:var(--ink2);display:inline-flex;align-items:center;gap:6px;transition:all .2s}
-.chip.on{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.chip{flex:none;height:var(--h-sm);padding:0 14px;border-radius:999px;background:var(--card);border:1px solid var(--line);font-size:14px;font-weight:600;color:var(--ink2);display:inline-flex;align-items:center;gap:6px;transition:all .2s}
+.chip.on{background:var(--brand);color:var(--brandInk);border-color:var(--brand)}
 .chip svg{width:16px;height:16px}
 
 /* página do cômodo */
@@ -326,9 +328,9 @@ button.it:active,button.proj-row:active{background:var(--soft)}
 .kpi{padding:14px 12px;display:flex;flex-direction:column;justify-content:flex-end;gap:2px}
 .kpi .k-ic{width:30px;height:30px;border-radius:var(--r-in);background:var(--soft);color:var(--brand);display:grid;place-items:center;margin-bottom:8px}
 .kpi .k-ic svg{width:17px;height:17px}
-.kpi .v{font-size:18px;font-weight:700;letter-spacing:-.02em;margin-top:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.kpi .v{font-size:clamp(15px,4.4vw,18px);font-weight:700;letter-spacing:-.02em;margin-top:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 @media (min-width:900px){.kpi{padding:20px}.kpi .v{font-size:28px}}
-.dash-seg{margin-top:20px}
+.dash-seg{margin-top:var(--sp-lg)}
 @media (min-width:900px){.dash-seg{max-width:420px}}
 .dash-body{margin-top:14px}
 .dash-days{display:grid;gap:14px;grid-template-columns:minmax(0,1fr)}
@@ -413,7 +415,7 @@ button.it:active,button.proj-row:active{background:var(--soft)}
 .kv div.go:active{background:var(--soft)}
 .kv div.go b,.bar .top-l b{display:inline-flex;align-items:center;gap:4px}
 .kv div.go b svg,.bar .top-l b svg{width:16px;height:16px;color:var(--muted);flex:none}
-.col{cursor:pointer;border-radius:8px;padding:0;transition:background .15s}
+.col{cursor:pointer;border-radius:var(--r-in);padding:0;transition:background .15s}
 .col:hover{background:color-mix(in srgb,var(--soft) 60%,transparent)}
 .col:active{background:var(--soft)}
 @media (hover:hover){.bar:hover{background:color-mix(in srgb,var(--soft) 50%,transparent)}}
@@ -425,8 +427,8 @@ button.it:active,button.proj-row:active{background:var(--soft)}
 .add-inline{display:flex;gap:8px;margin-bottom:var(--sp)}
 .add-inline .input{flex:1}
 .member .avatar{width:var(--lead);height:var(--lead);font-size:15px;background:var(--soft);color:var(--brand)}
-.member .mid b{display:block;font-size:14px;font-weight:600;word-break:break-all;line-height:1.25}
-.member .mid small{font-size:12px;color:var(--muted)}
+.member .mid b{display:block;font-size:14px;font-weight:600;line-height:1.25;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.member .mid small{display:block;font-size:12px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .member .select{height:var(--h-sm);width:auto;font-size:14px;border-radius:var(--r-sm);padding:0 32px 0 12px;background-position:right 8px center;background-size:16px}
 .note{font-size:13px;color:var(--muted);padding:10px 4px;line-height:1.45}
 .proj-row .mid{font-weight:600}
@@ -458,7 +460,7 @@ body.is-offline .top-in{padding-top:calc(42px + env(safe-area-inset-top))}
 body.is-offline .auth{padding-top:calc(48px + env(safe-area-inset-top))}
 
 /* botão flutuante de nova compra (celular e tablet) */
-.fab{position:fixed;z-index:31;right:max(var(--pad),calc((100vw - 560px)/2));bottom:calc(92px + env(safe-area-inset-bottom));width:60px;height:60px;border-radius:20px;background:var(--brand);color:var(--brandInk);display:grid;place-items:center;box-shadow:0 12px 28px -6px color-mix(in srgb,var(--brand) 70%,transparent),0 2px 6px rgba(0,0,0,.12);transition:transform .2s cubic-bezier(.3,1.4,.5,1);animation:fabIn .5s cubic-bezier(.3,1.4,.5,1) both}
+.fab{position:fixed;z-index:31;right:max(var(--pad),calc((100vw - 560px)/2));bottom:calc(92px + env(safe-area-inset-bottom));width:60px;height:60px;border-radius:var(--r);background:var(--brand);color:var(--brandInk);display:grid;place-items:center;box-shadow:0 12px 28px -6px color-mix(in srgb,var(--brand) 70%,transparent),0 2px 6px rgba(0,0,0,.12);transition:transform .2s cubic-bezier(.3,1.4,.5,1);animation:fabIn .5s cubic-bezier(.3,1.4,.5,1) both}
 .fab svg{width:26px;height:26px;stroke-width:2.4}
 .fab:active{transform:scale(.9)}
 @keyframes fabIn{from{opacity:0;transform:scale(.4) rotate(-45deg)}to{opacity:1;transform:none}}
@@ -467,10 +469,10 @@ body.is-offline .auth{padding-top:calc(48px + env(safe-area-inset-top))}
 @media (max-width:899px){body main.view.has-fab{padding-bottom:calc(170px + env(safe-area-inset-bottom))}}
 
 /* ordenação da lista de compras */
-.list-bar{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:16px 6px 0}
+.list-bar{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:16px 4px 0}
 .list-bar .list-note{padding:0}
 .sort-w{flex:none}
-.sort-w .select{height:36px;border-radius:999px;font-size:13.5px;font-weight:600;padding:0 32px 0 12px;width:auto;background-color:var(--card);background-position:right 10px center;background-size:16px}
+.sort-w .select{height:var(--h-sm);border-radius:999px;font-size:14px;font-weight:600;padding:0 32px 0 12px;width:auto;background-color:var(--card);background-position:right 10px center;background-size:16px}
 .sort-w .dd-btn>svg{width:16px;height:16px}
 
 /* lista de quero comprar */
@@ -481,7 +483,7 @@ a.btn{text-decoration:none}
 .switch-row .sw-ic svg{width:19px;height:19px}
 .switch-row .sw-tx{flex:1;min-width:0}
 .switch-row .sw-tx b{display:block;font-size:15px;font-weight:600}
-.switch-row .sw-tx small{display:block;font-size:12.5px;color:var(--muted);margin-top:1px}
+.switch-row .sw-tx small{display:block;font-size:13px;color:var(--muted);margin-top:1px}
 .switch-row input{position:absolute;opacity:0;pointer-events:none}
 .sw{width:50px;height:30px;border-radius:999px;background:var(--line);position:relative;flex:none;transition:background .25s}
 .sw::after{content:"";position:absolute;top:3px;left:3px;width:24px;height:24px;border-radius:50%;background:#fff;box-shadow:0 2px 6px rgba(0,0,0,.2);transition:transform .32s cubic-bezier(.3,1.4,.5,1)}
@@ -507,7 +509,7 @@ a.btn{text-decoration:none}
 .it.wish>.thumb{background:transparent;border:1.5px dashed color-mix(in srgb,var(--brand2) 60%,transparent)}
 .it.wish .val small{display:block}
 .w-acts{display:flex;gap:6px;flex:none}
-.w-btn{width:36px;height:36px;border-radius:50%;display:grid;place-items:center;background:var(--soft);color:var(--brand);transition:transform .15s,background .2s}
+.w-btn{width:var(--h-sm);height:var(--h-sm);border-radius:50%;display:grid;place-items:center;background:var(--soft);color:var(--brand);transition:transform .15s,background .2s}
 .w-btn svg{width:17px;height:17px}
 .w-btn.buy{background:color-mix(in srgb,var(--brand) 14%,transparent)}
 .w-btn:active{transform:scale(.88)}
@@ -518,9 +520,9 @@ a.btn{text-decoration:none}
 .wish-add:hover{background:var(--soft);color:var(--brand)}
 .wish-add svg{width:18px;height:18px}
 .empty.slim{padding:18px 20px}
-.room .wl{display:flex;align-items:center;gap:4px;margin-top:8px;font-size:11.5px;font-weight:600;color:var(--brand);opacity:.8}
+.room .wl{display:flex;align-items:center;gap:4px;margin-top:8px;font-size:12px;font-weight:600;color:var(--brand);opacity:.8}
 .room .wl svg{width:13px;height:13px}
-.wish-tag{display:inline-flex;align-items:center;gap:6px;font-size:12.5px;font-weight:600;color:var(--brand);background:color-mix(in srgb,var(--brand) 10%,transparent);padding:6px 12px;border-radius:999px;margin:0 0 var(--sp)}
+.wish-tag{display:inline-flex;align-items:center;gap:6px;font-size:13px;font-weight:600;color:var(--brand);background:color-mix(in srgb,var(--brand) 10%,transparent);padding:6px 12px;border-radius:999px;margin:0 0 var(--sp)}
 .wish-tag svg{width:15px;height:15px}
 .summary.ghost{background:var(--soft);color:var(--ink);box-shadow:none}
 .summary.ghost .label{color:var(--muted)}
@@ -528,17 +530,18 @@ a.btn{text-decoration:none}
 .kv-link{color:var(--brand);text-decoration:none;display:inline-flex;align-items:center;gap:5px}
 .kv-link svg{width:15px;height:15px}
 .list-seg{margin-bottom:var(--sp)}
-.list-seg button{display:flex;align-items:center;justify-content:center;gap:7px}
-.list-seg button svg{width:17px;height:17px;flex:none}
-.list-seg .seg-n{flex:none}
+/* abas internas com ícone (lista de compras e painel): mesmo formato */
+.seg.ics button{display:flex;align-items:center;justify-content:center;gap:7px}
+.seg.ics button svg{width:17px;height:17px;flex:none}
+.seg.ics .seg-n{flex:none}
 /* celulares estreitos: tira o ícone para o texto não encostar na borda */
-@media (max-width:374px){.list-seg button{gap:6px;padding:0 8px;font-size:13.5px}.list-seg button svg{display:none}}
+@media (max-width:374px){.seg.ics button{gap:6px;padding:0 8px;font-size:14px}.seg.ics button svg{display:none}}
 .seg-n{font-size:11px;font-weight:700;min-width:20px;height:20px;padding:0 6px;border-radius:999px;background:color-mix(in srgb,var(--brand) 15%,transparent);color:var(--brand);display:inline-grid;place-items:center}
 @media (min-width:900px){.list-seg{max-width:420px}}
 
 /* foto em tela cheia */
 .detail-photo{cursor:zoom-in;position:relative}
-.detail-photo .zoom{position:absolute;right:10px;bottom:10px;width:36px;height:36px;border-radius:50%;display:grid;place-items:center;background:rgba(20,12,8,.5);color:#fff;backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px)}
+.detail-photo .zoom{position:absolute;right:10px;bottom:10px;width:var(--h-sm);height:var(--h-sm);border-radius:50%;display:grid;place-items:center;background:rgba(20,12,8,.5);color:#fff;backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px)}
 .detail-photo .zoom svg{width:18px;height:18px}
 .lightbox{position:fixed;inset:0;z-index:95;background:rgba(10,6,4,.92);display:grid;grid-template:minmax(0,1fr)/minmax(0,1fr);place-items:center;padding:calc(16px + env(safe-area-inset-top)) 16px calc(16px + env(safe-area-inset-bottom));opacity:0;transition:opacity .25s;cursor:zoom-out}
 .lightbox.show{opacity:1}
@@ -659,6 +662,9 @@ const dayTitle = d => {
   const t = new Date(d + "T12:00:00").toLocaleDateString("pt-BR", { weekday:"long", day:"numeric", month:"long" });
   return t.charAt(0).toUpperCase() + t.slice(1);
 };
+const plural = (n, one, many) => `${(+n || 0).toLocaleString("pt-BR")} ${+n === 1 ? one : many}`;
+const buysTxt = n => plural(n, "compra", "compras");
+const wishTxt = n => `${(+n || 0).toLocaleString("pt-BR")} para comprar`;
 const qtyTxt = q => { q = +q || 0; return (Number.isInteger(q) ? q : q.toLocaleString("pt-BR")) + (q === 1 ? " item" : " itens"); };
 const itemTotal = i => (+i.quantity || 0) * (+i.unit_price || 0);
 const uid = () => (crypto.randomUUID ? crypto.randomUUID() : "10000000-1000-4000-8000-100000000000".replace(/[018]/g, c => (c ^ crypto.getRandomValues(new Uint8Array(1))[0] & 15 >> c / 4).toString(16)));
@@ -680,16 +686,16 @@ function toast(msg, err=false){
 function friendlyError(e){
   const m = String((e && (e.message || e.error_description)) || e || "");
   if (/invalid login/i.test(m)) return "E-mail ou senha incorretos";
-  if (/not confirmed/i.test(m)) return "Confirme seu e-mail pelo link que enviamos antes de entrar";
-  if (/already registered|already been registered/i.test(m)) return "Esse e-mail já tem conta. É só entrar";
-  if (/rate|seconds|too many/i.test(m)) return "Muitas tentativas. Aguarde um pouco e tente de novo";
+  if (/not confirmed/i.test(m)) return "Confirme seu e-mail pelo link enviado antes de entrar";
+  if (/already registered|already been registered/i.test(m)) return "Este e-mail já tem conta. Use a opção Entrar";
+  if (/rate|seconds|too many/i.test(m)) return "Muitas tentativas. Aguarde um pouco e tente novamente";
   if (/should be different|same password/i.test(m)) return "A nova senha precisa ser diferente da atual";
   if (/weak|at least/i.test(m)) return "Senha muito fraca. Use pelo menos 6 caracteres";
-  if (/duplicate|23505/i.test(m)) return "Esse e-mail já está no projeto";
+  if (/duplicate|23505/i.test(m)) return "Este e-mail já tem acesso ao projeto";
   if (isNetErr(e)) { setOffline(true); return OFF_MSG; }
   if (/row-level security|permission|42501/i.test(m)) return "Você não tem permissão para fazer isso";
-  if (/mime|size|payload|too large/i.test(m)) return "A foto não pôde ser enviada (formato ou tamanho)";
-  return "Não deu certo. Tente de novo";
+  if (/mime|size|payload|too large/i.test(m)) return "Não foi possível enviar a foto. Confira o formato e o tamanho";
+  return "Algo deu errado. Tente novamente";
 }
 
 /* ================= TEMA ================= */
@@ -733,17 +739,17 @@ try {
 function showAuth(mode, keepMsg=""){
   S.user = mode === "newpass" ? S.user : null;
   document.body.classList.remove("locked"); $("#sheets").innerHTML = "";
-  const sub = { login:"Entre na sua conta", signup:"Crie sua conta", forgot:"Enviaremos um link para o seu e-mail", newpass:"Crie uma nova senha" };
+  const sub = { login:"Entre na sua conta", signup:"Crie sua conta", forgot:"Informe seu e-mail para receber o link de nova senha", newpass:"Crie uma nova senha" };
   const f = [];
-  if (mode === "signup") f.push(`<input class="input" id="au-n" name="name" autocomplete="name" placeholder="Seu nome" aria-label="Seu nome">`);
+  if (mode === "signup") f.push(`<input class="input" id="au-n" name="name" autocomplete="name" placeholder="Nome" aria-label="Nome">`);
   if (mode !== "newpass") f.push(`<input class="input" id="au-e" name="email" type="email" inputmode="email" autocomplete="${mode==="signup"?"email":"username"}" autocapitalize="off" spellcheck="false" placeholder="E-mail" aria-label="E-mail">`);
   if (mode !== "forgot") f.push(`<input class="input" id="au-p" name="password" type="password" autocomplete="${mode==="login"?"current-password":"new-password"}" placeholder="${mode==="newpass"?"Nova senha":"Senha"}" aria-label="Senha">`);
   if (mode === "signup" || mode === "newpass") f.push(`<input class="input" id="au-p2" name="password2" type="password" autocomplete="new-password" placeholder="Confirmar senha" aria-label="Confirmar senha">`);
   const btn = { login:"Entrar", signup:"Criar conta", forgot:"Enviar link", newpass:"Salvar senha" }[mode];
   const links = {
-    login:`<button type="button" data-go="forgot">Esqueci a senha</button><span class="dot"></span><button type="button" data-go="signup">Criar conta</button>`,
+    login:`<button type="button" data-go="forgot">Esqueci minha senha</button><span class="dot"></span><button type="button" data-go="signup">Criar conta</button>`,
     signup:`<button type="button" data-go="login">Já tenho conta</button>`,
-    forgot:`<button type="button" data-go="login">Voltar para entrar</button>`,
+    forgot:`<button type="button" data-go="login">Voltar para o login</button>`,
     newpass:``
   }[mode];
   document.body.classList.add("auth-on");
@@ -778,14 +784,14 @@ function showAuth(mode, keepMsg=""){
         const { data, error } = await sb.auth.signUp({ email, password:pass, options:{ data:{ nome:$("#au-n").value.trim() }, emailRedirectTo:baseUrl() } });
         if (error) throw error;
         if (data?.user && Array.isArray(data.user.identities) && data.user.identities.length === 0) throw new Error("already registered");
-        if (!data.session) { showAuth("login", "Conta criada! Confirme pelo link que enviamos para o seu e-mail e depois entre aqui."); return; }
+        if (!data.session) { showAuth("login", "Conta criada. Confirme pelo link enviado para o seu e-mail e depois entre aqui."); return; }
       } else if (mode === "forgot") {
         const { error } = await sb.auth.resetPasswordForEmail(email, { redirectTo:baseUrl() }); if (error) throw error;
-        msg("Se esse e-mail tiver conta, o link já está a caminho.", true);
+        msg("Se este e-mail tiver conta, o link foi enviado", true);
       } else if (mode === "newpass") {
         const { error } = await sb.auth.updateUser({ password:pass }); if (error) throw error;
         S.recovery = false; history.replaceState(null, "", baseUrl());
-        toast("Senha alterada");
+        toast("Senha atualizada");
         const { data } = await sb.auth.getSession(); await handleSession(data.session, true);
         return;
       }
@@ -955,12 +961,12 @@ async function openProject(id, silent=false){
   await loadProjectData();
   if (!NET.offline) subscribe();
   S.nav = "fade"; render();
-  if (!silent) toast("Projeto: " + S.project.name);
+  if (!silent) toast("Projeto aberto: " + S.project.name);
 }
 async function loadProjectData(){
   if (!S.project) return;
   const pid = S.project.id;
-  const fromCopy = () => { if (!applySnapshot(pid)) { S.rooms = []; S.stores = []; S.items = []; S.wish = []; S.members = []; toast("Esse projeto ainda não foi aberto com internet neste aparelho", true); } };
+  const fromCopy = () => { if (!applySnapshot(pid)) { S.rooms = []; S.stores = []; S.items = []; S.wish = []; S.members = []; toast("Este projeto ainda não foi aberto com internet neste aparelho", true); } };
   if (!sb || NET.offline) return fromCopy();
   const [r, s, i, m, p, pl] = await Promise.all([
     sb.from("rooms").select("*").eq("project_id", pid).order("position").order("created_at"),
@@ -973,9 +979,9 @@ async function loadProjectData(){
   const err = [r, s, i, m, p].find(x => x.error);
   if (err && isNetErr(err.error)) { console.warn(err.error); setOffline(true); unsubscribe(); return fromCopy(); }
   if (pl.error && !isNetErr(pl.error)) S.hasPlanned = false; else if (!pl.error) S.hasPlanned = true;
-  if (err) { console.warn(err.error); toast("Não foi possível carregar tudo. Tente de novo", true); }
+  if (err) { console.warn(err.error); toast("Não foi possível carregar todos os dados. Tente novamente", true); }
   if (!p.error && !p.data) { // projeto apagado ou acesso removido
-    toast("Você não tem mais acesso a esse projeto");
+    toast("Você não tem mais acesso a este projeto");
     if (S.user) { try { localStorage.removeItem(offProjKey(S.user.id, pid)); } catch {} }
     lsSet("nl.project", null); return loadProjects();
   }
@@ -1067,8 +1073,7 @@ function render(){
   const oldPill = $("#tabpill") ? { left: $("#tabpill").style.left, width: $("#tabpill").style.width } : null;
   const anim = sameView ? "" : (S.nav === "fwd" ? "view-fwd" : S.nav === "back" ? "view-back" : "view-anim");
   const body = S.pages.length ? viewPage() : tabBody();
-  const fabWish = S.tab === "compras" && S.list === "wish";
-  const fab = canEdit() ? `<button class="fab" data-act="addItem" ${fabWish ? `data-planned="1" aria-label="Adicionar à lista"` : `aria-label="Nova compra"`}>${ic("plus")}</button>` : "";
+  const fab = canEdit() ? `<button class="fab" data-act="addItem" ${addAttrsNow()}>${ic("plus")}</button>` : "";
   app.innerHTML = header() + `<main class="view ${anim} ${fab ? "has-fab" : ""}" id="view">${body}</main>` + fab;
   if (sameView) window.scrollTo(0, y); else window.scrollTo(0, 0);
   markScrolled();
@@ -1109,16 +1114,26 @@ function viewPage(){
 }
 function pageHead(icon, title, line, editAct){
   return `<div class="room-top">
-      <button class="iconbtn" data-act="back" aria-label="Voltar">${ic("back")}</button>
-      ${editAct ? `<button class="iconbtn" ${editAct} aria-label="Editar">${ic("edit")}</button>` : ""}
+      <button class="iconbtn" data-act="back" aria-label="Voltar" title="Voltar">${ic("back")}</button>
+      ${editAct ? `<button class="iconbtn" ${editAct} aria-label="Editar" title="Editar">${ic("edit")}</button>` : ""}
     </div>
     <div class="room-hero"><div class="ic">${ic(icon)}</div><div><h2>${esc(title)}</h2><p>${line}</p></div></div>`;
 }
+/* resumo de uma tela de detalhe: sempre na mesma ordem (valor · compras · itens · lista · extras) */
+function pageLine(t, wishCount, extra=[]){
+  return [money(t.value), buysTxt(t.count), qtyTxt(t.qty), wishCount ? wishTxt(wishCount) : "", ...extra].filter(Boolean).map(esc).join(" · ");
+}
+/* estado vazio: mesmo formato em todo o app (ícone, título, texto e botão opcionais) */
+function emptyBox({ icon="", title="", text="", action="", slim=false, mt=true }){
+  return `<div class="card empty${slim ? " slim" : ""}${mt ? " mt" : ""}">${icon ? `<div class="logo">${ic(icon)}</div>` : ""}${title ? `<h4>${esc(title)}</h4>` : ""}${text ? `<p>${text}</p>` : ""}${action}</div>`;
+}
+/* botão principal de criar, mostrado só para quem pode editar */
+const addBtn = (label, attrs) => canEdit() ? `<button class="btn primary" ${attrs}>${ic("plus")} ${label}</button>` : "";
 function wishSection(wl, addAttrs){
   if (!wl.length && !(canEdit() && addAttrs)) return "";
-  return `<div class="section-t wish-h"><h3>${ic("bookmark")} Quero comprar</h3>${wl.length ? `<span class="muted">${wl.length} ${wl.length===1?"item":"itens"}</span>` : ""}</div>
+  return `<div class="section-t wish-h"><h3>${ic("bookmark")} Quero comprar</h3>${wl.length ? `<span class="muted">${qtyTxt(wl.length)}</span>` : ""}</div>
     ${wl.length ? `<div class="card group">${wl.map(wishRow).join("")}</div>` : ""}
-    ${canEdit() && addAttrs ? `<button class="wish-add" data-act="addItem" ${addAttrs} data-planned="1">${ic("plus")} Adicionar algo que quero comprar</button>` : ""}`;
+    ${canEdit() && addAttrs ? `<button class="wish-add" data-act="addItem" ${addAttrs} data-planned="1">${ic("plus")} Adicionar à lista</button>` : ""}`;
 }
 function viewStore(id){
   const none = id === "none";
@@ -1127,10 +1142,10 @@ function viewStore(id){
   const match = i => none ? !(i.store_id && storeById(i.store_id)) : i.store_id === id;
   const list = S.items.filter(match), wl = S.wish.filter(match), t = totals(list);
   const kind = none ? "" : (st.kind === "online" ? "Online" : "Loja física");
-  const line = [money(t.value), qtyTxt(t.qty), wl.length ? `${wl.length} para comprar` : "", kind, st.location ? esc(st.location) : ""].filter(Boolean).join(" · ");
+  const line = pageLine(t, wl.length, [kind, st.location || ""]);
   return pageHead(none ? "box" : (st.kind === "online" ? "globe" : "store"), st.name, line, canEdit() && !none ? `data-act="editStore" data-id="${id}"` : "")
     + (st.notes ? `<p class="note">${esc(st.notes)}</p>` : "")
-    + (list.length ? groupedList(list) : `<div class="card empty ${wl.length ? "slim " : ""}mt"><p>Nenhuma compra registrada ${none ? "sem loja" : "nesta loja"}.</p></div>`)
+    + (list.length ? groupedList(list) : emptyBox({ slim:true, text:`Nenhuma compra registrada ${none ? "sem loja" : "nesta loja"}.` }))
     + wishSection(wl, !none ? `data-store="${id}"` : "");
 }
 function viewDay(d){
@@ -1139,7 +1154,7 @@ function viewDay(d){
   const t = totals(list);
   const groups = new Map(); list.forEach(i => { const k = i.room_id && roomById(i.room_id) ? i.room_id : "none"; if (!groups.has(k)) groups.set(k, []); groups.get(k).push(i); });
   const order = [...S.rooms.map(r => r.id), "none"].filter(k => groups.has(k));
-  const title = dayTitle(d), line = [title === "Hoje" || title === "Ontem" ? fmtDate(d) : "", money(t.value), qtyTxt(t.qty), `${t.count} ${t.count===1?"compra":"compras"}`].filter(Boolean).join(" · ");
+  const title = dayTitle(d), line = pageLine(t, 0, [title === "Hoje" || title === "Ontem" ? fmtDate(d) : ""]);
   return pageHead("calendar", title, line, "")
     + `<div class="days">` + order.map(k => { const arr = groups.get(k), r = roomById(k);
       return `<div class="day">${groupHead("room", k, r ? r.name : "Sem cômodo", money(arr.reduce((a,i)=>a+itemTotal(i),0)))}<div class="card group">${arr.map(itemRow).join("")}</div></div>`; }).join("") + `</div>`;
@@ -1170,18 +1185,22 @@ function peopleLine(){
   if (others.length === 2) return `${me}, ${others[0]} e ${others[1]}`;
   return `${me}, ${others[0]} e mais ${others.length - 1} pessoas`;
 }
+/* ação principal de adicionar: na lista "Quero comprar" adiciona à lista; no resto, registra compra */
+const wishMode = () => S.tab === "compras" && S.list === "wish" && !S.pages.length;
+const addLabel = () => wishMode() ? "Adicionar à lista" : "Nova compra";
+const addAttrsNow = () => `${wishMode() ? `data-planned="1" ` : ""}aria-label="${addLabel()}"`;
 const TABS = [["casa","home","Casa"],["compras","list","Compras"],["painel","chart","Painel"],["lojas","store","Lojas"]];
 function header(){
   const role = S.role === "viewer" ? `<span class="badge">${ic("eye")} Só visualizar</span>` : "";
   return `<header class="top"><div class="top-in">
-    <button class="proj-btn" data-act="projects" aria-label="Trocar de projeto">
+    <button class="proj-btn" data-act="projects" aria-label="Trocar de projeto" title="Trocar de projeto">
       <div class="t"><div class="n">${esc(S.project.name)}</div><div class="s"><span>${esc(peopleLine())}</span>${role}</div></div>${ic("down")}
     </button>
     <nav class="tabs" id="tabs" aria-label="Navegação"><span class="pill" id="tabpill"></span>${TABS.map(([k,i,l]) => `<button data-act="tab" data-tab="${k}" class="${S.tab===k?"on":""}">${ic(i)}<span>${l}</span></button>`).join("")}</nav>
     <div class="top-act">
-      ${canEdit() ? `<button class="btn primary sm add-btn" data-act="addItem" aria-label="Nova compra">${ic("plus")}<span>Nova compra</span></button>` : ""}
-      <button class="iconbtn" data-act="share" aria-label="Compartilhar">${ic("users")}</button>
-      <button class="avatar" data-act="menu" aria-label="Menu">${esc(initials(myName()))}</button>
+      ${canEdit() ? `<button class="btn primary sm add-btn" data-act="addItem" ${addAttrsNow()}>${ic("plus")}<span>${addLabel()}</span></button>` : ""}
+      <button class="iconbtn" data-act="share" aria-label="Compartilhar projeto" title="Compartilhar projeto">${ic("users")}</button>
+      <button class="avatar" data-act="menu" aria-label="Menu da conta" title="Menu da conta">${esc(initials(myName()))}</button>
     </div>
   </div></header>`;
 }
@@ -1198,13 +1217,10 @@ function placeTabPill(from){
 
 /* ---------- boas-vindas (sem projeto) ---------- */
 function viewWelcome(){
-  return `<header class="top"><div class="top-in"><div class="proj-btn"><div class="t"><div class="n">Nosso Lar</div><div class="s">Olá, ${esc(firstName(myName()))}</div></div></div><div class="top-act"><button class="avatar" data-act="menu" aria-label="Menu">${esc(initials(myName()))}</button></div></div></header>
-  <main class="view view-anim"><div class="card empty">
-    <div class="logo">${ic("logo")}</div><h4>Vamos montar o enxoval?</h4>
-    <p>Crie um projeto para o apartamento, escolha os cômodos e comece a registrar as compras. Se alguém compartilhou um projeto com você, ele aparece aqui automaticamente.</p>
-    <button class="btn primary" data-act="newProject">${ic("plus")} Criar projeto</button>
-    <div class="mt-sm"><button class="btn soft sm" data-act="reloadProjects">Atualizar</button></div>
-  </div></main>`;
+  return `<header class="top"><div class="top-in"><div class="proj-btn"><div class="t"><div class="n">Nosso Lar</div><div class="s">Olá, ${esc(firstName(myName()))}</div></div></div><div class="top-act"><button class="avatar" data-act="menu" aria-label="Menu da conta" title="Menu da conta">${esc(initials(myName()))}</button></div></div></header>
+  <main class="view view-anim">${emptyBox({ mt:false, icon:"logo", title:"Nenhum projeto ainda",
+    text:"Crie um projeto para o apartamento, escolha os cômodos e comece a registrar as compras. Projetos compartilhados com você aparecem aqui automaticamente.",
+    action:`<button class="btn primary" data-act="newProject">${ic("plus")} Novo projeto</button><div class="mt-sm"><button class="btn soft sm" data-act="reloadProjects">Atualizar</button></div>` })}</main>`;
 }
 
 /* ---------- agregações ---------- */
@@ -1215,18 +1231,20 @@ function byKey(list, fn){ const m = new Map(); list.forEach(i => { const k = fn(
 function viewHouse(){
   const t = totals(S.items), per = byKey(S.items, i => i.room_id && roomById(i.room_id) ? i.room_id : "none");
   const wper = byKey(S.wish, i => i.room_id && roomById(i.room_id) ? i.room_id : "none");
-  const wl = id => { const n = (wper.get(id) || {}).count || 0; return n ? `<div class="wl">${ic("bookmark")}${n} para comprar</div>` : ""; };
+  const wl = id => { const n = (wper.get(id) || {}).count || 0; return n ? `<div class="wl">${ic("bookmark")}${wishTxt(n)}</div>` : ""; };
   const none = per.get("none") || (wper.get("none") ? { value:0, qty:0, count:0 } : null);
-  const tiles = S.rooms.map((r, k) => { const v = per.get(r.id) || { value:0, count:0 };
-    return `<button class="room" data-act="room" data-id="${r.id}" style="animation-delay:${k*45}ms">
-      ${v.count ? `<span class="cnt">${v.count}</span>` : ""}
-      <span class="ic">${ic(r.icon)}</span><span><div class="nm">${esc(r.name)}</div><div class="vl">${v.count ? money(v.value) : "Nenhuma compra"}</div><span class="share" title="${t.value ? Math.round(v.value / t.value * 100) : 0}% do total"><i data-w="${t.value ? (v.value / t.value * 100).toFixed(1) : 0}"></i></span>${wl(r.id)}</span></button>`; }).join("");
-  const noneTile = none ? `<button class="room none wide" data-act="room" data-id="none" style="animation-delay:${S.rooms.length*45}ms"><span class="ic">${ic("box")}</span><span><div class="nm">Sem cômodo</div><div class="vl">${none.count ? `${none.count} ${none.count===1?"compra":"compras"} · ${money(none.value)}` : "Nenhuma compra"}</div>${wl("none")}</span></button>` : "";
+  /* todos os blocos de cômodo seguem o mesmo formato, inclusive "Sem cômodo" */
+  const tile = (id, name, icon, v, k, cls="") => `<button class="room ${cls}" data-act="room" data-id="${id}" style="animation-delay:${k*45}ms" aria-label="${esc(name)}: ${v.count ? money(v.value) + ", " + buysTxt(v.count) : "nenhuma compra"}">
+      ${v.count ? `<span class="cnt" title="${buysTxt(v.count)}">${v.count}</span>` : ""}
+      <span class="ic">${ic(icon)}</span><span><div class="nm">${esc(name)}</div><div class="vl">${v.count ? money(v.value) : "Nenhuma compra"}</div><span class="share" title="${t.value ? Math.round(v.value / t.value * 100) : 0}% do total"><i data-w="${t.value ? (v.value / t.value * 100).toFixed(1) : 0}"></i></span>${wl(id)}</span></button>`;
+  const tiles = S.rooms.map((r, k) => tile(r.id, r.name, r.icon, per.get(r.id) || { value:0, count:0 }, k)).join("");
+  const noneTile = none ? tile("none", "Sem cômodo", "box", none, S.rooms.length, "none") : "";
   const add = canEdit() ? `<button class="room add" data-act="addRoom" style="animation-delay:${(S.rooms.length+1)*45}ms">${ic("plus")} Novo cômodo</button>` : "";
-  return `<div class="home">
+  return `<div class="page-t"><h2>Casa</h2></div>
+  <div class="home">
   <div class="card summary">
     <div><div class="label">Total do enxoval</div><div class="v" data-count="${t.value}">${money(t.value)}</div></div>
-    <div class="side">${qtyTxt(t.qty)}<br>${t.count} ${t.count===1?"compra":"compras"}</div>
+    <div class="side">${buysTxt(t.count)}<br>${qtyTxt(t.qty)}</div>
   </div>
   <div class="house">
     <svg class="roof" viewBox="0 0 400 70" preserveAspectRatio="none" aria-hidden="true">
@@ -1235,13 +1253,13 @@ function viewHouse(){
       <rect class="r1" x="300" y="16" width="22" height="30" rx="4"/>
     </svg>
     <div class="house-body">
-      ${S.rooms.length || none ? `<div class="rooms">${tiles}${noneTile}${add}</div>` : `<div class="empty"><h4>Nenhum cômodo ainda</h4><p>Adicione os cômodos do apartamento para organizar as compras.</p>${canEdit()?`<button class="btn primary" data-act="addRoom">${ic("plus")} Adicionar cômodo</button>`:""}</div>`}
+      ${S.rooms.length || none ? `<div class="rooms">${tiles}${noneTile}${add}</div>` : `<div class="empty"><h4>Nenhum cômodo ainda</h4><p>Adicione os cômodos do apartamento para organizar as compras.</p>${addBtn("Novo cômodo", `data-act="addRoom"`)}</div>`}
       <div class="door"><span></span></div>
     </div>
   </div>
   <div class="recent">
     <div class="section-t"><h3>Últimas compras</h3>${S.items.length ? `<button class="btn soft sm" data-act="tab" data-tab="compras">Ver todas</button>` : ""}</div>
-    ${S.items.length ? `<div class="card group">${S.items.slice(0,5).map(itemRow).join("")}</div>` : `<div class="card empty"><p>${canEdit() ? "Toque em <b>+</b> no topo para registrar a primeira compra." : "Ainda não há compras registradas."}</p></div>`}
+    ${S.items.length ? `<div class="card group">${S.items.slice(0,5).map(itemRow).join("")}</div>` : emptyBox({ mt:false, text:"As compras registradas aparecem aqui.", action:addBtn("Nova compra", `data-act="addItem"`) })}
   </div>
   </div>`;
 }
@@ -1253,18 +1271,19 @@ function wishRow(i){
   return `<div class="it wish" data-act="item" data-id="${i.id}" role="button" tabindex="0">
     <span class="thumb">${ph ? `<img src="${esc(ph)}" alt="" loading="lazy">` : ic(r ? r.icon : "bookmark")}</span>
     <span class="mid"><div class="nm">${esc(i.name)}</div><div class="sub">${esc(sub || "Sem valor estimado")}</div></span>
-    <span class="w-acts">${i.link ? `<a class="w-btn" href="${esc(i.link)}" target="_blank" rel="noopener" aria-label="Abrir link">${ic("external")}</a>` : ""}${canEdit() ? `<button class="w-btn buy" data-act="buy" data-id="${i.id}" aria-label="Marcar como comprado">${ic("check")}</button>` : ""}</span>
+    <span class="w-acts">${i.link ? `<a class="w-btn" href="${esc(i.link)}" target="_blank" rel="noopener" aria-label="Abrir link" title="Abrir link">${ic("external")}</a>` : ""}${canEdit() ? `<button class="w-btn buy" data-act="buy" data-id="${i.id}" aria-label="Marcar como comprado" title="Marcar como comprado">${ic("check")}</button>` : ""}</span>
   </div>`;
 }
 function itemRow(i){
   if (i.planned) return wishRow(i);
   const r = roomById(i.room_id), s = storeById(i.store_id);
   const pg = curPage();
-  const sub = [s && pg?.kind !== "store" ? s.name : null, pg?.kind !== "room" && pg?.kind !== "day" ? (r ? r.name : "Sem cômodo") : null].filter(Boolean).join(" · ");
+  /* linha de baixo: loja e cômodo (o que a tela atual já mostra fica de fora) */
+  const sub = [pg?.kind !== "store" ? (s ? s.name : "Sem loja") : null, pg?.kind !== "room" && pg?.kind !== "day" ? (r ? r.name : "Sem cômodo") : null].filter(Boolean).join(" · ");
   const ph = i.photo_path && S.photos[i.photo_path];
   return `<button class="it" data-act="item" data-id="${i.id}">
     <span class="thumb">${ph ? `<img src="${esc(ph)}" alt="" loading="lazy">` : ic(r ? r.icon : "box")}</span>
-    <span class="mid"><div class="nm">${esc(i.name)}</div><div class="sub">${esc(sub || fmtDate(i.purchased_on))}</div></span>
+    <span class="mid"><div class="nm">${esc(i.name)}</div><div class="sub">${esc(sub)}</div></span>
     <span class="val"><b>${money(itemTotal(i))}</b><small>${+i.quantity !== 1 ? `${(+i.quantity).toLocaleString("pt-BR")} × ${money(i.unit_price)}` : fmtDate(i.purchased_on)}</small></span>
   </button>`;
 }
@@ -1287,8 +1306,9 @@ function viewRoom(id){
   if (!r) { if (S.roomId === id) { S.roomId = null; return viewHouse(); } return ""; }
   const match = i => none ? !(i.room_id && roomById(i.room_id)) : i.room_id === id;
   const list = S.items.filter(match), wl = S.wish.filter(match), t = totals(list);
-  return pageHead(r.icon, r.name, `${money(t.value)} · ${qtyTxt(t.qty)}${wl.length ? ` · ${wl.length} para comprar` : ""}`, canEdit() && !none ? `data-act="editRoom" data-id="${r.id}"` : "")
-    + (list.length ? groupedList(list) : wl.length ? `<div class="card empty slim mt"><p>Nenhuma compra registrada ainda neste cômodo.</p></div>` : `<div class="card empty mt"><h4>Nada por aqui ainda</h4><p>${canEdit() ? "Registre as compras deste cômodo." : "Ainda não há compras neste cômodo."}</p>${canEdit() && !none ? `<button class="btn primary" data-act="addItem" data-room="${r.id}">${ic("plus")} Nova compra</button>` : ""}</div>`)
+  return pageHead(r.icon, r.name, pageLine(t, wl.length), canEdit() && !none ? `data-act="editRoom" data-id="${r.id}"` : "")
+    + (list.length ? groupedList(list) : wl.length || none ? emptyBox({ slim:true, text:`Nenhuma compra registrada ${none ? "sem cômodo" : "neste cômodo"}.` })
+      : emptyBox({ title:"Nenhuma compra ainda", text:"As compras deste cômodo aparecem aqui.", action:addBtn("Nova compra", `data-act="addItem" data-room="${r.id}"`) }))
     + wishSection(wl, !none ? `data-room="${r.id}"` : "");
 }
 
@@ -1305,40 +1325,41 @@ function filteredItems(src){
 }
 function wishListHtml(){
   const list = filteredItems(S.wish);
-  if (!S.wish.length) return `<div class="card empty mt"><div class="logo">${ic("bookmark")}</div><h4>Lista vazia</h4><p>${canEdit() ? "Guarde aqui o que vocês ainda vão comprar, com o link da loja. Não entra no total do enxoval." : "Quando houver itens na lista, eles aparecem aqui."}</p>${canEdit() ? `<button class="btn primary" data-act="addItem" data-planned="1">${ic("plus")} Adicionar à lista</button>` : ""}</div>`;
-  if (!list.length) return `<div class="card empty mt"><p>Nenhum item encontrado com esse filtro.</p></div>`;
+  if (!S.wish.length) return emptyBox({ icon:"bookmark", title:"Nenhum item na lista", text:"Guarde aqui o que ainda falta comprar, com o link do produto. Os itens da lista não entram no total do enxoval.", action:addBtn("Adicionar à lista", `data-act="addItem" data-planned="1"`) });
+  if (!list.length) return emptyBox({ text:"Nenhum item encontrado com este filtro." });
   const groups = new Map(); list.forEach(i => { const k = i.room_id && roomById(i.room_id) ? i.room_id : "none"; if (!groups.has(k)) groups.set(k, []); groups.get(k).push(i); });
   const order = [...S.rooms.map(r => r.id), "none"].filter(k => groups.has(k));
-  return `<div class="list-bar"><div class="list-note">${list.length} ${list.length===1?"item":"itens"} na lista · não entram no total</div></div><div class="days">` + order.map(k => { const arr = groups.get(k), r = roomById(k);
-    return `<div class="day">${groupHead("room", k, r ? r.name : "Sem cômodo", `${arr.length} ${arr.length===1?"item":"itens"}`)}<div class="card group">${arr.map(wishRow).join("")}</div></div>`; }).join("") + `</div>`;
+  return `<div class="list-bar"><div class="list-note">${qtyTxt(list.length)} na lista · não entram no total</div></div><div class="days">` + order.map(k => { const arr = groups.get(k), r = roomById(k);
+    return `<div class="day">${groupHead("room", k, r ? r.name : "Sem cômodo", qtyTxt(arr.length))}<div class="card group">${arr.map(wishRow).join("")}</div></div>`; }).join("") + `</div>`;
 }
 function itemsListHtml(){
   if (S.list === "wish") return wishListHtml();
   const list = filteredItems(), t = totals(list);
-  if (!S.items.length) return `<div class="card empty mt"><div class="logo">${ic("list")}</div><h4>Nenhuma compra ainda</h4><p>${canEdit() ? "Toque em + no topo para registrar a primeira compra do enxoval." : "Quando houver compras, elas aparecem aqui."}</p></div>`;
-  if (!list.length) return `<div class="card empty mt"><p>Nenhuma compra encontrada com esse filtro.</p></div>`;
+  if (!S.items.length) return emptyBox({ icon:"list", title:"Nenhuma compra ainda", text:"As compras registradas do enxoval aparecem aqui.", action:addBtn("Nova compra", `data-act="addItem"`) });
+  if (!list.length) return emptyBox({ text:"Nenhuma compra encontrada com este filtro." });
   const SORTS = [["recent","Mais recentes","calendar"],["value","Maior valor","chart"],["name","Nome (A a Z)","list"]];
   const sortSel = `<div class="sort-w"><select class="select" id="sort" aria-label="Ordenar compras">${SORTS.map(([v,l,i]) => `<option value="${v}" data-icon="${i}" ${S.sort===v?"selected":""}>${l}</option>`).join("")}</select></div>`;
   let body;
   if (S.sort === "value") body = `<div class="card group mt">${[...list].sort((a,b) => itemTotal(b) - itemTotal(a)).map(itemRow).join("")}</div>`;
   else if (S.sort === "name") body = `<div class="card group mt">${[...list].sort((a,b) => String(a.name).localeCompare(String(b.name), "pt-BR")).map(itemRow).join("")}</div>`;
   else body = groupedList(list);
-  return `<div class="list-bar"><div class="list-note">${list.length} ${list.length===1?"compra":"compras"} · <b>${money(t.value)}</b></div>${sortSel}</div>` + body;
+  return `<div class="list-bar"><div class="list-note">${buysTxt(list.length)} · <b>${money(t.value)}</b></div>${sortSel}</div>` + body;
 }
 function viewItems(){
   const f = S.filter, st = f.store ? storeById(f.store) : null;
   const src = S.list === "wish" ? S.wish : S.items;
   const hasNone = src.some(i => !(i.room_id && roomById(i.room_id)));
-  return `<div class="seg list-seg" id="list-seg"><span class="pill"></span>
+  return `<div class="page-t"><h2>Compras</h2></div>
+    <div class="seg ics list-seg" id="list-seg"><span class="pill"></span>
       <button data-act="list" data-mode="bought" class="${S.list!=="wish"?"on":""}">${ic("bag")} Compradas</button>
       <button data-act="list" data-mode="wish" class="${S.list==="wish"?"on":""}">${ic("bookmark")} Quero comprar${S.wish.length ? `<span class="seg-n">${S.wish.length}</span>` : ""}</button></div>
-    <div class="filters"><div class="search">${ic("search")}<input class="input" id="q" type="search" placeholder="${S.list === "wish" ? "Buscar na lista" : "Buscar compra, loja ou cômodo"}" value="${esc(f.q)}" autocomplete="off"></div>
+    <div class="filters"><div class="search">${ic("search")}<input class="input" id="q" type="search" placeholder="${S.list === "wish" ? "Buscar item, loja ou cômodo" : "Buscar compra, loja ou cômodo"}" aria-label="Buscar" value="${esc(f.q)}" autocomplete="off"></div>
     <div class="chips">
       <button class="chip ${f.room==="all"?"on":""}" data-act="fRoom" data-id="all">Todos</button>
       ${S.rooms.map(r => `<button class="chip ${f.room===r.id?"on":""}" data-act="fRoom" data-id="${r.id}">${ic(r.icon)}${esc(r.name)}</button>`).join("")}
       ${hasNone ? `<button class="chip ${f.room==="none"?"on":""}" data-act="fRoom" data-id="none">Sem cômodo</button>` : ""}
     </div></div>
-    ${st ? `<div class="chips mt-sm"><button class="chip on" data-act="fStore" data-id="">${ic("store")}${esc(st.name)} ${ic("x")}</button></div>` : ""}
+    ${st ? `<div class="chips mt-sm"><button class="chip on" data-act="fStore" data-id="" aria-label="Tirar filtro da loja ${esc(st.name)}">${ic("store")}${esc(st.name)} ${ic("x")}</button></div>` : ""}
     <div id="items-list">${itemsListHtml()}</div>`;
 }
 
@@ -1346,12 +1367,12 @@ function viewItems(){
 function viewDash(){
   const t = totals(S.items);
   const mode = S.dash;
-  const seg = `<div class="seg dash-seg" id="dash-seg"><span class="pill"></span>
-    <button data-act="dash" data-mode="rooms" class="${mode==="rooms"?"on":""}">Cômodos</button>
-    <button data-act="dash" data-mode="stores" class="${mode==="stores"?"on":""}">Lojas</button>
-    <button data-act="dash" data-mode="days" class="${mode==="days"?"on":""}">Dias</button></div>`;
+  const seg = `<div class="seg ics dash-seg" id="dash-seg"><span class="pill"></span>
+    <button data-act="dash" data-mode="rooms" class="${mode==="rooms"?"on":""}">${ic("home")} Cômodos</button>
+    <button data-act="dash" data-mode="stores" class="${mode==="stores"?"on":""}">${ic("store")} Lojas</button>
+    <button data-act="dash" data-mode="days" class="${mode==="days"?"on":""}">${ic("calendar")} Dias</button></div>`;
   let inner = "";
-  if (!S.items.length) inner = `<div class="card empty"><div class="logo">${ic("chart")}</div><h4>Sem dados ainda</h4><p>Os gráficos aparecem assim que houver compras registradas.</p></div>`;
+  if (!S.items.length) inner = emptyBox({ mt:false, icon:"chart", title:"Nenhuma compra ainda", text:"Os gráficos aparecem assim que houver compras registradas.", action:addBtn("Nova compra", `data-act="addItem"`) });
   else if (mode === "rooms") {
     const per = byKey(S.items, i => i.room_id && roomById(i.room_id) ? i.room_id : "none");
     const rows = [...per.entries()].map(([k, v]) => ({ k, v, name: k === "none" ? "Sem cômodo" : roomById(k).name, icon: k === "none" ? "box" : roomById(k).icon })).sort((a,b) => b.v.value - a.v.value);
@@ -1368,11 +1389,12 @@ function viewDash(){
     const rows = days.map(([d, v]) => ({ k:d, v, name: dayTitle(d), icon:"calendar" }));
     inner = `<div class="dash-days">${cols}${barsCard(rows, t.value, r => `data-act="page" data-kind="day" data-id="${r.k}"`, false)}</div>`;
   }
-  return `<div class="dash-top">
-    <div class="card summary"><div><div class="label">Total gasto</div><div class="v" data-count="${t.value}">${money(t.value)}</div></div><div class="side">${S.rooms.length} ${S.rooms.length===1?"cômodo":"cômodos"}<br>${S.stores.length} ${S.stores.length===1?"loja":"lojas"}</div></div>
+  return `<div class="page-t"><h2>Painel</h2></div>
+  <div class="dash-top">
+    <div class="card summary"><div><div class="label">Total do enxoval</div><div class="v" data-count="${t.value}">${money(t.value)}</div></div><div class="side">${plural(S.rooms.length, "cômodo", "cômodos")}<br>${plural(S.stores.length, "loja", "lojas")}</div></div>
     <div class="card kpi"><span class="k-ic">${ic("bag")}</span><div class="label">Compras</div><div class="v">${t.count}</div></div>
     <div class="card kpi"><span class="k-ic">${ic("box")}</span><div class="label">Itens</div><div class="v">${(+t.qty).toLocaleString("pt-BR")}</div></div>
-    <div class="card kpi"><span class="k-ic">${ic("chart")}</span><div class="label">Média</div><div class="v">${moneyShort(t.count ? t.value / t.count : 0)}</div></div>
+    <div class="card kpi"><span class="k-ic">${ic("chart")}</span><div class="label" title="Média por compra">Média</div><div class="v">${moneyShort(t.count ? t.value / t.count : 0)}</div></div>
   </div>${seg}<div class="dash-body">${inner}</div>`;
 }
 function barsCard(rows, total, attrs, two){
@@ -1380,19 +1402,19 @@ function barsCard(rows, total, attrs, two){
   return `<div class="card bars ${two && rows.length > 1 ? "two" : ""}">${rows.map(r => `<button class="bar" ${attrs(r)}>
     <div class="top-l"><span>${ic(r.icon)}<em>${esc(r.name)}</em></span><b>${money(r.v.value)}${ic("right")}</b></div>
     <div class="track"><div class="fill" data-w="${(r.v.value / mx * 100).toFixed(1)}"></div></div>
-    <div class="meta">${r.v.count} ${r.v.count===1?"compra":"compras"} · ${qtyTxt(r.v.qty)} · ${total ? Math.round(r.v.value / total * 100) : 0}% do total</div></button>`).join("")}</div>`;
+    <div class="meta">${buysTxt(r.v.count)} · ${qtyTxt(r.v.qty)} · ${total ? Math.round(r.v.value / total * 100) : 0}% do total</div></button>`).join("")}</div>`;
 }
 
 /* ---------- lojas ---------- */
 function viewStores(){
   const per = byKey(S.items, i => i.store_id);
   const list = S.stores.map(s => ({ s, v: per.get(s.id) || { value:0, count:0 } })).sort((a,b) => b.v.value - a.v.value || a.s.name.localeCompare(b.s.name));
-  return `<div class="page-t"><h2>Lojas</h2>${canEdit() ? `<button class="btn soft sm" data-act="addStore">${ic("plus")} Nova loja</button>` : ""}</div>
+  return `<div class="page-t"><h2>Lojas</h2>${canEdit() && list.length ? `<button class="btn soft sm" data-act="addStore">${ic("plus")} Nova loja</button>` : ""}</div>
   ${list.length ? `<div class="card group two">${list.map(({s, v}) => `<button class="it" data-act="store" data-id="${s.id}">
       <span class="store-ic">${ic(s.kind === "online" ? "globe" : "store")}</span>
       <span class="mid"><div class="nm">${esc(s.name)}</div><div class="sub">${esc([s.kind === "online" ? "Online" : "Loja física", s.location].filter(Boolean).join(" · "))}</div></span>
-      <span class="val"><b>${money(v.value)}</b><small>${v.count} ${v.count===1?"compra":"compras"}</small></span></button>`).join("")}</div>`
-  : `<div class="card empty"><div class="logo">${ic("store")}</div><h4>Nenhuma loja cadastrada</h4><p>Cadastre as lojas onde vocês compram para saber quanto foi gasto em cada uma.</p>${canEdit() ? `<button class="btn primary" data-act="addStore">${ic("plus")} Cadastrar loja</button>` : ""}</div>`}`;
+      <span class="val"><b>${money(v.value)}</b><small>${buysTxt(v.count)}</small></span></button>`).join("")}</div>`
+  : emptyBox({ mt:false, icon:"store", title:"Nenhuma loja ainda", text:"Adicione as lojas das compras para ver quanto foi gasto em cada uma.", action:addBtn("Nova loja", `data-act="addStore"`) })}`;
 }
 
 /* ================= MENU DE SELEÇÃO (visual do app) =================
@@ -1496,7 +1518,7 @@ function confirmBox({ title, text, ok="Confirmar", danger=false }){
 function openLightbox(src){
   if (!src) return;
   const lb = document.createElement("div"); lb.className = "lightbox"; lb.setAttribute("role", "dialog"); lb.setAttribute("aria-label", "Foto");
-  lb.innerHTML = `<img src="${esc(src)}" alt=""><button class="iconbtn" aria-label="Fechar">${ic("x")}</button>`;
+  lb.innerHTML = `<img src="${esc(src)}" alt=""><button class="iconbtn" aria-label="Fechar" title="Fechar">${ic("x")}</button>`;
   const close = () => { lb.classList.remove("show"); document.removeEventListener("keydown", onKey, true); setTimeout(() => lb.remove(), 260); };
   const onKey = e => { if (e.key === "Escape") { e.preventDefault(); e.stopImmediatePropagation(); close(); } };
   lb._close = close;
@@ -1542,30 +1564,31 @@ function itemForm(item, preset={}){
   let planned = !!it.planned;
   let newFile = null, removePhoto = false;
   const curPhoto = () => newFile ? URL.createObjectURL(newFile) : (!removePhoto && it.photo_path ? S.photos[it.photo_path] : null);
-  const photoHtml = () => { const src = curPhoto(); return `<div class="photo ${src?"has":""}" id="ph">${src ? `<img src="${esc(src)}" alt="">` : `${ic("image")}<span style="font-size:14px">Adicione uma foto do produto</span>`}
-      <div class="pbtns"><label>${ic("camera")} Câmera<input type="file" accept="image/*" capture="environment" hidden data-file></label><label>${ic("image")} Galeria<input type="file" accept="image/*" hidden data-file></label>${src ? `<button type="button" data-rmph aria-label="Remover foto">${ic("trash")}</button>` : ""}</div></div>`; };
-  const storeOpts = () => `<option value="" data-icon="box">Sem loja</option>` + S.stores.map(s => `<option value="${s.id}" data-icon="${s.kind === "online" ? "globe" : "store"}" ${s.id===it.store_id?"selected":""}>${esc(s.name)}</option>`).join("") + `<option value="__new" data-icon="plus">Cadastrar nova loja</option>`;
+  const photoHtml = () => { const src = curPhoto(); return `<div class="photo ${src?"has":""}" id="ph">${src ? `<img src="${esc(src)}" alt="">` : `${ic("image")}<span style="font-size:14px">Foto do produto (opcional)</span>`}
+      <div class="pbtns"><label>${ic("camera")} Câmera<input type="file" accept="image/*" capture="environment" hidden data-file></label><label>${ic("image")} Galeria<input type="file" accept="image/*" hidden data-file></label>${src ? `<button type="button" data-rmph aria-label="Remover foto" title="Remover foto">${ic("trash")}</button>` : ""}</div></div>`; };
+  const storeOpts = () => `<option value="" data-icon="box">Sem loja</option>` + S.stores.map(s => `<option value="${s.id}" data-icon="${s.kind === "online" ? "globe" : "store"}" ${s.id===it.store_id?"selected":""}>${esc(s.name)}</option>`).join("") + `<option value="__new" data-icon="plus">Nova loja</option>`;
   const priceStr = it.unit_price ? (+it.unit_price).toLocaleString("pt-BR", { minimumFractionDigits:2, maximumFractionDigits:2 }) : "";
-  const title = () => preset.buy ? "Registrar compra" : isNew ? (planned ? "Quero comprar" : "Nova compra") : (planned ? "Editar item da lista" : "Editar compra");
-  const saveTxt = () => preset.buy ? "Salvar compra" : planned ? (isNew ? "Salvar na lista" : "Salvar alterações") : (isNew ? "Salvar compra" : "Salvar alterações");
+  /* o título da janela repete o nome do botão que a abriu; o botão de salvar é sempre "Salvar" */
+  const title = () => preset.buy ? "Marcar como comprado" : isNew ? (planned ? "Adicionar à lista" : "Nova compra") : (planned ? "Editar item da lista" : "Editar compra");
+  const saveTxt = () => "Salvar";
   openSheet(`<form id="itf" novalidate class="${planned ? "is-wish" : ""}">
-    <div class="sheet-h"><h3 id="it-t">${title()}</h3><button type="button" class="iconbtn" data-close aria-label="Fechar">${ic("x")}</button></div>
-    ${preset.buy ? "" : `<label class="switch-row"><span class="sw-ic">${ic("bookmark")}</span><span class="sw-tx"><b>Ainda vou comprar</b><small>Fica na lista do cômodo e não entra no total</small></span><input type="checkbox" name="planned" ${planned ? "checked" : ""}><span class="sw" aria-hidden="true"></span></label>`}
-    <div class="wish-only"><div class="wish-in"><label class="field"><span>Link do produto (opcional)</span><div class="link-in">${ic("link")}<input class="input" name="link" type="url" inputmode="url" autocapitalize="off" spellcheck="false" placeholder="Cole aqui o link da loja" value="${esc(it.link || "")}" autocomplete="off"></div></label></div></div>
+    <div class="sheet-h"><h3 id="it-t">${title()}</h3><button type="button" class="iconbtn" data-close aria-label="Fechar" title="Fechar">${ic("x")}</button></div>
+    ${preset.buy ? "" : `<label class="switch-row"><span class="sw-ic">${ic("bookmark")}</span><span class="sw-tx"><b>Quero comprar</b><small>Ainda não comprei. Fica na lista e não entra no total</small></span><input type="checkbox" name="planned" ${planned ? "checked" : ""}><span class="sw" aria-hidden="true"></span></label>`}
+    <div class="wish-only"><div class="wish-in"><label class="field"><span>Link do produto (opcional)</span><div class="link-in">${ic("link")}<input class="input" name="link" type="url" inputmode="url" autocapitalize="off" spellcheck="false" placeholder="Cole aqui o link do produto" value="${esc(it.link || "")}" autocomplete="off"></div></label></div></div>
     <div id="phw">${photoHtml()}</div>
-    <label class="field"><span>Nome do produto</span><input class="input" name="name" value="${esc(it.name)}" placeholder="Ex: Jogo de panelas" maxlength="120" autocomplete="off"></label>
+    <label class="field"><span>Nome do produto</span><input class="input" name="name" value="${esc(it.name)}" placeholder="Ex.: Jogo de panelas" maxlength="120" autocomplete="off"></label>
     <div class="row2" id="row-rd">
       <label class="field"><span>Cômodo</span><select class="select" name="room"><option value="" data-icon="box">Sem cômodo</option>${S.rooms.map(r => `<option value="${r.id}" data-icon="${esc(r.icon)}" ${r.id===it.room_id?"selected":""}>${esc(r.name)}</option>`).join("")}</select></label>
       <label class="field bought-only"><span>Data da compra</span><input class="input" type="date" name="date" value="${esc(it.purchased_on)}"></label>
     </div>
-    <label class="field"><span id="store-l">${planned ? "Onde pretende comprar" : "Loja"}</span><select class="select" name="store">${storeOpts()}</select></label>
+    <label class="field"><span>Loja</span><select class="select" name="store">${storeOpts()}</select></label>
     <div class="row2">
-      <label class="field"><span>Quantidade</span><div class="stepper"><button type="button" data-q="-1" aria-label="Diminuir">${ic("minus")}</button><input name="qty" inputmode="numeric" value="${+it.quantity || 1}"><button type="button" data-q="1" aria-label="Aumentar">${ic("plus")}</button></div></label>
+      <label class="field"><span>Quantidade</span><div class="stepper"><button type="button" data-q="-1" aria-label="Diminuir quantidade">${ic("minus")}</button><input name="qty" inputmode="numeric" value="${+it.quantity || 1}" aria-label="Quantidade"><button type="button" data-q="1" aria-label="Aumentar quantidade">${ic("plus")}</button></div></label>
       <label class="field"><span id="price-l">${planned ? "Valor estimado (R$)" : "Valor unitário (R$)"}</span><input class="input" name="price" inputmode="numeric" placeholder="0,00" value="${priceStr}"></label>
     </div>
-    <div class="total-line"><span class="muted" id="tot-l">${planned ? "Estimativa" : "Total"}</span><b id="tot">${money(itemTotal(it))}</b></div>
-    <label class="field"><span>Observações (opcional)</span><textarea class="input" name="notes" rows="2" maxlength="500" placeholder="Cor, tamanho, garantia, entrega...">${esc(it.notes || "")}</textarea></label>
-    <div class="sheet-actions">${!isNew && !preset.buy ? `<button type="button" class="btn danger icon" data-del aria-label="Excluir">${ic("trash")}</button>` : ""}<button class="btn primary" type="submit" id="its">${saveTxt()}</button></div>
+    <div class="total-line"><span class="muted" id="tot-l">${planned ? "Total estimado" : "Total"}</span><b id="tot">${money(itemTotal(it))}</b></div>
+    <label class="field"><span>Observações (opcional)</span><textarea class="input" name="notes" rows="2" maxlength="500" placeholder="Ex.: cor, tamanho, garantia, entrega">${esc(it.notes || "")}</textarea></label>
+    <div class="sheet-actions">${!isNew && !preset.buy ? `<button type="button" class="btn danger icon" data-del aria-label="Excluir" title="Excluir">${ic("trash")}</button>` : ""}<button class="btn primary" type="submit" id="its">${saveTxt()}</button></div>
   </form>`, w => {
     const f = $("#itf", w);
     const qty = () => Math.max(1, parseInt(f.qty.value.replace(/\D/g, ""), 10) || 1);
@@ -1574,8 +1597,7 @@ function itemForm(item, preset={}){
       f.classList.toggle("is-wish", planned);
       $("#it-t", w).textContent = title(); $("#its", w).textContent = saveTxt();
       $("#price-l", w).textContent = planned ? "Valor estimado (R$)" : "Valor unitário (R$)";
-      $("#store-l", w).textContent = planned ? "Onde pretende comprar" : "Loja";
-      $("#tot-l", w).textContent = planned ? "Estimativa" : "Total";
+      $("#tot-l", w).textContent = planned ? "Total estimado" : "Total";
     };
     const sw = f.planned; if (sw) sw.addEventListener("change", () => { planned = sw.checked; applyMode(); if (planned) setTimeout(() => f.link.focus(), 220); });
     moneyMask(f.price); f.price.addEventListener("money", upd);
@@ -1584,7 +1606,7 @@ function itemForm(item, preset={}){
     $$("[data-q]", w).forEach(b => b.onclick = () => { f.qty.value = Math.max(1, qty() + +b.dataset.q); upd(); });
     f.store.addEventListener("change", () => { if (f.store.value !== "__new") return; f.store.value = it.store_id || ""; storeForm(null, s => { it.store_id = s.id; f.store.innerHTML = storeOpts(); f.store.value = s.id; }); });
     const wirePhoto = () => {
-      $$("[data-file]", w).forEach(inp => inp.onchange = () => { const file = inp.files && inp.files[0]; if (!file) return; if (!/^image\//.test(file.type) && !/\.(heic|heif)$/i.test(file.name)) return toast("Escolha uma imagem", true); newFile = file; removePhoto = false; $("#phw", w).innerHTML = photoHtml(); wirePhoto(); });
+      $$("[data-file]", w).forEach(inp => inp.onchange = () => { const file = inp.files && inp.files[0]; if (!file) return; if (!/^image\//.test(file.type) && !/\.(heic|heif)$/i.test(file.name)) return toast("Escolha um arquivo de imagem", true); newFile = file; removePhoto = false; $("#phw", w).innerHTML = photoHtml(); wirePhoto(); });
       const rm = $("[data-rmph]", w); if (rm) rm.onclick = () => { newFile = null; removePhoto = true; $("#phw", w).innerHTML = photoHtml(); wirePhoto(); };
     };
     wirePhoto();
@@ -1596,7 +1618,7 @@ function itemForm(item, preset={}){
       if (!planned && !f.date.value) return toast("Informe a data da compra", true);
       const link = normLink(f.link.value);
       if (f.link.value.trim() && planned && !link) return toast("Confira o link", true);
-      if ((planned || wasPlanned) && !S.hasPlanned) return toast("Falta atualizar o banco de dados para usar a lista", true);
+      if ((planned || wasPlanned) && !S.hasPlanned) return toast("A lista Quero comprar ainda não está ativa no banco de dados", true);
       const btn = $("#its", w); busy(btn, true);
       let uploaded = null;
       try {
@@ -1609,7 +1631,7 @@ function itemForm(item, preset={}){
         else { const { error } = await sb.from("items").update(row).eq("id", it.id); if (error) throw error; }
         if (oldPath && (newFile || removePhoto)) removePhotos([oldPath]);
         closeAllSheets();
-        toast(wasPlanned && !planned ? "Comprado! Já entrou no total" : planned ? (isNew ? "Adicionado à lista" : "Lista atualizada") : (isNew ? "Compra registrada" : "Compra atualizada"));
+        toast(wasPlanned && !planned ? "Marcado como comprado" : planned ? (isNew ? "Item adicionado à lista" : "Item atualizado") : (isNew ? "Compra registrada" : "Compra atualizada"));
         await loadProjectData(); render();
       } catch (err) { console.warn(err); if (uploaded) removePhotos([uploaded]); toast(friendlyError(err), true); busy(btn, false); }
     });
@@ -1618,11 +1640,11 @@ function itemForm(item, preset={}){
 async function deleteItem(it, formSheet){
   if (offlineBlock()) return;
   const wish = !!it.planned;
-  if (!(await confirmBox({ title: wish ? "Tirar da lista?" : "Excluir compra?", text:`<b>${esc(it.name)}</b> ${wish ? "sai da lista de quero comprar." : "será removida do enxoval."}`, ok: wish ? "Tirar da lista" : "Excluir", danger:true }))) return;
+  if (!(await confirmBox({ title: wish ? "Excluir item da lista?" : "Excluir compra?", text:`Esta ação exclui <b>${esc(it.name)}</b> ${wish ? "da lista Quero comprar" : "do enxoval"}.`, ok:"Excluir", danger:true }))) return;
   const { error } = await sb.from("items").delete().eq("id", it.id);
   if (error) return toast(friendlyError(error), true);
   if (it.photo_path) removePhotos([it.photo_path]);
-  closeAllSheets(); toast(wish ? "Item tirado da lista" : "Compra excluída");
+  closeAllSheets(); toast(wish ? "Item excluído" : "Compra excluída");
   await loadProjectData(); render();
 }
 
@@ -1631,16 +1653,19 @@ function itemDetail(id){
   const it = allItems().find(i => i.id === id); if (!it) return;
   const wish = !!it.planned;
   const r = roomById(it.room_id), s = storeById(it.store_id), ph = it.photo_path && S.photos[it.photo_path];
-  const actions = !canEdit() ? (wish && it.link ? `<div class="sheet-actions"><a class="btn soft block" href="${esc(it.link)}" target="_blank" rel="noopener">${ic("external")} Abrir link</a></div>` : "")
-    : wish ? `${it.link ? `<div class="sheet-actions"><a class="btn soft block" href="${esc(it.link)}" target="_blank" rel="noopener">${ic("external")} Abrir link da loja</a></div>` : ""}<div class="sheet-actions"><button class="btn danger icon" data-del aria-label="Tirar da lista">${ic("trash")}</button><button class="btn soft icon" data-edit aria-label="Editar">${ic("edit")}</button><button class="btn primary" data-buy>${ic("check")} Comprei</button></div>`
-    : `<div class="sheet-actions"><button class="btn danger icon" data-del aria-label="Excluir">${ic("trash")}</button><button class="btn soft" data-dup>${ic("copy")} Duplicar</button><button class="btn primary" data-edit>${ic("edit")} Editar</button></div>`;
-  openSheet(`<div class="sheet-h"><h3>${esc(it.name)}</h3><button class="iconbtn" data-close aria-label="Fechar">${ic("x")}</button></div>
+  /* ações sempre na mesma ordem: excluir (ícone), ação secundária, ação principal */
+  const linkBtn = it.link ? `<a class="btn soft" href="${esc(it.link)}" target="_blank" rel="noopener">${ic("external")} Abrir link</a>` : "";
+  const delBtn = `<button class="btn danger icon" data-del aria-label="Excluir" title="Excluir">${ic("trash")}</button>`;
+  const actions = !canEdit() ? (wish && linkBtn ? `<div class="sheet-actions">${linkBtn}</div>` : "")
+    : wish ? `<div class="sheet-actions"><button class="btn primary" data-buy>${ic("check")} Marcar como comprado</button></div><div class="sheet-actions">${delBtn}${linkBtn}<button class="btn soft" data-edit>${ic("edit")} Editar</button></div>`
+    : `<div class="sheet-actions">${delBtn}<button class="btn soft" data-dup>${ic("copy")} Duplicar</button><button class="btn primary" data-edit>${ic("edit")} Editar</button></div>`;
+  openSheet(`<div class="sheet-h"><h3>${esc(it.name)}</h3><button class="iconbtn" data-close aria-label="Fechar" title="Fechar">${ic("x")}</button></div>
     ${wish ? `<div class="wish-tag">${ic("bookmark")} Quero comprar · não entra no total</div>` : ""}
     ${ph ? `<div class="detail-photo" data-zoom role="button" aria-label="Ver foto em tela cheia"><img src="${esc(ph)}" alt=""><span class="zoom">${ic("expand")}</span></div>` : ""}
-    <div class="card summary compact ${wish ? "ghost" : ""}"><div><div class="label">${wish ? "Valor estimado" : "Total"}</div><div class="v">${money(itemTotal(it))}</div></div><div class="side">${(+it.quantity).toLocaleString("pt-BR")} × ${money(it.unit_price)}</div></div>
+    <div class="card summary compact ${wish ? "ghost" : ""}"><div><div class="label">${wish ? "Total estimado" : "Total"}</div><div class="v">${money(itemTotal(it))}</div></div><div class="side">${(+it.quantity).toLocaleString("pt-BR")} × ${money(it.unit_price)}</div></div>
     <div class="card kv">
       ${kvGo("room", r ? r.id : "none", "Cômodo", r ? r.name : "Sem cômodo")}
-      ${kvGo("store", s ? s.id : "none", wish ? "Onde comprar" : "Loja", s ? s.name : wish ? "Não definido" : "Sem loja")}
+      ${kvGo("store", s ? s.id : "none", "Loja", s ? s.name : "Sem loja")}
       ${wish ? (it.link ? `<div><span>Link</span><b><a class="kv-link" href="${esc(it.link)}" target="_blank" rel="noopener">${esc(linkHost(it.link))} ${ic("external")}</a></b></div>` : "") : kvGo("day", it.purchased_on, "Data da compra", fmtDate(it.purchased_on))}
       ${it.created_by_email ? `<div><span>Registrado por</span><b>${esc(it.created_by_email)}</b></div>` : ""}
       ${it.notes ? `<div class="block"><span>Observações</span><p>${esc(it.notes)}</p></div>` : ""}
@@ -1667,24 +1692,24 @@ function roomForm(room){
   if (!canEdit()) return;
   if (offlineBlock()) return;
   const isNew = !room; let icon = room ? room.icon : "box";
-  openSheet(`<form id="rf" novalidate><div class="sheet-h"><h3>${isNew ? "Novo cômodo" : "Editar cômodo"}</h3><button type="button" class="iconbtn" data-close aria-label="Fechar">${ic("x")}</button></div>
-    <label class="field"><span>Nome</span><input class="input" name="name" value="${esc(room ? room.name : "")}" placeholder="Ex: ${esc(ROOM_EX[icon] || "Lavanderia")}" maxlength="40"></label>
-    <div class="field"><span>Ícone</span><div class="icon-grid">${ROOM_ICONS.map(n => `<button type="button" data-ic="${n}" class="${n===icon?"on":""}" aria-label="${n}">${ic(n)}</button>`).join("")}</div></div>
-    <div class="sheet-actions">${!isNew ? `<button type="button" class="btn danger icon" data-del aria-label="Excluir">${ic("trash")}</button>` : ""}<button class="btn primary" type="submit" id="rs">Salvar</button></div></form>`, w => {
+  openSheet(`<form id="rf" novalidate><div class="sheet-h"><h3>${isNew ? "Novo cômodo" : "Editar cômodo"}</h3><button type="button" class="iconbtn" data-close aria-label="Fechar" title="Fechar">${ic("x")}</button></div>
+    <label class="field"><span>Nome do cômodo</span><input class="input" name="name" value="${esc(room ? room.name : "")}" placeholder="Ex.: ${esc(ROOM_EX[icon] || "Lavanderia")}" maxlength="40" autocomplete="off"></label>
+    <div class="field"><span>Ícone</span><div class="icon-grid">${ROOM_ICONS.map(n => `<button type="button" data-ic="${n}" class="${n===icon?"on":""}" aria-label="${esc(ROOM_EX[n] || n)}" title="${esc(ROOM_EX[n] || n)}">${ic(n)}</button>`).join("")}</div></div>
+    <div class="sheet-actions">${!isNew ? `<button type="button" class="btn danger icon" data-del aria-label="Excluir" title="Excluir">${ic("trash")}</button>` : ""}<button class="btn primary" type="submit" id="rs">Salvar</button></div></form>`, w => {
     const f = $("#rf", w);
-    $$("[data-ic]", w).forEach(b => b.onclick = () => { icon = b.dataset.ic; $$("[data-ic]", w).forEach(x => x.classList.toggle("on", x === b)); f.name.placeholder = "Ex: " + (ROOM_EX[icon] || "Lavanderia"); });
+    $$("[data-ic]", w).forEach(b => b.onclick = () => { icon = b.dataset.ic; $$("[data-ic]", w).forEach(x => x.classList.toggle("on", x === b)); f.name.placeholder = "Ex.: " + (ROOM_EX[icon] || "Lavanderia"); });
     f.addEventListener("submit", async e => {
       e.preventDefault(); const name = f.name.value.trim(); if (!name) return toast("Informe o nome do cômodo", true);
       const btn = $("#rs", w); busy(btn, true);
       const q = isNew ? sb.from("rooms").insert({ project_id:S.project.id, name, icon, position: S.rooms.length ? Math.max(...S.rooms.map(r => r.position || 0)) + 1 : 0 }) : sb.from("rooms").update({ name, icon }).eq("id", room.id);
       const { error } = await q;
       if (error) { busy(btn, false); return toast(friendlyError(error), true); }
-      closeSheet(w); toast(isNew ? "Cômodo criado" : "Cômodo atualizado"); await loadProjectData(); render();
+      closeSheet(w); toast(isNew ? "Cômodo adicionado" : "Cômodo atualizado"); await loadProjectData(); render();
     });
     const d = $("[data-del]", w);
     if (d) d.onclick = async () => {
-      const n = S.items.filter(i => i.room_id === room.id).length;
-      if (offlineBlock()) return; if (!(await confirmBox({ title:"Excluir cômodo?", text: n ? `As ${n} compras de <b>${esc(room.name)}</b> não serão apagadas, elas passam para "Sem cômodo".` : `<b>${esc(room.name)}</b> será removido da casa.`, ok:"Excluir", danger:true }))) return;
+      const n = allItems().filter(i => i.room_id === room.id).length;
+      if (offlineBlock()) return; if (!(await confirmBox({ title:"Excluir cômodo?", text: `<b>${esc(room.name)}</b> será excluído.` + (n ? ` ${n === 1 ? "O item deste cômodo não será excluído e passa" : `Os ${n} itens deste cômodo não serão excluídos e passam`} para Sem cômodo.` : ""), ok:"Excluir", danger:true }))) return;
       const { error } = await sb.from("rooms").delete().eq("id", room.id);
       if (error) return toast(friendlyError(error), true);
       closeAllSheets(); if (S.roomId === room.id) S.roomId = null; S.pages = S.pages.filter(x => !(x.kind === "room" && x.id === room.id)); S.nav = "back"; toast("Cômodo excluído"); await loadProjectData(); render();
@@ -1693,22 +1718,23 @@ function roomForm(room){
 }
 
 /* ================= LOJA ================= */
+const LOC_EX = { fisica:"Ex.: Shopping Center, loja 120", online:"Ex.: amazon.com.br" };
 function storeForm(store, onSaved){
   if (!canEdit()) return;
   if (offlineBlock()) return;
   const isNew = !store, st = store || { name:"", kind:"fisica", location:"", notes:"" };
-  openSheet(`<form id="sf" novalidate><div class="sheet-h"><h3>${isNew ? "Nova loja" : "Editar loja"}</h3><button type="button" class="iconbtn" data-close aria-label="Fechar">${ic("x")}</button></div>
-    <label class="field"><span>Nome da loja</span><input class="input" name="name" value="${esc(st.name)}" placeholder="Ex: Amazon, Magazine Luiza" maxlength="60" autocomplete="off"></label>
+  openSheet(`<form id="sf" novalidate><div class="sheet-h"><h3>${isNew ? "Nova loja" : "Editar loja"}</h3><button type="button" class="iconbtn" data-close aria-label="Fechar" title="Fechar">${ic("x")}</button></div>
+    <label class="field"><span>Nome da loja</span><input class="input" name="name" value="${esc(st.name)}" placeholder="Ex.: Amazon, Magazine Luiza" maxlength="60" autocomplete="off"></label>
     <div class="field"><span>Tipo</span>${segHtml("kind", [["fisica","Loja física"],["online","Online"]], st.kind)}</div>
-    <label class="field"><span id="loc-l">${st.kind === "online" ? "Site" : "Endereço"} (opcional)</span><input class="input" name="location" value="${esc(st.location || "")}" maxlength="120" autocomplete="off"></label>
-    <label class="field"><span>Observações (opcional)</span><textarea class="input" name="notes" rows="2" maxlength="300">${esc(st.notes || "")}</textarea></label>
-    <div class="sheet-actions">${!isNew ? `<button type="button" class="btn danger icon" data-del aria-label="Excluir">${ic("trash")}</button>` : ""}<button class="btn primary" type="submit" id="ss">Salvar</button></div></form>`, w => {
+    <label class="field"><span id="loc-l">${st.kind === "online" ? "Site" : "Endereço"} (opcional)</span><input class="input" name="location" value="${esc(st.location || "")}" placeholder="${st.kind === "online" ? LOC_EX.online : LOC_EX.fisica}" maxlength="120" autocomplete="off"></label>
+    <label class="field"><span>Observações (opcional)</span><textarea class="input" name="notes" rows="2" maxlength="300" placeholder="Ex.: horário, contato, condições de entrega">${esc(st.notes || "")}</textarea></label>
+    <div class="sheet-actions">${!isNew ? `<button type="button" class="btn danger icon" data-del aria-label="Excluir" title="Excluir">${ic("trash")}</button>` : ""}<button class="btn primary" type="submit" id="ss">Salvar</button></div></form>`, w => {
     wireSeg(w);
     const f = $("#sf", w), seg = $("[data-seg=kind]", w);
-    seg.addEventListener("change", () => { $("#loc-l", w).textContent = (seg.dataset.value === "online" ? "Site" : "Endereço") + " (opcional)"; });
+    seg.addEventListener("change", () => { const on = seg.dataset.value === "online"; $("#loc-l", w).textContent = (on ? "Site" : "Endereço") + " (opcional)"; f.location.placeholder = on ? LOC_EX.online : LOC_EX.fisica; });
     f.addEventListener("submit", async e => {
       e.preventDefault(); const name = f.name.value.trim(); if (!name) return toast("Informe o nome da loja", true);
-      if (isNew && S.stores.some(s => s.name.toLowerCase() === name.toLowerCase())) return toast("Já existe uma loja com esse nome", true);
+      if (isNew && S.stores.some(s => s.name.toLowerCase() === name.toLowerCase())) return toast("Já existe uma loja com este nome", true);
       const btn = $("#ss", w); busy(btn, true);
       const row = { name, kind: seg.dataset.value || "fisica", location: f.location.value.trim() || null, notes: f.notes.value.trim() || null };
       const q = isNew ? sb.from("stores").insert({ ...row, project_id:S.project.id }).select().single() : sb.from("stores").update(row).eq("id", store.id).select().single();
@@ -1716,13 +1742,13 @@ function storeForm(store, onSaved){
       if (error) { busy(btn, false); return toast(friendlyError(error), true); }
       const k = S.stores.findIndex(s => s.id === data.id); if (k >= 0) S.stores[k] = data; else S.stores.push(data);
       S.stores.sort((a,b) => a.name.localeCompare(b.name));
-      closeSheet(w); toast(isNew ? "Loja cadastrada" : "Loja atualizada");
+      closeSheet(w); toast(isNew ? "Loja adicionada" : "Loja atualizada");
       if (onSaved) onSaved(data); else { await loadProjectData(); render(); }
     });
     const d = $("[data-del]", w);
     if (d) d.onclick = async () => {
-      const n = S.items.filter(i => i.store_id === store.id).length;
-      if (offlineBlock()) return; if (!(await confirmBox({ title:"Excluir loja?", text: n ? `As ${n} compras feitas na <b>${esc(store.name)}</b> não serão apagadas, só ficam sem loja.` : `<b>${esc(store.name)}</b> será removida.`, ok:"Excluir", danger:true }))) return;
+      const n = allItems().filter(i => i.store_id === store.id).length;
+      if (offlineBlock()) return; if (!(await confirmBox({ title:"Excluir loja?", text: `<b>${esc(store.name)}</b> será excluída.` + (n ? ` ${n === 1 ? "O item desta loja não será excluído e passa" : `Os ${n} itens desta loja não serão excluídos e passam`} para Sem loja.` : ""), ok:"Excluir", danger:true }))) return;
       const { error } = await sb.from("stores").delete().eq("id", store.id);
       if (error) return toast(friendlyError(error), true);
       closeAllSheets(); S.pages = S.pages.filter(x => !(x.kind === "store" && x.id === store.id)); S.nav = "back"; toast("Loja excluída"); await loadProjectData(); render();
@@ -1735,23 +1761,23 @@ function newProjectForm(){
   const list = DEFAULT_ROOMS.map(([n, i, on]) => [n, i]);
   const picked = new Set(DEFAULT_ROOMS.filter(r => r[2]).map(r => r[0]));
   const rows = () => list.map(([n, i]) => { const on = picked.has(n); return `<button type="button" class="check-row ${on?"on":""}" data-room="${esc(n)}" role="checkbox" aria-checked="${on}"><span class="store-ic">${ic(i)}</span><span class="mid">${esc(n)}</span><span class="ck" aria-hidden="true">${ic("check")}</span></button>`; }).join("");
-  openSheet(`<form id="pf" novalidate><div class="sheet-h"><h3>Novo projeto</h3><button type="button" class="iconbtn" data-close aria-label="Fechar">${ic("x")}</button></div>
-    <label class="field"><span>Nome do projeto</span><input class="input" name="name" placeholder="Ex: Nosso Apê" maxlength="50" autocomplete="off"></label>
+  openSheet(`<form id="pf" novalidate><div class="sheet-h"><h3>Novo projeto</h3><button type="button" class="iconbtn" data-close aria-label="Fechar" title="Fechar">${ic("x")}</button></div>
+    <label class="field"><span>Nome do projeto</span><input class="input" name="name" placeholder="Ex.: Nosso Apê" maxlength="50" autocomplete="off"></label>
     <div class="field"><span>Cômodos do apartamento</span><div class="card group" id="pick">${rows()}</div></div>
-    <div class="add-inline"><input class="input" id="newroom" placeholder="Outro cômodo (ex: Suíte)" maxlength="40"><button type="button" class="btn soft icon" id="addroom" aria-label="Adicionar cômodo">${ic("plus")}</button></div>
+    <div class="add-inline"><input class="input" id="newroom" placeholder="Outro cômodo. Ex.: Suíte" aria-label="Outro cômodo" maxlength="40" autocomplete="off"><button type="button" class="btn soft icon" id="addroom" aria-label="Adicionar à lista de cômodos" title="Adicionar">${ic("plus")}</button></div>
     <div class="sheet-actions"><button class="btn primary" type="submit" id="ps">Criar projeto</button></div></form>`, w => {
     const f = $("#pf", w);
     $("#pick", w).addEventListener("click", e => { const b = e.target.closest("[data-room]"); if (!b) return; const n = b.dataset.room; picked.has(n) ? picked.delete(n) : picked.add(n); const on = picked.has(n); b.classList.toggle("on", on); b.setAttribute("aria-checked", on); });
     const addR = () => {
       const inp = $("#newroom", w), n = inp.value.trim(); if (!n) return;
-      if (list.some(r => r[0].toLowerCase() === n.toLowerCase())) return toast("Esse cômodo já está na lista", true);
+      if (list.some(r => r[0].toLowerCase() === n.toLowerCase())) return toast("Este cômodo já está na lista", true);
       const known = DEFAULT_ROOMS.find(r => n.toLowerCase().startsWith(r[0].toLowerCase()));
       list.push([n, known ? known[1] : "box"]); picked.add(n); inp.value = ""; $("#pick", w).innerHTML = rows();
     };
     $("#addroom", w).onclick = addR;
     $("#newroom", w).addEventListener("keydown", e => { if (e.key === "Enter") { e.preventDefault(); addR(); } });
     f.addEventListener("submit", async e => {
-      e.preventDefault(); const name = f.name.value.trim(); if (!name) { f.name.focus(); return toast("Dê um nome ao projeto", true); }
+      e.preventDefault(); const name = f.name.value.trim(); if (!name) { f.name.focus(); return toast("Informe o nome do projeto", true); }
       const btn = $("#ps", w); busy(btn, true);
       try {
         const { data: proj, error } = await sb.from("projects").insert({ name }).select().single();
@@ -1765,9 +1791,9 @@ function newProjectForm(){
   });
 }
 function projectsSheet(){
-  openSheet(`<div class="sheet-h"><h3>Meus projetos</h3><button class="iconbtn" data-close aria-label="Fechar">${ic("x")}</button></div>
+  openSheet(`<div class="sheet-h"><h3>Meus projetos</h3><button class="iconbtn" data-close aria-label="Fechar" title="Fechar">${ic("x")}</button></div>
     <div class="card group">${S.projects.map(p => { const mine = p.owner_id === S.user.id; return `<button class="proj-row" data-pid="${p.id}"><span class="store-ic">${ic("home")}</span><span class="mid">${esc(p.name)}<small>${mine ? "Criado por você" : "Compartilhado com você"}</small></span>${S.project && p.id === S.project.id ? `<span class="ok">${ic("check")}</span>` : ""}</button>`; }).join("")}</div>
-    <div class="sheet-actions"><button class="btn soft" data-new>${ic("plus")} Novo projeto</button>${S.project ? `<button class="btn soft" data-set>${ic("gear")} Configurar</button>` : ""}</div>`, w => {
+    <div class="sheet-actions">${S.project ? `<button class="btn soft" data-set>${ic("gear")} Configurar</button>` : ""}<button class="btn primary" data-new>${ic("plus")} Novo projeto</button></div>`, w => {
     $$("[data-pid]", w).forEach(b => b.onclick = async () => { closeSheet(w); if (b.dataset.pid !== S.project?.id) { S.tab = "casa"; await openProject(b.dataset.pid); } });
     $("[data-new]", w).onclick = () => { closeSheet(w); setTimeout(newProjectForm, 150); };
     const st = $("[data-set]", w); if (st) st.onclick = () => { closeSheet(w); setTimeout(projectSettings, 150); };
@@ -1775,11 +1801,11 @@ function projectsSheet(){
 }
 function projectSettings(){
   const p = S.project; if (!p) return;
-  openSheet(`<form id="psf" novalidate><div class="sheet-h"><h3>Configurar projeto</h3><button type="button" class="iconbtn" data-close aria-label="Fechar">${ic("x")}</button></div>
+  openSheet(`<form id="psf" novalidate><div class="sheet-h"><h3>Configurar projeto</h3><button type="button" class="iconbtn" data-close aria-label="Fechar" title="Fechar">${ic("x")}</button></div>
     <label class="field"><span>Nome do projeto</span><input class="input" name="name" value="${esc(p.name)}" maxlength="50" ${isOwner() ? "" : "disabled"}></label>
-    ${isOwner() ? `<button class="btn primary block" type="submit" id="pss">Salvar nome</button>` : `<p class="note">Só quem criou o projeto pode mudar o nome.</p>`}
-    <div class="section-t"><h3>Cômodos</h3>${canEdit() ? `<button type="button" class="btn soft sm" data-addroom>${ic("plus")} Adicionar</button>` : ""}</div>
-    <div class="card group">${S.rooms.length ? S.rooms.map(r => `<button type="button" class="proj-row" data-room="${r.id}"><span class="store-ic">${ic(r.icon)}</span><span class="mid">${esc(r.name)}</span>${canEdit() ? `<span class="muted">${ic("edit")}</span>` : ""}</button>`).join("") : `<div class="empty"><p>Nenhum cômodo</p></div>`}</div>
+    ${isOwner() ? `<button class="btn primary block" type="submit" id="pss">Salvar</button>` : `<p class="note">Só o dono do projeto pode alterar o nome.</p>`}
+    <div class="section-t"><h3>Cômodos</h3>${canEdit() ? `<button type="button" class="btn soft sm" data-addroom>${ic("plus")} Novo cômodo</button>` : ""}</div>
+    <div class="card group">${S.rooms.length ? S.rooms.map(r => `<button type="button" class="proj-row" data-room="${r.id}"><span class="store-ic">${ic(r.icon)}</span><span class="mid">${esc(r.name)}</span>${canEdit() ? `<span class="muted" aria-hidden="true">${ic("edit")}</span>` : ""}</button>`).join("") : `<div class="empty"><p>Nenhum cômodo ainda.</p></div>`}</div>
     <div class="section-t"><h3>Acesso</h3></div>
     <div class="card menu-list">
       <button type="button" data-share>${ic("users")} Pessoas com acesso<span class="end">${S.members.length}</span></button>
@@ -1787,18 +1813,18 @@ function projectSettings(){
     </div></form>`, w => {
     const f = $("#psf", w);
     f.addEventListener("submit", async e => {
-      e.preventDefault(); if (!isOwner()) return; if (offlineBlock()) return; const name = f.name.value.trim(); if (!name) return toast("Informe o nome", true);
+      e.preventDefault(); if (!isOwner()) return; if (offlineBlock()) return; const name = f.name.value.trim(); if (!name) return toast("Informe o nome do projeto", true);
       const btn = $("#pss", w); busy(btn, true);
       const { error } = await sb.from("projects").update({ name }).eq("id", p.id);
       busy(btn, false); if (error) return toast(friendlyError(error), true);
-      toast("Nome atualizado"); await loadProjectData(); render();
+      toast("Projeto atualizado"); await loadProjectData(); render();
     });
     const ar = $("[data-addroom]", w); if (ar) ar.onclick = () => { closeSheet(w); setTimeout(() => roomForm(null), 150); };
     $$("[data-room]", w).forEach(b => b.onclick = () => { if (!canEdit()) return; const r = roomById(b.dataset.room); closeSheet(w); setTimeout(() => roomForm(r), 150); });
     $("[data-share]", w).onclick = () => { closeSheet(w); setTimeout(shareSheet, 150); };
     const dp = $("[data-delp]", w);
     if (dp) dp.onclick = async () => {
-      if (offlineBlock()) return; if (!(await confirmBox({ title:"Excluir projeto?", text:`Tudo de <b>${esc(p.name)}</b> será apagado: cômodos, lojas, compras e fotos. Quem tem acesso também perde o projeto.`, ok:"Excluir projeto", danger:true }))) return;
+      if (offlineBlock()) return; if (!(await confirmBox({ title:"Excluir projeto?", text:`Tudo de <b>${esc(p.name)}</b> será excluído: cômodos, lojas, compras, lista e fotos. Quem tem acesso também perde o projeto.`, ok:"Excluir", danger:true }))) return;
       try {
         const { data: files } = await sb.storage.from(BUCKET).list(p.id, { limit:1000 });
         if (files && files.length) await removePhotos(files.map(x => `${p.id}/${x.name}`));
@@ -1808,7 +1834,7 @@ function projectSettings(){
     };
     const lv = $("[data-leave]", w);
     if (lv) lv.onclick = async () => {
-      if (offlineBlock()) return; if (!(await confirmBox({ title:"Sair do projeto?", text:`Você deixa de ver <b>${esc(p.name)}</b>. Para voltar, o dono precisa compartilhar de novo.`, ok:"Sair do projeto", danger:true }))) return;
+      if (offlineBlock()) return; if (!(await confirmBox({ title:"Sair do projeto?", text:`Você deixa de ver <b>${esc(p.name)}</b>. Para voltar, o dono do projeto precisa compartilhar novamente.`, ok:"Sair", danger:true }))) return;
       const me = S.members.find(m => String(m.email).toLowerCase() === myEmail());
       const { error } = await sb.from("project_members").delete().eq("id", me?.id);
       if (error) return toast(friendlyError(error), true);
@@ -1822,18 +1848,19 @@ function shareSheet(){
   const draw = () => S.members.map(m => {
     const me = String(m.email).toLowerCase() === myEmail();
     const ctrl = isOwner() && m.role !== "owner"
-      ? `<select class="select" data-role="${m.id}"><option value="editor" data-icon="edit" ${m.role==="editor"?"selected":""}>Pode editar</option><option value="viewer" data-icon="eye" ${m.role==="viewer"?"selected":""}>Só visualizar</option></select><button type="button" class="iconbtn" data-rm="${m.id}" aria-label="Remover">${ic("x")}</button>`
+      ? `<select class="select" data-role="${m.id}"><option value="editor" data-icon="edit" ${m.role==="editor"?"selected":""}>Pode editar</option><option value="viewer" data-icon="eye" ${m.role==="viewer"?"selected":""}>Só visualizar</option></select><button type="button" class="iconbtn" data-rm="${m.id}" aria-label="Remover acesso" title="Remover acesso">${ic("x")}</button>`
       : `<span class="badge ${m.role==="owner"?"owner":""}">${ROLE[m.role] || m.role}</span>`;
-    return `<div class="member"><span class="avatar">${esc(initials(m.email))}</span><span class="mid"><b>${esc(m.email)}${me ? " (você)" : ""}</b><small>${m.role === "owner" ? "Criou o projeto" : "Convidado"}</small></span>${ctrl}</div>`;
+    /* nome em cima e e-mail embaixo, como no resto do app */
+    return `<div class="member"><span class="avatar">${esc(initials(m.email))}</span><span class="mid"><b>${esc(me ? firstName(myName()) : nameFromEmail(m.email))}${me ? " (você)" : ""}</b><small>${esc(m.email)}</small></span>${ctrl}</div>`;
   }).join("");
-  openSheet(`<div class="sheet-h"><h3>Compartilhar</h3><button class="iconbtn" data-close aria-label="Fechar">${ic("x")}</button></div>
+  openSheet(`<div class="sheet-h"><h3>Compartilhar projeto</h3><button class="iconbtn" data-close aria-label="Fechar" title="Fechar">${ic("x")}</button></div>
     ${isOwner() ? `<form id="shf" novalidate>
       <label class="field"><span>E-mail da pessoa</span><input class="input" name="email" type="email" inputmode="email" autocapitalize="off" placeholder="pessoa@email.com" autocomplete="off"></label>
       <div class="field"><span>Permissão</span>${segHtml("role", [["editor","Pode editar"],["viewer","Só visualizar"]], "editor")}</div>
       <button class="btn primary block" type="submit" id="shs">${ic("mail")} Dar acesso</button>
     </form>
-    <p class="note">A pessoa entra no Nosso Lar com esse mesmo e-mail (criando a conta, se ainda não tiver) e o projeto aparece para ela. Envie o link do app para ela:</p>
-    <button class="btn soft block" data-copy>${ic("copy")} Copiar link do app</button>` : `<p class="note">Só quem criou o projeto pode convidar pessoas ou mudar permissões.</p>`}
+    <p class="note">A pessoa precisa entrar no Nosso Lar com este mesmo e-mail (ou criar a conta, se ainda não tiver). O projeto aparece para ela automaticamente.</p>
+    <button class="btn soft block" data-copy>${ic("copy")} Copiar link do app</button>` : `<p class="note">Só o dono do projeto pode dar acesso ou alterar permissões.</p>`}
     <div class="section-t"><h3>Pessoas com acesso</h3></div>
     <div class="card group" id="mlist">${draw()}</div>`, w => {
     wireSeg(w);
@@ -1844,13 +1871,13 @@ function shareSheet(){
     if (f) f.addEventListener("submit", async e => {
       e.preventDefault(); if (offlineBlock()) return; const email = f.email.value.trim().toLowerCase();
       if (!/^\S+@\S+\.\S+$/.test(email)) return toast("Confira o e-mail", true);
-      if (S.members.some(m => String(m.email).toLowerCase() === email)) return toast("Esse e-mail já está no projeto", true);
+      if (S.members.some(m => String(m.email).toLowerCase() === email)) return toast("Este e-mail já tem acesso ao projeto", true);
       const role = $("[data-seg=role]", w).dataset.value || "editor";
       const btn = $("#shs", w); busy(btn, true);
       const { error } = await sb.from("project_members").insert({ project_id:S.project.id, email, role });
       busy(btn, false);
       if (error) return toast(friendlyError(error), true);
-      f.email.value = ""; toast("Acesso liberado para " + email);
+      f.email.value = ""; toast("Acesso liberado");
       await loadProjectData(); redraw(); render();
     });
     $("#mlist", w).addEventListener("change", async e => {
@@ -1874,7 +1901,7 @@ function shareSheet(){
 /* ================= MENU ================= */
 function menuSheet(){
   const th = lsGet("nl.theme", "system");
-  openSheet(`<div class="me"><span class="avatar">${esc(initials(myName()))}</span><div><b>${esc(myName())}</b><small>${esc(myEmail())}</small></div><button class="iconbtn" data-close aria-label="Fechar">${ic("x")}</button></div>
+  openSheet(`<div class="me"><span class="avatar">${esc(initials(myName()))}</span><div><b>${esc(myName())}</b><small>${esc(myEmail())}</small></div><button class="iconbtn" data-close aria-label="Fechar" title="Fechar">${ic("x")}</button></div>
     <div class="card menu-list">
       <button data-m="projects">${ic("folder")} Meus projetos<span class="end">${S.projects.length}</span></button>
       ${S.project ? `<button data-m="share">${ic("users")} Compartilhar projeto</button><button data-m="settings">${ic("gear")} Configurar projeto</button>` : ""}
@@ -1882,7 +1909,7 @@ function menuSheet(){
     </div>
     <div class="section-t"><h3>Aparência</h3></div>
     ${segHtml("theme", [["system","Sistema"],["light","Claro"],["dark","Escuro"]], th)}
-    <div class="card menu-list mt-lg"><button class="red" data-m="logout">${ic("logout")} Sair</button></div>`, w => {
+    <div class="card menu-list mt-lg"><button class="red" data-m="logout">${ic("logout")} Sair da conta</button></div>`, w => {
     wireSeg(w);
     $("[data-seg=theme]", w).addEventListener("change", e => { lsSet("nl.theme", e.currentTarget.dataset.value); applyTheme(); });
     $$("[data-m]", w).forEach(b => b.onclick = async () => {
@@ -1894,8 +1921,8 @@ function menuSheet(){
 }
 function nameForm(){
   if (offlineBlock()) return;
-  openSheet(`<form id="nf" novalidate><div class="sheet-h"><h3>Seu nome</h3><button type="button" class="iconbtn" data-close aria-label="Fechar">${ic("x")}</button></div>
-    <label class="field"><span>Nome</span><input class="input" name="nome" value="${esc(S.user?.user_metadata?.nome || "")}" maxlength="40"></label>
+  openSheet(`<form id="nf" novalidate><div class="sheet-h"><h3>Alterar meu nome</h3><button type="button" class="iconbtn" data-close aria-label="Fechar" title="Fechar">${ic("x")}</button></div>
+    <label class="field"><span>Nome</span><input class="input" name="nome" value="${esc(S.user?.user_metadata?.nome || "")}" maxlength="40" autocomplete="name"></label>
     <div class="sheet-actions"><button class="btn primary" type="submit" id="nfs">Salvar</button></div></form>`, w => {
     const f = $("#nf", w);
     f.addEventListener("submit", async e => {
@@ -2040,7 +2067,7 @@ window.addEventListener("popstate", () => {
 /* ================= INÍCIO ================= */
 renderNet();
 if (!RECOVERY_AT_LOAD) bootFromCache();
-if (!sb && !S.cacheShown) $("#app").innerHTML = `<div class="auth"><div class="auth-box"><div class="logo sm">${ic("logo")}</div><h1>Nosso Lar</h1><p class="auth-sub">Sem internet. Conecte e abra o app de novo.</p></div></div>`;
+if (!sb && !S.cacheShown) $("#app").innerHTML = `<div class="auth"><div class="auth-box"><div class="logo sm">${ic("logo")}</div><h1>Nosso Lar</h1><p class="auth-sub">Sem internet. Conecte e abra o app novamente.</p></div></div>`;
 if ("serviceWorker" in navigator && /^https?:$/.test(location.protocol)) {
   window.addEventListener("load", () => navigator.serviceWorker.register("sw.js").catch(e => console.warn(e)));
 }
