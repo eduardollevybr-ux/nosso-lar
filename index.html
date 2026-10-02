@@ -223,7 +223,7 @@ main.view{max-width:var(--maxw);margin:0 auto;padding:16px var(--pad) calc(40px 
 .summary::before{content:"";position:absolute;z-index:-1;inset:0;background:linear-gradient(180deg,rgba(255,255,255,.10),transparent 45%);pointer-events:none}
 .summary .v{font-size:32px;font-weight:700;letter-spacing:-.03em;line-height:1.05;margin-top:4px}
 .summary .label{color:color-mix(in srgb,var(--brandInk) 75%,transparent)}
-.summary .side{text-align:right;font-size:13px;opacity:.9;line-height:1.5}
+.summary .side{text-align:right;font-size:13px;opacity:.9;line-height:1.5;white-space:nowrap}
 .summary.compact{padding:16px 18px}
 .summary.compact .v{font-size:28px}
 
@@ -328,8 +328,9 @@ button.it:active,button.proj-row:active{background:var(--soft)}
 .kpi{padding:14px 12px;display:flex;flex-direction:column;justify-content:flex-end;gap:2px}
 .kpi .k-ic{width:30px;height:30px;border-radius:var(--r-in);background:var(--soft);color:var(--brand);display:grid;place-items:center;margin-bottom:8px}
 .kpi .k-ic svg{width:17px;height:17px}
-.kpi .v{font-size:clamp(15px,4.4vw,18px);font-weight:700;letter-spacing:-.02em;margin-top:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.kpi .v{font-size:clamp(14px,4.4vw,18px);font-weight:700;letter-spacing:-.02em;margin-top:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 @media (min-width:900px){.kpi{padding:20px}.kpi .v{font-size:28px}}
+@media (max-width:359px){.kpi{padding:12px 10px}}
 .dash-seg{margin-top:var(--sp-lg)}
 @media (min-width:900px){.dash-seg{max-width:420px}}
 .dash-body{margin-top:14px}
@@ -409,6 +410,9 @@ button.it:active,button.proj-row:active{background:var(--soft)}
 .kv div.block{display:block}
 .kv div.block p{margin:6px 0 0;white-space:pre-wrap}
 .kv span{color:var(--muted)}
+/* rótulo sempre em uma linha só; se o valor for comprido, é ele que quebra (do lado direito) */
+.kv div:not(.block)>span{flex:none;white-space:nowrap}
+.kv div:not(.block)>b{min-width:0;overflow-wrap:anywhere}
 /* linhas e blocos que abrem uma tela de detalhe: seta discreta + toque */
 .kv div.go{cursor:pointer;transition:background .15s}
 .kv div.go:hover{background:color-mix(in srgb,var(--soft) 50%,transparent)}
@@ -536,6 +540,8 @@ a.btn{text-decoration:none}
 .seg.ics .seg-n{flex:none}
 /* celulares estreitos: tira o ícone para o texto não encostar na borda */
 @media (max-width:374px){.seg.ics button{gap:6px;padding:0 8px;font-size:14px}.seg.ics button svg{display:none}}
+/* celulares bem estreitos (320px): letra um pouco menor para "Quero comprar" e o número caberem inteiros */
+@media (max-width:359px){.seg.ics button{gap:5px;padding:0 6px;font-size:13px}}
 .seg-n{font-size:11px;font-weight:700;min-width:20px;height:20px;padding:0 6px;border-radius:999px;background:color-mix(in srgb,var(--brand) 15%,transparent);color:var(--brand);display:inline-grid;place-items:center}
 @media (min-width:900px){.list-seg{max-width:420px}}
 
@@ -651,7 +657,13 @@ const $$ = (s, el=document) => [...el.querySelectorAll(s)];
 const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 const BRL = new Intl.NumberFormat("pt-BR", { style:"currency", currency:"BRL" });
 const money = v => BRL.format(+v || 0);
-const moneyShort = v => { v = +v || 0; if (v >= 100000) return "R$ " + (v/1000).toLocaleString("pt-BR",{maximumFractionDigits:0}) + " mil"; return BRL.format(v); };
+/* valor curto para cartões pequenos (sempre cabe em uma linha) */
+const moneyShort = v => { v = +v || 0;
+  const n = (x, d) => x.toLocaleString("pt-BR", { maximumFractionDigits:d });
+  if (v >= 1e6) return "R$ " + n(v/1e6, 1) + " mi";
+  if (v >= 1e4) return "R$ " + n(Math.round(v/1e3), 0) + " mil";
+  if (v >= 100) return "R$ " + n(Math.round(v), 0);
+  return BRL.format(v); };
 const pad = n => String(n).padStart(2, "0");
 const todayStr = () => { const d = new Date(); return d.getFullYear() + "-" + pad(d.getMonth()+1) + "-" + pad(d.getDate()); };
 const fmtDate = d => { if (!d) return ""; const [y,m,dd] = d.split("-"); return `${dd}/${m}/${y}`; };
@@ -674,6 +686,8 @@ const baseUrl = () => location.origin + location.pathname;
 const initials = s => { s = String(s || "").trim(); if (!s) return "?"; const p = s.split(/[\s@._-]+/).filter(Boolean); return ((p[0]||"")[0] + ((p[1]||"")[0]||"")).toUpperCase(); };
 const ROLE = { owner:"Dono", editor:"Pode editar", viewer:"Só visualizar" };
 const firstName = s => { s = String(s || "").trim().split(/\s+/)[0] || ""; return s.charAt(0).toUpperCase() + s.slice(1); };
+/* nome curto de quem fez algo no projeto: "Você" para o próprio usuário, senão o nome tirado do e-mail */
+const whoName = e => String(e || "").toLowerCase() === myEmail() ? "Você" : nameFromEmail(e);
 const nameFromEmail = e => firstName(String(e || "").split("@")[0].split(/[._\-+0-9]+/).filter(Boolean)[0] || String(e || "").split("@")[0]);
 
 let toastT = null;
@@ -1394,7 +1408,7 @@ function viewDash(){
     <div class="card summary"><div><div class="label">Total do enxoval</div><div class="v" data-count="${t.value}">${money(t.value)}</div></div><div class="side">${plural(S.rooms.length, "cômodo", "cômodos")}<br>${plural(S.stores.length, "loja", "lojas")}</div></div>
     <div class="card kpi"><span class="k-ic">${ic("bag")}</span><div class="label">Compras</div><div class="v">${t.count}</div></div>
     <div class="card kpi"><span class="k-ic">${ic("box")}</span><div class="label">Itens</div><div class="v">${(+t.qty).toLocaleString("pt-BR")}</div></div>
-    <div class="card kpi"><span class="k-ic">${ic("chart")}</span><div class="label" title="Média por compra">Média</div><div class="v">${moneyShort(t.count ? t.value / t.count : 0)}</div></div>
+    <div class="card kpi"><span class="k-ic">${ic("chart")}</span><div class="label" title="Média por compra">Média</div><div class="v" title="${money(t.count ? t.value / t.count : 0)}">${moneyShort(t.count ? t.value / t.count : 0)}</div></div>
   </div>${seg}<div class="dash-body">${inner}</div>`;
 }
 function barsCard(rows, total, attrs, two){
@@ -1667,7 +1681,7 @@ function itemDetail(id){
       ${kvGo("room", r ? r.id : "none", "Cômodo", r ? r.name : "Sem cômodo")}
       ${kvGo("store", s ? s.id : "none", "Loja", s ? s.name : "Sem loja")}
       ${wish ? (it.link ? `<div><span>Link</span><b><a class="kv-link" href="${esc(it.link)}" target="_blank" rel="noopener">${esc(linkHost(it.link))} ${ic("external")}</a></b></div>` : "") : kvGo("day", it.purchased_on, "Data da compra", fmtDate(it.purchased_on))}
-      ${it.created_by_email ? `<div><span>Registrado por</span><b>${esc(it.created_by_email)}</b></div>` : ""}
+      ${it.created_by_email ? `<div><span>Adicionado por</span><b title="${esc(it.created_by_email)}">${esc(whoName(it.created_by_email))}</b></div>` : ""}
       ${it.notes ? `<div class="block"><span>Observações</span><p>${esc(it.notes)}</p></div>` : ""}
     </div>
     ${actions}`, w => {
