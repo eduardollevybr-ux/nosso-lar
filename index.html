@@ -516,6 +516,17 @@ a.btn{text-decoration:none}
 .w-btn{width:var(--h-sm);height:var(--h-sm);border-radius:50%;display:grid;place-items:center;background:var(--soft);color:var(--brand);transition:transform .15s,background .2s}
 .w-btn svg{width:17px;height:17px}
 .w-btn.buy{background:color-mix(in srgb,var(--brand) 14%,transparent)}
+/* próximas compras: estrela cheia quando marcado */
+.w-btn.fav{background:transparent;color:var(--muted)}
+.w-btn.fav.on,.fav-ic.on{color:#C8913A}
+.w-btn.fav.on svg,.fav-ic.on svg,.chip.fav-f.on svg{fill:currentColor}
+span.w-btn.fav{cursor:default}
+.it.wish.is-fav>.thumb,.it.wish.is-fav>.mid{opacity:.85}
+.chip.fav-f.on{background:#C8913A;border-color:#C8913A;color:#fff}
+.chip.fav-f .seg-n{background:rgba(255,255,255,.25);color:inherit}
+.chip.fav-f:not(.on) .seg-n{background:color-mix(in srgb,#C8913A 18%,transparent);color:#9A6B22}
+.sheet-h .fav-ic{color:var(--muted);margin-left:auto;margin-right:-4px}
+.sheet-h .fav-ic.on{color:#C8913A}
 .w-btn:active{transform:scale(.88)}
 .wish-h h3{display:flex;align-items:center;gap:8px}
 .wish-h h3 svg{width:18px;height:18px;color:var(--brand)}
@@ -598,6 +609,7 @@ a.btn{text-decoration:none}
   .chip:not(.on):hover{border-color:color-mix(in srgb,var(--brand2) 50%,var(--line));color:var(--ink)}
   .seg button:not(.on):hover,.tabs button:not(.on):hover{color:var(--ink)}
   .w-btn:hover{background:color-mix(in srgb,var(--brand) 22%,transparent)}
+  .w-btn.fav:hover{background:var(--soft)}
   .stepper button:hover{background:var(--soft)}
   .icon-grid button:not(.on):hover{border-color:color-mix(in srgb,var(--brand2) 50%,var(--line));color:var(--brand)}
   .switch-row:hover{border-color:color-mix(in srgb,var(--brand2) 45%,var(--line))}
@@ -677,6 +689,7 @@ const P = {
   expand:"M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7",
   bag:"M5 8h14l-1 12H6zM9 8V6a3 3 0 0 1 6 0v2",
   bookmark:"M6 3h12v18l-6-4-6 4z",
+  star:"M12 3.5l2.6 5.3 5.9.9-4.3 4.1 1 5.8L12 16.9l-5.2 2.7 1-5.8-4.3-4.1 5.9-.9z",
   crop:"M6 2v14a2 2 0 0 0 2 2h14M2 6h14a2 2 0 0 1 2 2v14",
   link:"M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1",
   external:"M14 4h6v6M20 4l-9 9M18 14v6H4V6h6",
@@ -760,9 +773,9 @@ try { matchMedia("(prefers-color-scheme: dark)").addEventListener("change", appl
 /* ================= ESTADO ================= */
 const S = {
   user:null, projects:[], project:null, role:null,
-  rooms:[], stores:[], items:[], wish:[], members:[], photos:{}, hasPlanned:false, list: lsGet("nl.list", "bought"),
+  rooms:[], stores:[], items:[], wish:[], members:[], photos:{}, hasPlanned:false, hasFav:false, list: lsGet("nl.list", "bought"),
   tab: lsGet("nl.tab", "casa"), roomId:null, pages:[],
-  filter:{ room:"all", store:null, q:"" }, dash:"rooms", sort: lsGet("nl.sort", "recent"),
+  filter:{ room:"all", store:null, q:"", fav:false }, dash:"rooms", sort: lsGet("nl.sort", "recent"),
   channel:null, nav:"", recovery:RECOVERY_AT_LOAD, booting:true
 };
 const canEdit = () => S.role === "owner" || S.role === "editor";
@@ -875,14 +888,14 @@ function saveUserCache(){
 function saveSnapshot(){
   if (!S.user || !S.project) return;
   const photos = {}; Object.entries(S.photos).forEach(([k, v]) => { if (/^https?:/.test(v)) photos[k] = v; });
-  lsSet(offProjKey(S.user.id, S.project.id), { project:S.project, rooms:S.rooms, stores:S.stores, items:allItems(), members:S.members, role:S.role, hasPlanned:S.hasPlanned, photos, photosAt:S.photosAt || 0, saved_at:Date.now() });
+  lsSet(offProjKey(S.user.id, S.project.id), { project:S.project, rooms:S.rooms, stores:S.stores, items:allItems(), members:S.members, role:S.role, hasPlanned:S.hasPlanned, hasFav:S.hasFav, photos, photosAt:S.photosAt || 0, saved_at:Date.now() });
 }
 function applySnapshot(pid){
   if (!S.user) return false;
   const c = lsGet(offProjKey(S.user.id, pid)); if (!c || !c.project) return false;
   S.project = c.project; S.rooms = c.rooms || []; S.stores = c.stores || []; S.members = c.members || [];
   const all = c.items || []; S.items = all.filter(x => !x.planned); S.wish = all.filter(x => x.planned);
-  S.role = c.role || "viewer"; S.hasPlanned = !!c.hasPlanned;
+  S.role = c.role || "viewer"; S.hasPlanned = !!c.hasPlanned; S.hasFav = !!c.hasFav;
   S.photos = Object.assign({}, c.photos || {}, S.photos); S.photosAt = c.photosAt || 0;
   return true;
 }
@@ -1004,7 +1017,7 @@ async function openProject(id, silent=false){
   S.project = S.projects.find(p => p.id === id) || null;
   if (!S.project) return render();
   lsSet("nl.project", id);
-  S.roomId = null; S.pages = []; S.filter = { room:"all", store:null, q:"" };
+  S.roomId = null; S.pages = []; S.filter = { room:"all", store:null, q:"", fav:false };
   S.photos = {}; S.photosAt = 0;
   await loadProjectData();
   if (!NET.offline) subscribe();
@@ -1016,17 +1029,19 @@ async function loadProjectData(){
   const pid = S.project.id;
   const fromCopy = () => { if (!applySnapshot(pid)) { S.rooms = []; S.stores = []; S.items = []; S.wish = []; S.members = []; toast("Este projeto ainda não foi aberto com internet neste aparelho", true); } };
   if (!sb || NET.offline) return fromCopy();
-  const [r, s, i, m, p, pl] = await Promise.all([
+  const [r, s, i, m, p, pl, fv] = await Promise.all([
     sb.from("rooms").select("*").eq("project_id", pid).order("position").order("created_at"),
     sb.from("stores").select("*").eq("project_id", pid).order("name"),
     sb.from("items").select("*").eq("project_id", pid).order("purchased_on", { ascending:false }).order("created_at", { ascending:false }),
     sb.from("project_members").select("*").eq("project_id", pid).order("created_at"),
     sb.from("projects").select("id,name,owner_id,created_at").eq("id", pid).maybeSingle(),
-    sb.from("items").select("planned,link").eq("project_id", pid).limit(1) /* confere se o banco já tem a lista */
+    sb.from("items").select("planned,link").eq("project_id", pid).limit(1), /* confere se o banco já tem a lista */
+    sb.from("items").select("favorite").eq("project_id", pid).limit(1) /* confere se o banco já tem as próximas compras */
   ]);
   const err = [r, s, i, m, p].find(x => x.error);
   if (err && isNetErr(err.error)) { console.warn(err.error); setOffline(true); unsubscribe(); return fromCopy(); }
   if (pl.error && !isNetErr(pl.error)) S.hasPlanned = false; else if (!pl.error) S.hasPlanned = true;
+  if (fv.error && !isNetErr(fv.error)) S.hasFav = false; else if (!fv.error) S.hasFav = true;
   if (err) { console.warn(err.error); toast("Não foi possível carregar todos os dados. Tente novamente", true); }
   if (!p.error && !p.data) { // projeto apagado ou acesso removido
     toast("Você não tem mais acesso a este projeto");
@@ -1251,7 +1266,10 @@ function emptyBox({ icon="", title="", text="", action="", slim=false, mt=true }
 }
 /* botão principal de criar, mostrado só para quem pode editar */
 const addBtn = (label, attrs) => canEdit() ? `<button class="btn primary" ${attrs}>${ic("plus")} ${label}</button>` : "";
+/* próximas compras sempre no topo da lista (mantém a ordem do resto) */
+const favFirst = arr => [...arr].sort((a, b) => (+!!b.favorite) - (+!!a.favorite));
 function wishSection(wl, addAttrs){
+  wl = favFirst(wl);
   if (!wl.length && !(canEdit() && addAttrs)) return "";
   return `<div class="section-t wish-h"><h3>${ic("bookmark")} Quero comprar</h3>${wl.length ? `<span class="muted">${qtyTxt(wl.length)}</span>` : ""}</div>
     ${wl.length ? `<div class="card group">${wl.map(wishRow).join("")}</div>` : ""}
@@ -1390,11 +1408,29 @@ function wishRow(i){
   const pg = curPage();
   const sub = [+i.unit_price ? money(itemTotal(i)) : null, s && pg?.kind !== "store" ? s.name : null, pg?.kind !== "room" && !(!pg && S.tab === "compras" && S.list === "wish") ? (r ? r.name : "Sem cômodo") : null].filter(Boolean).join(" · ");
   const ph = i.photo_path && S.photos[i.photo_path];
-  return `<div class="it wish" data-act="item" data-id="${i.id}" role="button" tabindex="0">
+  return `<div class="it wish ${i.favorite ? "is-fav" : ""}" data-act="item" data-id="${i.id}" role="button" tabindex="0">
     <span class="thumb">${ph ? `<img src="${esc(ph)}" alt="" loading="lazy">` : ic(r ? r.icon : "bookmark")}</span>
     <span class="mid"><div class="nm">${esc(i.name)}</div><div class="sub">${esc(sub || "Sem valor estimado")}</div></span>
-    <span class="w-acts">${i.link ? `<a class="w-btn" href="${esc(i.link)}" target="_blank" rel="noopener" aria-label="Abrir link" title="Abrir link">${ic("external")}</a>` : ""}${canEdit() ? `<button class="w-btn buy" data-act="buy" data-id="${i.id}" aria-label="Marcar como comprado" title="Marcar como comprado">${ic("check")}</button>` : ""}</span>
+    <span class="w-acts">${favBtn(i)}${i.link ? `<a class="w-btn" href="${esc(i.link)}" target="_blank" rel="noopener" aria-label="Abrir link" title="Abrir link">${ic("external")}</a>` : ""}${canEdit() ? `<button class="w-btn buy" data-act="buy" data-id="${i.id}" aria-label="Marcar como comprado" title="Marcar como comprado">${ic("check")}</button>` : ""}</span>
   </div>`;
+}
+/* estrela das próximas compras: quem edita marca e desmarca; quem só visualiza vê a estrela dos marcados */
+function favBtn(i){
+  if (!S.hasFav) return "";
+  if (!canEdit()) return i.favorite ? `<span class="w-btn fav on" title="Favorito" aria-label="Favorito">${ic("star")}</span>` : "";
+  const t = i.favorite ? "Tirar dos favoritos" : "Adicionar aos favoritos";
+  return `<button class="w-btn fav ${i.favorite ? "on" : ""}" data-act="fav" data-id="${i.id}" aria-pressed="${!!i.favorite}" aria-label="${t}" title="${t}">${ic("star")}</button>`;
+}
+async function toggleFav(it){
+  if (!it || !canEdit()) return false;
+  if (offlineBlock()) return false;
+  if (!S.hasFav) { toast("Os favoritos ainda não estão ativos no banco de dados", true); return false; }
+  const v = !it.favorite; it.favorite = v; render();
+  const { error } = await sb.from("items").update({ favorite:v }).eq("id", it.id);
+  if (error) { it.favorite = !v; render(); toast(friendlyError(error), true); return false; }
+  saveSnapshot();
+  toast(v ? "Adicionado aos favoritos" : "Tirado dos favoritos");
+  return true;
 }
 function itemRow(i){
   if (i.planned) return wishRow(i);
@@ -1446,12 +1482,14 @@ function filteredItems(src){
   });
 }
 function wishListHtml(){
-  const list = filteredItems(S.wish);
+  const favN = S.wish.filter(i => i.favorite).length;
+  const list = filteredItems(S.wish).filter(i => !S.filter.fav || i.favorite);
+  const favChip = S.hasFav && S.wish.length ? `<button class="chip fav-f ${S.filter.fav ? "on" : ""}" data-act="fFav" aria-pressed="${S.filter.fav}">${ic("star")} Favoritos${favN ? `<span class="seg-n">${favN}</span>` : ""}</button>` : "";
   if (!S.wish.length) return emptyBox({ icon:"bookmark", title:"Nenhum item na lista", text:"Guarde aqui o que ainda falta comprar, com o link do produto. Os itens da lista não entram no total do enxoval.", action:addBtn("Adicionar à lista", `data-act="addItem" data-planned="1"`) });
-  if (!list.length) return emptyBox({ text:"Nenhum item encontrado com este filtro." });
-  const groups = new Map(); list.forEach(i => { const k = i.room_id && roomById(i.room_id) ? i.room_id : "none"; if (!groups.has(k)) groups.set(k, []); groups.get(k).push(i); });
+  if (!list.length) return `<div class="list-bar"><div class="list-note">${S.filter.fav ? "Só os favoritos" : "Nenhum item"}</div>${favChip}</div>` + emptyBox({ text: S.filter.fav && !favN ? "Nenhum item nos favoritos. Toque na estrela de um item para favoritar." : "Nenhum item encontrado com este filtro." });
+  const groups = new Map(); favFirst(list).forEach(i => { const k = i.room_id && roomById(i.room_id) ? i.room_id : "none"; if (!groups.has(k)) groups.set(k, []); groups.get(k).push(i); });
   const order = [...S.rooms.map(r => r.id), "none"].filter(k => groups.has(k));
-  return `<div class="list-bar"><div class="list-note">${qtyTxt(list.length)} na lista · não entram no total</div></div><div class="days">` + order.map(k => { const arr = groups.get(k), r = roomById(k);
+  return `<div class="list-bar"><div class="list-note">${S.filter.fav ? qtyTxt(list.length) : `${qtyTxt(list.length)} na lista · não entram no total`}</div>${favChip}</div><div class="days">` + order.map(k => { const arr = groups.get(k), r = roomById(k);
     return `<div class="day">${groupHead("room", k, r ? r.name : "Sem cômodo", qtyTxt(arr.length))}<div class="card group">${arr.map(wishRow).join("")}</div></div>`; }).join("") + `</div>`;
 }
 function itemsListHtml(){
@@ -1765,6 +1803,7 @@ function itemForm(item, preset={}){
       try {
         const row = { name, room_id: f.room.value || null, store_id: (f.store.value && f.store.value !== "__new") ? f.store.value : null, quantity: qty(), unit_price: parseMoney(f.price.value), purchased_on: planned ? (it.purchased_on || todayStr()) : f.date.value, notes: f.notes.value.trim() || null };
         if (S.hasPlanned) { row.planned = planned; row.link = link || null; }
+        if (S.hasFav && !planned) row.favorite = false; /* comprou: sai das próximas compras */
         const oldPath = it.photo_path || null;
         if (newFile) { uploaded = await uploadPhoto(newFile); row.photo_path = uploaded; }
         else if (removePhoto) row.photo_path = null;
@@ -1800,7 +1839,9 @@ function itemDetail(id){
   const actions = !canEdit() ? (wish && linkBtn ? `<div class="sheet-actions">${linkBtn}</div>` : "")
     : wish ? `<div class="sheet-actions"><button class="btn primary" data-buy>${ic("check")} Marcar como comprado</button></div><div class="sheet-actions">${delBtn}${linkBtn}<button class="btn soft" data-edit>${ic("edit")} Editar</button></div>`
     : `<div class="sheet-actions">${delBtn}<button class="btn soft" data-dup>${ic("copy")} Duplicar</button><button class="btn primary" data-edit>${ic("edit")} Editar</button></div>`;
-  openSheet(`<div class="sheet-h"><h3>${esc(it.name)}</h3><button class="iconbtn" data-close aria-label="Fechar" title="Fechar">${ic("x")}</button></div>
+  const favT = () => it.favorite ? "Tirar dos favoritos" : "Adicionar aos favoritos";
+  const favTop = wish && S.hasFav && (canEdit() || it.favorite) ? (canEdit() ? `<button class="iconbtn fav-ic ${it.favorite ? "on" : ""}" data-fav aria-pressed="${!!it.favorite}" aria-label="${favT()}" title="${favT()}">${ic("star")}</button>` : `<span class="iconbtn fav-ic on" title="Favorito" aria-label="Favorito">${ic("star")}</span>`) : "";
+  openSheet(`<div class="sheet-h"><h3>${esc(it.name)}</h3>${favTop}<button class="iconbtn" data-close aria-label="Fechar" title="Fechar">${ic("x")}</button></div>
     ${wish ? `<div class="wish-tag">${ic("bookmark")} Quero comprar · não entra no total</div>` : ""}
     ${ph ? `<div class="detail-photo" data-zoom role="button" aria-label="Ver foto em tela cheia"><img src="${esc(ph)}" alt=""><span class="zoom">${ic("expand")}</span></div>` : ""}
     <div class="card summary compact ${wish ? "ghost" : ""}"><div><div class="label">${wish ? "Total estimado" : "Total"}</div><div class="v">${money(itemTotal(it))}</div></div><div class="side">${(+it.quantity).toLocaleString("pt-BR")} × ${money(it.unit_price)}</div></div>
@@ -1814,6 +1855,7 @@ function itemDetail(id){
     ${actions}`, w => {
     const e = $("[data-edit]", w); if (e) e.onclick = () => { closeSheet(w); setTimeout(() => itemForm(it), 150); };
     const du = $("[data-dup]", w); if (du) du.onclick = () => { closeSheet(w); setTimeout(() => itemForm(null, { copy: it }), 150); };
+    const fb = $("[data-fav]", w); if (fb) fb.onclick = async () => { if (await toggleFav(it)) { fb.classList.toggle("on", !!it.favorite); fb.setAttribute("aria-pressed", !!it.favorite); fb.setAttribute("aria-label", favT()); fb.title = favT(); } };
     const by = $("[data-buy]", w); if (by) by.onclick = () => { closeSheet(w); setTimeout(() => itemForm(it, { buy:true }), 150); };
     const z = $("[data-zoom]", w); if (z) z.onclick = () => openLightbox(ph);
     const d = $("[data-del]", w); if (d) d.onclick = () => deleteItem(it);
@@ -2085,6 +2127,8 @@ const ACT = {
   back: () => { if (S.pages.length) S.pages.pop(); else S.roomId = null; S.nav = "back"; render(); },
   addItem: d => itemForm(null, { room: d.room || null, store: d.store || null, planned: !!d.planned }),
   buy: d => { const it = S.wish.find(i => i.id === d.id); if (it) itemForm(it, { buy:true }); },
+  fav: d => toggleFav(S.wish.find(i => i.id === d.id)),
+  fFav: () => { S.filter.fav = !S.filter.fav; const el = $("#items-list"); if (el) el.innerHTML = itemsListHtml(); else render(); },
   list: d => { if (S.list === d.mode) return; S.list = d.mode; lsSet("nl.list", S.list); S.filter.store = null; render(); },
   item: d => itemDetail(d.id),
   addRoom: () => roomForm(null),
