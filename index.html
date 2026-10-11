@@ -519,12 +519,19 @@ a.btn{text-decoration:none}
 /* próximas compras: estrela cheia quando marcado */
 .w-btn.fav{background:transparent;color:var(--muted)}
 .w-btn.fav.on,.fav-ic.on{color:#C8913A}
-.w-btn.fav.on svg,.fav-ic.on svg,.chip.fav-f.on svg{fill:currentColor}
+.w-btn.fav.on svg,.fav-ic.on svg,.fav-f.on svg{fill:currentColor}
 span.w-btn.fav{cursor:default}
 .it.wish.is-fav>.thumb,.it.wish.is-fav>.mid{opacity:.85}
-.chip.fav-f.on{background:#C8913A;border-color:#C8913A;color:#fff}
-.chip.fav-f .seg-n{background:rgba(255,255,255,.25);color:inherit}
-.chip.fav-f:not(.on) .seg-n{background:color-mix(in srgb,#C8913A 18%,transparent);color:#9A6B22}
+/* linha de filtros: cômodo (caixa de seleção) e Favoritos com o mesmo tamanho, ícone e letra */
+.f-row{display:flex;gap:8px;min-width:0}
+.room-w{flex:1;min-width:0}
+.room-w .dd-btn{width:100%}
+.fav-f{flex:none;height:var(--h-ctl);border-radius:var(--r-ctl);border:1px solid var(--line);background:var(--card);padding:0 14px;font-size:16px;color:var(--ink);display:inline-flex;align-items:center;gap:8px;white-space:nowrap;transition:border-color .2s,background .2s,box-shadow .2s}
+.fav-f svg{width:18px;height:18px;color:var(--brand)}
+.fav-f.on{border-color:#C8913A;background:color-mix(in srgb,#C8913A 12%,var(--card))}
+.fav-f.on svg{color:#C8913A}
+.fav-f .seg-n{background:color-mix(in srgb,#C8913A 18%,transparent);color:#9A6B22}
+@media (min-width:900px){.f-row{flex:none}.room-w{flex:none;width:240px}}
 .sheet-h .fav-ic{color:var(--muted);margin-left:auto;margin-right:-4px}
 .sheet-h .fav-ic.on{color:#C8913A}
 .w-btn:active{transform:scale(.88)}
@@ -610,6 +617,8 @@ span.w-btn.fav{cursor:default}
   .seg button:not(.on):hover,.tabs button:not(.on):hover{color:var(--ink)}
   .w-btn:hover{background:color-mix(in srgb,var(--brand) 22%,transparent)}
   .w-btn.fav:hover{background:var(--soft)}
+  .fav-f:hover{border-color:color-mix(in srgb,var(--brand2) 45%,var(--line))}
+  .fav-f.on:hover{border-color:#C8913A}
   .stepper button:hover{background:var(--soft)}
   .icon-grid button:not(.on):hover{border-color:color-mix(in srgb,var(--brand2) 50%,var(--line));color:var(--brand)}
   .switch-row:hover{border-color:color-mix(in srgb,var(--brand2) 45%,var(--line))}
@@ -1484,12 +1493,11 @@ function filteredItems(src){
 function wishListHtml(){
   const favN = S.wish.filter(i => i.favorite).length;
   const list = filteredItems(S.wish).filter(i => !S.filter.fav || i.favorite);
-  const favChip = S.hasFav && S.wish.length ? `<button class="chip fav-f ${S.filter.fav ? "on" : ""}" data-act="fFav" aria-pressed="${S.filter.fav}">${ic("star")} Favoritos${favN ? `<span class="seg-n">${favN}</span>` : ""}</button>` : "";
   if (!S.wish.length) return emptyBox({ icon:"bookmark", title:"Nenhum item na lista", text:"Guarde aqui o que ainda falta comprar, com o link do produto. Os itens da lista não entram no total do enxoval.", action:addBtn("Adicionar à lista", `data-act="addItem" data-planned="1"`) });
-  if (!list.length) return `<div class="list-bar"><div class="list-note">${S.filter.fav ? "Só os favoritos" : "Nenhum item"}</div>${favChip}</div>` + emptyBox({ text: S.filter.fav && !favN ? "Nenhum item nos favoritos. Toque na estrela de um item para favoritar." : "Nenhum item encontrado com este filtro." });
+  if (!list.length) return emptyBox({ text: S.filter.fav && !favN ? "Nenhum item nos favoritos. Toque na estrela de um item para favoritar." : "Nenhum item encontrado com este filtro." });
   const groups = new Map(); favFirst(list).forEach(i => { const k = i.room_id && roomById(i.room_id) ? i.room_id : "none"; if (!groups.has(k)) groups.set(k, []); groups.get(k).push(i); });
   const order = [...S.rooms.map(r => r.id), "none"].filter(k => groups.has(k));
-  return `<div class="list-bar"><div class="list-note">${S.filter.fav ? qtyTxt(list.length) : `${qtyTxt(list.length)} na lista · não entram no total`}</div>${favChip}</div><div class="days">` + order.map(k => { const arr = groups.get(k), r = roomById(k);
+  return `<div class="list-bar"><div class="list-note">${S.filter.fav ? qtyTxt(list.length) : `${qtyTxt(list.length)} na lista · não entram no total`}</div></div><div class="days">` + order.map(k => { const arr = groups.get(k), r = roomById(k);
     return `<div class="day">${groupHead("room", k, r ? r.name : "Sem cômodo", qtyTxt(arr.length))}<div class="card group">${arr.map(wishRow).join("")}</div></div>`; }).join("") + `</div>`;
 }
 function itemsListHtml(){
@@ -1514,10 +1522,13 @@ function viewItems(){
       <button data-act="list" data-mode="bought" class="${S.list!=="wish"?"on":""}">${ic("bag")} Compradas</button>
       <button data-act="list" data-mode="wish" class="${S.list==="wish"?"on":""}">${ic("bookmark")} Quero comprar${S.wish.length ? `<span class="seg-n">${S.wish.length}</span>` : ""}</button></div>
     <div class="filters"><div class="search">${ic("search")}<input class="input" id="q" type="search" placeholder="${S.list === "wish" ? "Buscar item, loja ou cômodo" : "Buscar compra, loja ou cômodo"}" aria-label="Buscar" value="${esc(f.q)}" autocomplete="off"></div>
-    <div class="chips">
-      <button class="chip ${f.room==="all"?"on":""}" data-act="fRoom" data-id="all">Todos</button>
-      ${S.rooms.map(r => `<button class="chip ${f.room===r.id?"on":""}" data-act="fRoom" data-id="${r.id}">${ic(r.icon)}${esc(r.name)}</button>`).join("")}
-      ${hasNone ? `<button class="chip ${f.room==="none"?"on":""}" data-act="fRoom" data-id="none">Sem cômodo</button>` : ""}
+    <div class="f-row">
+      <div class="room-w"><select class="select" id="f-room" aria-label="Filtrar por cômodo">
+        <option value="all" data-icon="home" ${f.room==="all"?"selected":""}>Todos</option>
+        ${S.rooms.map(r => `<option value="${r.id}" data-icon="${esc(r.icon)}" ${f.room===r.id?"selected":""}>${esc(r.name)}</option>`).join("")}
+        ${hasNone || f.room === "none" ? `<option value="none" data-icon="box" ${f.room==="none"?"selected":""}>Sem cômodo</option>` : ""}
+      </select></div>
+      ${S.list === "wish" && S.hasFav && S.wish.length ? (n => `<button class="fav-f ${f.fav ? "on" : ""}" data-act="fFav" aria-pressed="${!!f.fav}">${ic("star")}<span>Favoritos</span>${n ? `<span class="seg-n">${n}</span>` : ""}</button>`)(S.wish.filter(i => i.favorite).length) : ""}
     </div></div>
     ${st ? `<div class="chips mt-sm"><button class="chip on" data-act="fStore" data-id="" aria-label="Tirar filtro da loja ${esc(st.name)}">${ic("store")}${esc(st.name)} ${ic("x")}</button></div>` : ""}
     <div id="items-list">${itemsListHtml()}</div>`;
@@ -2128,7 +2139,7 @@ const ACT = {
   addItem: d => itemForm(null, { room: d.room || null, store: d.store || null, planned: !!d.planned }),
   buy: d => { const it = S.wish.find(i => i.id === d.id); if (it) itemForm(it, { buy:true }); },
   fav: d => toggleFav(S.wish.find(i => i.id === d.id)),
-  fFav: () => { S.filter.fav = !S.filter.fav; const el = $("#items-list"); if (el) el.innerHTML = itemsListHtml(); else render(); },
+  fFav: (d, b) => { S.filter.fav = !S.filter.fav; if (b) { b.classList.toggle("on", S.filter.fav); b.setAttribute("aria-pressed", S.filter.fav); } const el = $("#items-list"); if (el) el.innerHTML = itemsListHtml(); else render(); },
   list: d => { if (S.list === d.mode) return; S.list = d.mode; lsSet("nl.list", S.list); S.filter.store = null; render(); },
   item: d => itemDetail(d.id),
   addRoom: () => roomForm(null),
@@ -2151,6 +2162,7 @@ document.addEventListener("click", e => {
   const fn = ACT[a.dataset.act]; if (fn) { e.preventDefault(); fn(a.dataset, a); }
 });
 document.addEventListener("change", e => {
+  if (e.target.id === "f-room") { S.filter.room = e.target.value; const el = $("#items-list"); if (el) el.innerHTML = itemsListHtml(); return; }
   if (e.target.id === "sort") { S.sort = e.target.value; lsSet("nl.sort", S.sort); const el = $("#items-list"); if (el) el.innerHTML = itemsListHtml(); }
 });
 document.addEventListener("input", e => {
