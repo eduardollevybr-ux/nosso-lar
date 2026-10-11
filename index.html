@@ -555,6 +555,38 @@ a.btn{text-decoration:none}
 .lightbox img{display:block;width:auto;height:auto;max-width:calc(100vw - 32px);max-height:calc(100vh - 32px - env(safe-area-inset-top) - env(safe-area-inset-bottom));max-height:calc(100dvh - 32px - env(safe-area-inset-top) - env(safe-area-inset-bottom));border-radius:var(--r-md);object-fit:contain;transform:scale(.94);transition:transform .35s var(--ease)}
 .lightbox.show img{transform:none}
 .lightbox .iconbtn{position:absolute;top:calc(12px + env(safe-area-inset-top));right:12px;color:#fff;background:rgba(255,255,255,.12)}
+/* recortar foto: mostrar só a parte que interessa (exemplo: o produto dentro de um print) */
+.cropper{position:fixed;inset:0;z-index:96;background:#0d0906;color:#fff;display:flex;flex-direction:column;padding:env(safe-area-inset-top) 0 env(safe-area-inset-bottom);opacity:0;transition:opacity .25s;touch-action:none;user-select:none;-webkit-user-select:none}
+.cropper.show{opacity:1}
+.cr-top{display:flex;align-items:center;gap:8px;padding:8px 12px 0}
+.cr-top b{flex:1;text-align:center;font-size:16px}
+.cr-top .iconbtn{color:#fff;background:rgba(255,255,255,.12)}
+.cr-top .cr-sp{width:40px;flex:none}
+.cr-tip{margin:6px 16px 0;text-align:center;font-size:13px;color:rgba(255,255,255,.7)}
+/* o escurecido em volta do quadro fica só dentro desta área; a folga de 24px deixa os cantos inteiros para tocar */
+.cr-stage{flex:1;min-height:0;position:relative;margin:8px 0;overflow:hidden}
+.cr-img{position:absolute}
+.cr-img img{display:block;width:100%;height:100%;pointer-events:none;-webkit-user-drag:none}
+.cr-box{position:absolute;box-shadow:0 0 0 9999px rgba(13,9,6,.62);outline:1.5px solid #fff;cursor:move;touch-action:none}
+.cr-box .g{position:absolute;inset:0;pointer-events:none;background:linear-gradient(90deg,transparent calc(33.33% - .5px),rgba(255,255,255,.35) calc(33.33% - .5px) calc(33.33% + .5px),transparent calc(33.33% + .5px) calc(66.66% - .5px),rgba(255,255,255,.35) calc(66.66% - .5px) calc(66.66% + .5px),transparent calc(66.66% + .5px)),linear-gradient(180deg,transparent calc(33.33% - .5px),rgba(255,255,255,.35) calc(33.33% - .5px) calc(33.33% + .5px),transparent calc(33.33% + .5px) calc(66.66% - .5px),rgba(255,255,255,.35) calc(66.66% - .5px) calc(66.66% + .5px),transparent calc(66.66% + .5px))}
+/* área de toque grande (44px) em cada canto e lado; o desenho do canto fica por dentro */
+.cr-box [data-h]{position:absolute;width:44px;height:44px;touch-action:none}
+.cr-box [data-h]::after{content:"";position:absolute;width:20px;height:20px;border:0 solid #fff}
+.cr-box [data-h=nw]{left:-22px;top:-22px;cursor:nwse-resize}.cr-box [data-h=nw]::after{left:19px;top:19px;border-width:4px 0 0 4px}
+.cr-box [data-h=ne]{right:-22px;top:-22px;cursor:nesw-resize}.cr-box [data-h=ne]::after{right:19px;top:19px;border-width:4px 4px 0 0}
+.cr-box [data-h=sw]{left:-22px;bottom:-22px;cursor:nesw-resize}.cr-box [data-h=sw]::after{left:19px;bottom:19px;border-width:0 0 4px 4px}
+.cr-box [data-h=se]{right:-22px;bottom:-22px;cursor:nwse-resize}.cr-box [data-h=se]::after{right:19px;bottom:19px;border-width:0 4px 4px 0}
+.cr-box [data-h=n],.cr-box [data-h=s]{left:22px;right:22px;width:auto;cursor:ns-resize}
+.cr-box [data-h=n]{top:-22px}.cr-box [data-h=s]{bottom:-22px}
+.cr-box [data-h=e],.cr-box [data-h=w]{top:22px;bottom:22px;height:auto;cursor:ew-resize}
+.cr-box [data-h=e]{right:-22px}.cr-box [data-h=w]{left:-22px}
+.cr-box [data-h=n]::after,.cr-box [data-h=s]::after{left:50%;width:24px;height:0;margin-left:-12px;border-top-width:4px}
+.cr-box [data-h=n]::after{top:19px}.cr-box [data-h=s]::after{bottom:19px}
+.cr-box [data-h=e]::after,.cr-box [data-h=w]::after{top:50%;height:24px;width:0;margin-top:-12px;border-left-width:4px}
+.cr-box [data-h=e]::after{right:19px}.cr-box [data-h=w]::after{left:19px}
+.cr-bot{display:flex;gap:8px;padding:0 16px 16px;width:100%;max-width:560px;margin:0 auto}
+.cr-bot .btn{flex:1}
+.cr-bot .btn.soft{background:rgba(255,255,255,.12);color:#fff}
 .spin{width:18px;height:18px;border-radius:50%;border:2.5px solid currentColor;border-right-color:transparent;animation:sp .7s linear infinite}
 @keyframes sp{to{transform:rotate(360deg)}}
 /* passar o mouse: mesmo retorno visual em todo o site (só em computador, para não "grudar" no toque) */
@@ -575,6 +607,7 @@ a.btn{text-decoration:none}
   .proj-btn:hover .n{color:var(--brand)}
   .detail-photo:hover .zoom{background:rgba(20,12,8,.72)}
   .lightbox .iconbtn:hover{background:rgba(255,255,255,.22)}
+  .cr-top .iconbtn:hover,.cr-bot .btn.soft:hover{background:rgba(255,255,255,.22)}
 }
 @media (prefers-reduced-motion:reduce){*{animation-duration:.01ms!important;transition-duration:.01ms!important}}
 </style>
@@ -644,6 +677,7 @@ const P = {
   expand:"M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7",
   bag:"M5 8h14l-1 12H6zM9 8V6a3 3 0 0 1 6 0v2",
   bookmark:"M6 3h12v18l-6-4-6 4z",
+  crop:"M6 2v14a2 2 0 0 0 2 2h14M2 6h14a2 2 0 0 1 2 2v14",
   link:"M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1",
   external:"M14 4h6v6M20 4l-9 9M18 14v6H4V6h6",
   alert:"M12 8v5M12 16.5h.01M10.3 3.9L2.4 18a2 2 0 0 0 1.7 3h15.8a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"
@@ -1072,6 +1106,80 @@ async function uploadPhoto(file){
 async function removePhotos(paths){
   paths = paths.filter(Boolean); if (!paths.length) return;
   try { await sb.storage.from(BUCKET).remove(paths); } catch (e) { console.warn(e); }
+}
+/* tela de recortar: devolve a foto recortada, a mesma foto (se ficou inteira) ou null (cancelou) */
+function cropImage(file){
+  return new Promise(resolve => {
+    const url = URL.createObjectURL(file), img = new Image();
+    img.onerror = () => { URL.revokeObjectURL(url); resolve(file); }; /* formato que o navegador não abre: segue com a foto como veio */
+    img.onload = () => {
+      const W = img.naturalWidth, H = img.naturalHeight;
+      const cr = document.createElement("div"); cr.className = "cropper"; cr.setAttribute("role", "dialog"); cr.setAttribute("aria-modal", "true"); cr.setAttribute("aria-label", "Recortar foto");
+      cr.innerHTML = `<div class="cr-top"><button type="button" class="iconbtn" data-x aria-label="Cancelar" title="Cancelar">${ic("x")}</button><b>Recortar foto</b><span class="cr-sp"></span></div>
+        <p class="cr-tip">Arraste os cantos para deixar só o produto</p>
+        <div class="cr-stage"><div class="cr-img"><img src="${url}" alt="" draggable="false"><div class="cr-box"><i class="g"></i>${["nw","n","ne","e","se","s","sw","w"].map(h => `<span data-h="${h}"></span>`).join("")}</div></div></div>
+        <div class="cr-bot"><button type="button" class="btn soft" data-full>Foto inteira</button><button type="button" class="btn primary" data-ok>Concluir</button></div>`;
+      const stage = $(".cr-stage", cr), wrap = $(".cr-img", cr), boxEl = $(".cr-box", cr);
+      let box = { x:0, y:0, w:1, h:1 }; /* em frações da foto (0 a 1) */
+      const paint = () => { boxEl.style.left = box.x * 100 + "%"; boxEl.style.top = box.y * 100 + "%"; boxEl.style.width = box.w * 100 + "%"; boxEl.style.height = box.h * 100 + "%"; };
+      const fit = () => {
+        const pad = 24, sw = stage.clientWidth, sh = stage.clientHeight, k = Math.min((sw - pad * 2) / W, (sh - pad * 2) / H);
+        const w = W * k, h = H * k;
+        Object.assign(wrap.style, { width:w + "px", height:h + "px", left:(sw - w) / 2 + "px", top:(sh - h) / 2 + "px" });
+      };
+      /* arrastar: dentro do quadro move; nos cantos e lados muda o tamanho */
+      let drag = null;
+      boxEl.addEventListener("pointerdown", e => {
+        e.preventDefault(); e.stopPropagation();
+        const h = e.target.closest("[data-h]")?.dataset.h || "move";
+        drag = { h, id:e.pointerId, x0:e.clientX, y0:e.clientY, b:{ ...box }, rw:wrap.clientWidth, rh:wrap.clientHeight };
+        try { boxEl.setPointerCapture(e.pointerId); } catch {}
+      });
+      boxEl.addEventListener("pointermove", e => {
+        if (!drag || e.pointerId !== drag.id) return;
+        const dx = (e.clientX - drag.x0) / drag.rw, dy = (e.clientY - drag.y0) / drag.rh, b = drag.b, h = drag.h;
+        const mw = Math.min(1, 48 / drag.rw), mh = Math.min(1, 48 / drag.rh); /* tamanho mínimo do quadro */
+        if (h === "move") { box = { ...b, x:Math.min(1 - b.w, Math.max(0, b.x + dx)), y:Math.min(1 - b.h, Math.max(0, b.y + dy)) }; }
+        else {
+          let x1 = b.x, y1 = b.y, x2 = b.x + b.w, y2 = b.y + b.h;
+          if (h.includes("w")) x1 = Math.min(x2 - mw, Math.max(0, b.x + dx));
+          if (h.includes("e")) x2 = Math.max(x1 + mw, Math.min(1, b.x + b.w + dx));
+          if (h.includes("n")) y1 = Math.min(y2 - mh, Math.max(0, b.y + dy));
+          if (h.includes("s")) y2 = Math.max(y1 + mh, Math.min(1, b.y + b.h + dy));
+          box = { x:x1, y:y1, w:x2 - x1, h:y2 - y1 };
+        }
+        paint();
+      });
+      const up = e => { if (drag && e.pointerId === drag.id) drag = null; };
+      boxEl.addEventListener("pointerup", up); boxEl.addEventListener("pointercancel", up);
+      let done = false;
+      const close = val => {
+        if (done) return; done = true; resolve(val);
+        cr.classList.remove("show"); window.removeEventListener("resize", fit); document.removeEventListener("keydown", onKey, true);
+        setTimeout(() => { cr.remove(); URL.revokeObjectURL(url); }, 260);
+      };
+      const onKey = e => { if (e.key === "Escape") { e.preventDefault(); e.stopImmediatePropagation(); close(null); } };
+      cr._close = () => close(null);
+      $("[data-x]", cr).onclick = () => close(null);
+      $("[data-full]", cr).onclick = () => { box = { x:0, y:0, w:1, h:1 }; paint(); };
+      $("[data-ok]", cr).onclick = async () => {
+        const full = box.x < .005 && box.y < .005 && box.w > .99 && box.h > .99;
+        if (full) return close(file);
+        const sx = Math.round(box.x * W), sy = Math.round(box.y * H), sw = Math.max(1, Math.round(box.w * W)), sh = Math.max(1, Math.round(box.h * H));
+        const c = document.createElement("canvas"); c.width = sw; c.height = sh;
+        const ctx = c.getContext("2d"); ctx.fillStyle = "#fff"; ctx.fillRect(0, 0, sw, sh); ctx.drawImage(img, sx, sy, sw, sh, 0, 0, sw, sh);
+        const blob = await new Promise(r => c.toBlob(r, "image/jpeg", 0.92));
+        close(blob ? new File([blob], "foto.jpg", { type:"image/jpeg" }) : file);
+      };
+      window.addEventListener("resize", fit);
+      document.addEventListener("keydown", onKey, true);
+      document.body.appendChild(cr);
+      fit(); paint();
+      requestAnimationFrame(() => cr.classList.add("show"));
+      syncBackGuard();
+    };
+    img.src = url;
+  });
 }
 
 /* ================= RENDER ================= */
@@ -1576,10 +1684,10 @@ function itemForm(item, preset={}){
   /* "Marcar como comprado": abre o mesmo item já como compra, com a data de hoje */
   if (preset.buy) { it.planned = false; it.purchased_on = todayStr(); }
   let planned = !!it.planned;
-  let newFile = null, removePhoto = false;
+  let newFile = null, removePhoto = false, origFile = null, origStored = false; /* origFile: a foto antes do recorte, para poder recortar de novo */
   const curPhoto = () => newFile ? URL.createObjectURL(newFile) : (!removePhoto && it.photo_path ? S.photos[it.photo_path] : null);
   const photoHtml = () => { const src = curPhoto(); return `<div class="photo ${src?"has":""}" id="ph">${src ? `<img src="${esc(src)}" alt="">` : `${ic("image")}<span style="font-size:14px">Foto do produto (opcional)</span>`}
-      <div class="pbtns"><label>${ic("camera")} Câmera<input type="file" accept="image/*" capture="environment" hidden data-file></label><label>${ic("image")} Galeria<input type="file" accept="image/*" hidden data-file></label>${src ? `<button type="button" data-rmph aria-label="Remover foto" title="Remover foto">${ic("trash")}</button>` : ""}</div></div>`; };
+      <div class="pbtns"><label>${ic("camera")} Câmera<input type="file" accept="image/*" capture="environment" hidden data-file></label><label>${ic("image")} Galeria<input type="file" accept="image/*" hidden data-file></label>${src ? `<button type="button" data-crop aria-label="Recortar foto" title="Recortar foto">${ic("crop")}</button><button type="button" data-rmph aria-label="Remover foto" title="Remover foto">${ic("trash")}</button>` : ""}</div></div>`; };
   const storeOpts = () => `<option value="" data-icon="box">Sem loja</option>` + S.stores.map(s => `<option value="${s.id}" data-icon="${s.kind === "online" ? "globe" : "store"}" ${s.id===it.store_id?"selected":""}>${esc(s.name)}</option>`).join("") + `<option value="__new" data-icon="plus">Nova loja</option>`;
   const priceStr = it.unit_price ? (+it.unit_price).toLocaleString("pt-BR", { minimumFractionDigits:2, maximumFractionDigits:2 }) : "";
   /* o título da janela repete o nome do botão que a abriu; o botão de salvar é sempre "Salvar" */
@@ -1620,8 +1728,27 @@ function itemForm(item, preset={}){
     $$("[data-q]", w).forEach(b => b.onclick = () => { f.qty.value = Math.max(1, qty() + +b.dataset.q); upd(); });
     f.store.addEventListener("change", () => { if (f.store.value !== "__new") return; f.store.value = it.store_id || ""; storeForm(null, s => { it.store_id = s.id; f.store.innerHTML = storeOpts(); f.store.value = s.id; }); });
     const wirePhoto = () => {
-      $$("[data-file]", w).forEach(inp => inp.onchange = () => { const file = inp.files && inp.files[0]; if (!file) return; if (!/^image\//.test(file.type) && !/\.(heic|heif)$/i.test(file.name)) return toast("Escolha um arquivo de imagem", true); newFile = file; removePhoto = false; $("#phw", w).innerHTML = photoHtml(); wirePhoto(); });
-      const rm = $("[data-rmph]", w); if (rm) rm.onclick = () => { newFile = null; removePhoto = true; $("#phw", w).innerHTML = photoHtml(); wirePhoto(); };
+      const show = () => { $("#phw", w).innerHTML = photoHtml(); wirePhoto(); };
+      $$("[data-file]", w).forEach(inp => inp.onchange = async () => {
+        const file = inp.files && inp.files[0]; inp.value = ""; if (!file) return;
+        if (!/^image\//.test(file.type) && !/\.(heic|heif)$/i.test(file.name)) return toast("Escolha um arquivo de imagem", true);
+        const out = await cropImage(file); if (!out) return;
+        origFile = file; origStored = false; newFile = out; removePhoto = false; show();
+      });
+      const cb = $("[data-crop]", w); if (cb) cb.onclick = async () => {
+        /* foto já salva: baixa a original para recortar (direto do Storage, sem passar pela cópia do aparelho) */
+        if (!origFile && it.photo_path && !removePhoto) {
+          if (offlineBlock()) return;
+          busy(cb, true);
+          try { const { data, error } = await sb.storage.from(BUCKET).download(it.photo_path); if (error || !data) throw error || new Error("download"); origFile = new File([data], "foto.jpg", { type:data.type || "image/jpeg" }); origStored = true; }
+          catch (e) { console.warn(e); busy(cb, false); return toast("Não foi possível abrir a foto", true); }
+          busy(cb, false);
+        }
+        if (!origFile) return;
+        const out = await cropImage(origFile); if (!out) return;
+        newFile = (out === origFile && origStored) ? null : out; show(); /* voltou à foto salva inteira: não envia de novo */
+      };
+      const rm = $("[data-rmph]", w); if (rm) rm.onclick = () => { newFile = null; origFile = null; origStored = false; removePhoto = true; show(); };
     };
     wirePhoto();
     const del = $("[data-del]", w); if (del) del.onclick = () => deleteItem(it, w);
@@ -1992,6 +2119,7 @@ new MutationObserver(() => { ["#dash-seg", "#list-seg"].forEach(id => { const se
 /* o que dá para "voltar", do mais por cima para o mais por baixo: lista aberta, foto, janela, cômodo */
 function backLayer(){
   if (ddOpen) return { kind:"dd" };
+  const cr = $(".cropper.show"); if (cr) return { kind:"crop", el:cr };
   const lb = [...document.querySelectorAll(".lightbox.show")].pop(); if (lb) return { kind:"photo", el:lb };
   const w = $$("#sheets .sheet-wrap").filter(x => !x.closing).pop(); if (w) return { kind:"sheet", el:w };
   if (S.user && S.project && (S.pages.length || (S.tab === "casa" && S.roomId)) && $("#view")) return { kind:"room", el:$("#view") };
@@ -2000,7 +2128,7 @@ function backLayer(){
 function doBack(layer){
   layer = layer || backLayer(); if (!layer) return false;
   if (layer.kind === "dd") closeDropdown();
-  else if (layer.kind === "photo") layer.el._close();
+  else if (layer.kind === "photo" || layer.kind === "crop") layer.el._close();
   else if (layer.kind === "sheet") { if ($("form.busy", layer.el)) return true; closeSheet(layer.el); }
   else if (layer.kind === "room") ACT.back();
   return true;
@@ -2037,7 +2165,7 @@ window.addEventListener("popstate", () => {
     g = null;
     if (e.touches.length !== 1) return;
     const t = e.touches[0]; if (t.clientX > EDGE) return;
-    const layer = backLayer(); if (!layer || layer.kind === "dd") return;
+    const layer = backLayer(); if (!layer || layer.kind === "dd" || layer.kind === "crop") return; /* no recorte o dedo arrasta o quadro */
     if (e.target.closest && e.target.closest('input[type="range"]')) return;
     g = { layer, x0:t.clientX, y0:t.clientY, dx:0, on:false, lx:t.clientX, lt:e.timeStamp, v:0 };
   }, { passive:true, capture:true });
