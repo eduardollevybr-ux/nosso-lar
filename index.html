@@ -534,6 +534,7 @@ span.w-btn.fav{cursor:default}
 @media (min-width:900px){.f-row{flex:none}.room-w{flex:none;width:240px}}
 .sheet-h .fav-ic{color:var(--muted);margin-left:auto;margin-right:-4px}
 .sheet-h .fav-ic.on{color:#C8913A}
+.sheet-h .fav-ic[hidden]{display:none}
 .w-btn:active{transform:scale(.88)}
 .wish-h h3{display:flex;align-items:center;gap:8px}
 .wish-h h3 svg{width:18px;height:18px;color:var(--brand)}
@@ -1733,6 +1734,8 @@ function itemForm(item, preset={}){
   /* "Marcar como comprado": abre o mesmo item já como compra, com a data de hoje */
   if (preset.buy) { it.planned = false; it.purchased_on = todayStr(); }
   let planned = !!it.planned;
+  let fav = !!it.favorite && !preset.buy; /* estrela de favorito já no cadastro (só na lista Quero comprar) */
+  const favT = () => fav ? "Tirar dos favoritos" : "Adicionar aos favoritos";
   let newFile = null, removePhoto = false, origFile = null, origStored = false; /* origFile: a foto antes do recorte, para poder recortar de novo */
   const curPhoto = () => newFile ? URL.createObjectURL(newFile) : (!removePhoto && it.photo_path ? S.photos[it.photo_path] : null);
   const photoHtml = () => { const src = curPhoto(); return `<div class="photo ${src?"has":""}" id="ph">${src ? `<img src="${esc(src)}" alt="">` : `${ic("image")}<span style="font-size:14px">Foto do produto (opcional)</span>`}
@@ -1743,7 +1746,7 @@ function itemForm(item, preset={}){
   const title = () => preset.buy ? "Marcar como comprado" : isNew ? (planned ? "Adicionar à lista" : "Nova compra") : (planned ? "Editar item da lista" : "Editar compra");
   const saveTxt = () => "Salvar";
   openSheet(`<form id="itf" novalidate class="${planned ? "is-wish" : ""}">
-    <div class="sheet-h"><h3 id="it-t">${title()}</h3><button type="button" class="iconbtn" data-close aria-label="Fechar" title="Fechar">${ic("x")}</button></div>
+    <div class="sheet-h"><h3 id="it-t">${title()}</h3>${S.hasFav && !preset.buy ? `<button type="button" class="iconbtn fav-ic ${fav ? "on" : ""}" id="it-fav" aria-pressed="${fav}" aria-label="${favT()}" title="${favT()}" ${planned ? "" : "hidden"}>${ic("star")}</button>` : ""}<button type="button" class="iconbtn" data-close aria-label="Fechar" title="Fechar">${ic("x")}</button></div>
     ${preset.buy ? "" : `<label class="switch-row"><span class="sw-ic">${ic("bookmark")}</span><span class="sw-tx"><b>Quero comprar</b><small>Ainda não comprei. Fica na lista e não entra no total</small></span><input type="checkbox" name="planned" ${planned ? "checked" : ""}><span class="sw" aria-hidden="true"></span></label>`}
     <div class="wish-only"><div class="wish-in"><label class="field"><span>Link do produto (opcional)</span><div class="link-in">${ic("link")}<input class="input" name="link" type="url" inputmode="url" autocapitalize="off" spellcheck="false" placeholder="Cole aqui o link do produto" value="${esc(it.link || "")}" autocomplete="off"></div></label></div></div>
     <div id="phw">${photoHtml()}</div>
@@ -1769,7 +1772,9 @@ function itemForm(item, preset={}){
       $("#it-t", w).textContent = title(); $("#its", w).textContent = saveTxt();
       $("#price-l", w).textContent = planned ? "Valor estimado (R$)" : "Valor unitário (R$)";
       $("#tot-l", w).textContent = planned ? "Total estimado" : "Total";
+      const fb = $("#it-fav", w); if (fb) fb.hidden = !planned;
     };
+    const fb = $("#it-fav", w); if (fb) fb.onclick = () => { fav = !fav; fb.classList.toggle("on", fav); fb.setAttribute("aria-pressed", fav); fb.setAttribute("aria-label", favT()); fb.title = favT(); };
     const sw = f.planned; if (sw) sw.addEventListener("change", () => { planned = sw.checked; applyMode(); if (planned) setTimeout(() => f.link.focus(), 220); });
     moneyMask(f.price); f.price.addEventListener("money", upd);
     f.qty.addEventListener("input", () => { f.qty.value = f.qty.value.replace(/\D/g, "").slice(0, 4); upd(); });
@@ -1814,7 +1819,7 @@ function itemForm(item, preset={}){
       try {
         const row = { name, room_id: f.room.value || null, store_id: (f.store.value && f.store.value !== "__new") ? f.store.value : null, quantity: qty(), unit_price: parseMoney(f.price.value), purchased_on: planned ? (it.purchased_on || todayStr()) : f.date.value, notes: f.notes.value.trim() || null };
         if (S.hasPlanned) { row.planned = planned; row.link = link || null; }
-        if (S.hasFav && !planned) row.favorite = false; /* comprou: sai das próximas compras */
+        if (S.hasFav) row.favorite = planned && fav; /* comprou: sai dos favoritos */
         const oldPath = it.photo_path || null;
         if (newFile) { uploaded = await uploadPhoto(newFile); row.photo_path = uploaded; }
         else if (removePhoto) row.photo_path = null;
