@@ -62,7 +62,10 @@ body{min-height:100dvh;overscroll-behavior-y:none;background:var(--bg)}
 /* foco visível para quem usa teclado */
 button:focus-visible,a:focus-visible,label:focus-visible,[tabindex]:focus-visible,.chip:focus-visible{outline:2.5px solid var(--brand2);outline-offset:2px}
 img{transition:opacity .35s}
-body.locked{overflow:hidden}
+/* trava a rolagem da página só enquanto houver uma janela aberta (a trava fica no html, que é quem rola) */
+html.locked{overflow:hidden}
+/* computador: reserva o espaço da barra de rolagem para a tela não "pular" ao abrir e fechar janelas */
+@media (min-width:900px){html{scrollbar-gutter:stable}}
 button,input,select,textarea{font:inherit;color:inherit}
 button{cursor:pointer;border:0;background:none;padding:0}
 svg.i{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;flex:none}
@@ -80,7 +83,8 @@ svg.i{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:1.8;stro
 .logo.sm svg{width:26px;height:26px;stroke-width:2.2}
 
 /* ---------- login ---------- */
-body.auth-on{overflow:hidden;height:100dvh}
+/* login: a página rola normalmente se o formulário não couber na tela (telas baixas) */
+body.auth-on{overflow-x:hidden}
 .auth{min-height:100dvh;display:flex;align-items:center;justify-content:center;padding:24px var(--pad) calc(24px + env(safe-area-inset-bottom))}
 .auth-box{width:100%;max-width:360px;display:flex;flex-direction:column;align-items:center;text-align:center;animation:fadeIn .5s ease}
 .auth-box h1{font-size:24px;font-weight:700;letter-spacing:-.02em;margin:14px 0 2px}
@@ -745,6 +749,25 @@ const ROLE = { owner:"Dono", editor:"Pode editar", viewer:"Só visualizar" };
 const firstName = s => { s = String(s || "").trim().split(/\s+/)[0] || ""; return s.charAt(0).toUpperCase() + s.slice(1); };
 /* nome curto de quem fez algo no projeto: "Você" para o próprio usuário, senão o nome tirado do e-mail */
 const whoName = e => String(e || "").toLowerCase() === myEmail() ? "Você" : nameFromEmail(e);
+/* padroniza nomes ao salvar (pessoa, loja, cômodo, projeto, produto):
+   tira espaços sobrando, primeira letra de cada palavra maiúscula e conectivos em minúsculo
+   (menos na primeira palavra). Siglas e marcas digitadas com maiúsculas (TV, LED, iPhone) ficam como estão;
+   palavra inteira em maiúsculo com 4 letras ou mais (caps lock) vira normal: "LOJA" -> "Loja". */
+const NAME_LOWER = new Set(["e","de","da","do","das","dos","em","no","na","nos","nas","para","com","por","a","o","as","os"]);
+const capFirst = w => w.replace(/\p{L}/u, c => c.toLocaleUpperCase("pt-BR"));
+function fmtName(v){
+  const words = String(v == null ? "" : v).replace(/\s+/g, " ").trim().split(" ").filter(Boolean);
+  return words.map((w, i) => {
+    const low = w.toLocaleLowerCase("pt-BR");
+    if (NAME_LOWER.has(low)) return i === 0 ? capFirst(low) : low;
+    const letters = w.replace(/[^\p{L}]/gu, "");
+    if (letters.length >= 2 && /\p{Lu}/u.test(letters.slice(1))) {
+      const allUpper = letters === letters.toLocaleUpperCase("pt-BR");
+      if (!allUpper || letters.length <= 3) return w; /* iPhone, TV, LED */
+    }
+    return capFirst(low);
+  }).join(" ");
+}
 const nameFromEmail = e => firstName(String(e || "").split("@")[0].split(/[._\-+0-9]+/).filter(Boolean)[0] || String(e || "").split("@")[0]);
 
 let toastT = null;
@@ -783,7 +806,7 @@ try { matchMedia("(prefers-color-scheme: dark)").addEventListener("change", appl
 /* ================= ESTADO ================= */
 const S = {
   user:null, projects:[], project:null, role:null,
-  rooms:[], stores:[], items:[], wish:[], members:[], photos:{}, hasPlanned:false, hasFav:false, list: lsGet("nl.list", "bought"),
+  rooms:[], stores:[], items:[], wish:[], members:[], people:null, photos:{}, hasPlanned:false, hasFav:false, list: lsGet("nl.list", "bought"),
   tab: lsGet("nl.tab", "casa"), roomId:null, pages:[],
   filter:{ room:"all", store:null, q:"", fav:false }, dash:"rooms", sort: lsGet("nl.sort", "recent"),
   channel:null, nav:"", recovery:RECOVERY_AT_LOAD, booting:true
@@ -809,7 +832,7 @@ try {
 /* ================= LOGIN ================= */
 function showAuth(mode, keepMsg=""){
   S.user = mode === "newpass" ? S.user : null;
-  document.body.classList.remove("locked"); $("#sheets").innerHTML = "";
+  $("#sheets").innerHTML = ""; syncLock();
   const sub = { login:"Entre na sua conta", signup:"Crie sua conta", forgot:"Informe seu e-mail para receber o link de nova senha", newpass:"Crie uma nova senha" };
   const f = [];
   if (mode === "signup") f.push(`<input class="input" id="au-n" name="name" autocomplete="name" placeholder="Nome" aria-label="Nome">`);
@@ -844,7 +867,7 @@ function showAuth(mode, keepMsg=""){
     if (mode !== "newpass" && !/^\S+@\S+\.\S+$/.test(email)) return msg("Confira o e-mail");
     if (mode !== "forgot" && pass.length < 6) return msg("A senha precisa ter pelo menos 6 caracteres");
     if ((mode === "signup" || mode === "newpass") && pass !== pass2) return msg("As senhas não são iguais");
-    if (mode === "signup" && !($("#au-n").value || "").trim()) return msg("Informe seu nome");
+    if (mode === "signup" && !fmtName($("#au-n").value)) return msg("Informe seu nome");
     if (navigator.onLine === false || NET.offline) return msg(mode === "login" || mode === "signup" ? "Sem internet. Conecte para entrar" : OFF_MSG);
     const b = $("#au-btn"); b.disabled = true; const old = b.innerHTML; b.innerHTML = `<span class="spin"></span>`; msg("");
     try {
@@ -852,7 +875,7 @@ function showAuth(mode, keepMsg=""){
       if (mode === "login") {
         const { error } = await sb.auth.signInWithPassword({ email, password:pass }); if (error) throw error;
       } else if (mode === "signup") {
-        const { data, error } = await sb.auth.signUp({ email, password:pass, options:{ data:{ nome:$("#au-n").value.trim() }, emailRedirectTo:baseUrl() } });
+        const { data, error } = await sb.auth.signUp({ email, password:pass, options:{ data:{ nome:fmtName($("#au-n").value) }, emailRedirectTo:baseUrl() } });
         if (error) throw error;
         if (data?.user && Array.isArray(data.user.identities) && data.user.identities.length === 0) throw new Error("already registered");
         if (!data.session) { showAuth("login", "Conta criada. Confirme pelo link enviado para o seu e-mail e depois entre aqui."); return; }
@@ -898,12 +921,12 @@ function saveUserCache(){
 function saveSnapshot(){
   if (!S.user || !S.project) return;
   const photos = {}; Object.entries(S.photos).forEach(([k, v]) => { if (/^https?:/.test(v)) photos[k] = v; });
-  lsSet(offProjKey(S.user.id, S.project.id), { project:S.project, rooms:S.rooms, stores:S.stores, items:allItems(), members:S.members, role:S.role, hasPlanned:S.hasPlanned, hasFav:S.hasFav, photos, photosAt:S.photosAt || 0, saved_at:Date.now() });
+  lsSet(offProjKey(S.user.id, S.project.id), { project:S.project, rooms:S.rooms, stores:S.stores, items:allItems(), members:S.members, people:S.people, role:S.role, hasPlanned:S.hasPlanned, hasFav:S.hasFav, photos, photosAt:S.photosAt || 0, saved_at:Date.now() });
 }
 function applySnapshot(pid){
   if (!S.user) return false;
   const c = lsGet(offProjKey(S.user.id, pid)); if (!c || !c.project) return false;
-  S.project = c.project; S.rooms = c.rooms || []; S.stores = c.stores || []; S.members = c.members || [];
+  S.project = c.project; S.rooms = c.rooms || []; S.stores = c.stores || []; S.members = c.members || []; S.people = c.people || null;
   const all = c.items || []; S.items = all.filter(x => !x.planned); S.wish = all.filter(x => x.planned);
   S.role = c.role || "viewer"; S.hasPlanned = !!c.hasPlanned; S.hasFav = !!c.hasFav;
   S.photos = Object.assign({}, c.photos || {}, S.photos); S.photosAt = c.photosAt || 0;
@@ -925,7 +948,7 @@ function bootFromCache(){
   S.project = p;
   if (p && !applySnapshot(p.id)) { S.rooms = []; S.stores = []; S.items = []; S.wish = []; S.members = []; S.role = "viewer"; }
   S.cacheShown = true; S.booting = false;
-  document.body.classList.remove("auth-on"); $("#sheets").innerHTML = "";
+  document.body.classList.remove("auth-on"); $("#sheets").innerHTML = ""; syncLock();
   S.nav = "fade"; render();
   return true;
 }
@@ -982,7 +1005,7 @@ async function handleSession(session, force=false){
     }
     if (cachedUid) clearOffline(cachedUid);
     S.booting = false; S.authed = false; S.cacheShown = false; unsubscribe();
-    Object.assign(S, { user:null, projects:[], project:null, role:null, rooms:[], stores:[], items:[], wish:[], members:[], photos:{} });
+    Object.assign(S, { user:null, projects:[], project:null, role:null, rooms:[], stores:[], items:[], wish:[], members:[], people:null, photos:{} });
     showAuth("login");
   }
 }
@@ -1039,14 +1062,15 @@ async function loadProjectData(){
   const pid = S.project.id;
   const fromCopy = () => { if (!applySnapshot(pid)) { S.rooms = []; S.stores = []; S.items = []; S.wish = []; S.members = []; toast("Este projeto ainda não foi aberto com internet neste aparelho", true); } };
   if (!sb || NET.offline) return fromCopy();
-  const [r, s, i, m, p, pl, fv] = await Promise.all([
+  const [r, s, i, m, p, pl, fv, pp] = await Promise.all([
     sb.from("rooms").select("*").eq("project_id", pid).order("position").order("created_at"),
     sb.from("stores").select("*").eq("project_id", pid).order("name"),
     sb.from("items").select("*").eq("project_id", pid).order("purchased_on", { ascending:false }).order("created_at", { ascending:false }),
     sb.from("project_members").select("*").eq("project_id", pid).order("created_at"),
     sb.from("projects").select("id,name,owner_id,created_at").eq("id", pid).maybeSingle(),
     sb.from("items").select("planned,link").eq("project_id", pid).limit(1), /* confere se o banco já tem a lista */
-    sb.from("items").select("favorite").eq("project_id", pid).limit(1) /* confere se o banco já tem as próximas compras */
+    sb.from("items").select("favorite").eq("project_id", pid).limit(1), /* confere se o banco já tem as próximas compras */
+    sb.rpc("nl_project_people", { pid }) /* nome cadastrado de quem participa (função criada no Supabase) */
   ]);
   const err = [r, s, i, m, p].find(x => x.error);
   if (err && isNetErr(err.error)) { console.warn(err.error); setOffline(true); unsubscribe(); return fromCopy(); }
@@ -1064,6 +1088,7 @@ async function loadProjectData(){
   if (!s.error) S.stores = s.data || [];
   if (!i.error) { const all = i.data || []; S.items = all.filter(x => !x.planned); S.wish = all.filter(x => x.planned); }
   if (!m.error) S.members = m.data || [];
+  if (!pp.error) S.people = pp.data || []; else if (!isNetErr(pp.error)) S.people = null; /* função ainda não criada: usa o e-mail */
   const me = S.members.find(x => String(x.email).toLowerCase() === myEmail());
   S.role = me ? me.role : (S.project.owner_id === S.user.id ? "owner" : "viewer");
   await refreshPhotos();
@@ -1082,10 +1107,24 @@ async function refreshPhotos(){
     if (!S.photosAt) S.photosAt = Date.now();
   } catch (e) { console.warn(e); if (isNetErr(e)) setOffline(true); }
 }
-let reloadT = null;
+let reloadT = null, lastScrollAt = 0;
+window.addEventListener("scroll", () => { lastScrollAt = Date.now(); }, { passive:true });
+window.addEventListener("wheel", () => { lastScrollAt = Date.now(); }, { passive:true });
+const dataSig = () => { try { return JSON.stringify([S.project, S.role, S.rooms, S.stores, S.items, S.wish, S.members, S.people, Object.keys(S.photos)]); } catch { return String(Math.random()); } };
+/* redesenha só quando a pessoa não está rolando a página (redesenhar no meio da rolagem trava o movimento) */
+function renderWhenIdle(){
+  const wait = 350 - (Date.now() - lastScrollAt);
+  if (wait > 0) { clearTimeout(renderWhenIdle.t); renderWhenIdle.t = setTimeout(renderWhenIdle, wait + 20); return; }
+  S.nav = ""; render();
+}
 function scheduleReload(){
   clearTimeout(reloadT);
-  reloadT = setTimeout(async () => { if (!S.project || NET.offline || document.querySelector(".sheet-wrap form.busy")) return; await loadProjectData(); S.nav = ""; render(); }, 450);
+  reloadT = setTimeout(async () => {
+    if (!S.project || NET.offline || document.querySelector(".sheet-wrap form.busy")) return;
+    const before = dataSig();
+    await loadProjectData();
+    if (dataSig() !== before) renderWhenIdle(); /* nada mudou (exemplo: só voltou para a aba): não mexe na tela */
+  }, 450);
 }
 function subscribe(){
   unsubscribe();
@@ -1221,8 +1260,9 @@ function render(){
   const anim = sameView ? "" : (S.nav === "fwd" ? "view-fwd" : S.nav === "back" ? "view-back" : "view-anim");
   const body = S.pages.length ? viewPage() : tabBody();
   const fab = canEdit() ? `<button class="fab" data-act="addItem" ${addAttrsNow()}>${ic("plus")}</button>` : "";
+  document.body.classList.remove("auth-on"); syncLock();
   app.innerHTML = header() + `<main class="view ${anim} ${fab ? "has-fab" : ""}" id="view">${body}</main>` + fab;
-  if (sameView) window.scrollTo(0, y); else window.scrollTo(0, 0);
+  if (!sameView) window.scrollTo(0, 0); else if (Math.abs(window.scrollY - y) > 1) window.scrollTo(0, y);
   markScrolled();
   lastKey = key; S.nav = "";
   syncBackGuard();
@@ -1309,6 +1349,14 @@ function viewDay(d){
     + `<div class="days">` + order.map(k => { const arr = groups.get(k), r = roomById(k);
       return `<div class="day">${groupHead("room", k, r ? r.name : "Sem cômodo", money(arr.reduce((a,i)=>a+itemTotal(i),0)))}<div class="card group">${arr.map(itemRow).join("")}</div></div>`; }).join("") + `</div>`;
 }
+/* depois de trocar lista, painel ou filtro: se a página ficou rolada para baixo,
+   volta até os botões de troca, em vez de deixar a pessoa "presa" no fim da lista nova (telas menores) */
+function keepInView(sel){
+  const el = $(sel); if (!el) return;
+  const head = $(".top") ? $(".top").getBoundingClientRect().bottom : 0;
+  const t = el.getBoundingClientRect().top;
+  if (t < head) window.scrollTo(0, Math.max(0, window.scrollY + t - head - 12));
+}
 /* sombra no topo quando a página rola */
 function markScrolled(){ const t = $(".top"); if (t) t.classList.toggle("scrolled", window.scrollY > 4); }
 window.addEventListener("scroll", markScrolled, { passive:true });
@@ -1327,13 +1375,27 @@ function countUp(){
     requestAnimationFrame(step);
   });
 }
+/* nome cadastrado de uma pessoa do projeto; sem nome cadastrado, usa o começo do e-mail */
+function personName(email){
+  email = String(email || "").toLowerCase();
+  if (email === myEmail() && (S.user?.user_metadata?.nome || "").trim()) return fmtName(S.user.user_metadata.nome);
+  const p = (S.people || []).find(x => String(x.email || "").toLowerCase() === email);
+  return p && (p.nome || "").trim() ? fmtName(p.nome) : nameFromEmail(email);
+}
+/* abaixo do nome do projeto: só quem edita (dono e editores), sem os que só visualizam */
 function peopleLine(){
-  const others = S.members.filter(m => String(m.email).toLowerCase() !== myEmail()).map(m => nameFromEmail(m.email));
-  if (!others.length) return "Só você";
-  const me = firstName(myName());
-  if (others.length === 1) return `${me} e ${others[0]}`;
-  if (others.length === 2) return `${me}, ${others[0]} e ${others[1]}`;
-  return `${me}, ${others[0]} e mais ${others.length - 1} pessoas`;
+  const src = S.people || S.members.map(m => ({ email:m.email, role:m.role }));
+  const list = [], seen = new Set();
+  const add = (email, role) => { email = String(email || "").toLowerCase(); if (!email || seen.has(email)) return; seen.add(email); list.push({ email, role }); };
+  src.filter(x => x.role === "owner").forEach(x => add(x.email, "owner"));
+  if (!S.people && S.project && S.project.owner_id === S.user?.id) add(myEmail(), "owner"); /* sem a função: o dono só é conhecido quando é você */
+  src.filter(x => x.role === "editor").forEach(x => add(x.email, "editor"));
+  const n = list.map(x => personName(x.email));
+  if (!n.length) return "";
+  if (n.length === 1) return n[0];
+  if (n.length === 2) return `${n[0]} e ${n[1]}`;
+  if (n.length === 3) return `${n[0]}, ${n[1]} e ${n[2]}`;
+  return `${n[0]}, ${n[1]} e mais ${n.length - 2} pessoas`;
 }
 /* ação principal de adicionar: na lista "Quero comprar" adiciona à lista; no resto, registra compra */
 const wishMode = () => S.tab === "compras" && S.list === "wish" && !S.pages.length;
@@ -1630,7 +1692,7 @@ function enhanceSelect(sel){
     ddOpen = { menu, btn, sel, choose };
     btn.classList.add("open"); btn.setAttribute("aria-expanded", "true");
     requestAnimationFrame(() => menu.classList.add("show"));
-    const on = $(".dd-opt.on", menu); if (on) on.scrollIntoView({ block:"nearest" });
+    const on = $(".dd-opt.on", menu); if (on && on.offsetTop + on.offsetHeight > menu.clientHeight) menu.scrollTop = on.offsetTop - 6;
   };
   btn.addEventListener("click", e => { e.preventDefault(); e.stopPropagation(); open(); });
   btn.addEventListener("keydown", e => { if (!ddOpen && (e.key === "ArrowDown" || e.key === "ArrowUp")) { e.preventDefault(); open(); } });
@@ -1644,7 +1706,7 @@ document.addEventListener("keydown", e => {
   if (!ddOpen) return;
   const opts = $$(".dd-opt", ddOpen.menu); let k = opts.findIndex(o => o.classList.contains("hl")); if (k < 0) k = opts.findIndex(o => o.classList.contains("on"));
   if (e.key === "Escape") { e.preventDefault(); e.stopImmediatePropagation(); const b = ddOpen.btn; closeDropdown(); b.focus(); return; }
-  if (e.key === "ArrowDown" || e.key === "ArrowUp") { e.preventDefault(); k = Math.max(0, Math.min(opts.length - 1, k + (e.key === "ArrowDown" ? 1 : -1))); opts.forEach((o, i) => o.classList.toggle("hl", i === k)); opts[k].scrollIntoView({ block:"nearest" }); }
+  if (e.key === "ArrowDown" || e.key === "ArrowUp") { e.preventDefault(); k = Math.max(0, Math.min(opts.length - 1, k + (e.key === "ArrowDown" ? 1 : -1))); opts.forEach((o, i) => o.classList.toggle("hl", i === k)); { const o = opts[k], m = ddOpen.menu; if (o.offsetTop < m.scrollTop) m.scrollTop = o.offsetTop; else if (o.offsetTop + o.offsetHeight > m.scrollTop + m.clientHeight) m.scrollTop = o.offsetTop + o.offsetHeight - m.clientHeight; } }
   if ((e.key === "Enter" || e.key === " ") && k >= 0) { e.preventDefault(); ddOpen.choose(opts[k].dataset.v); }
   if (e.key === "Tab") closeDropdown();
 }, true);
@@ -1655,7 +1717,7 @@ function openSheet(html, onMount){
   w.className = "sheet-wrap";
   w.innerHTML = `<div class="sheet-bg" data-close></div><div class="sheet" role="dialog" aria-modal="true"><div class="grab"></div>${html}</div>`;
   $("#sheets").appendChild(w);
-  document.body.classList.add("locked");
+  syncLock();
   requestAnimationFrame(() => requestAnimationFrame(() => w.classList.add("open")));
   w.addEventListener("click", e => { if (e.target.closest("[data-close]")) { e.preventDefault(); closeSheet(w); } });
   enableDrag(w);
@@ -1665,9 +1727,15 @@ function openSheet(html, onMount){
 }
 function closeSheet(w){
   w = w || $$("#sheets .sheet-wrap").pop(); if (!w || w.closing) return;
-  w.closing = true; w.classList.remove("open"); closeDropdown();
+  w.closing = true; w.classList.remove("open"); closeDropdown(); syncLock();
   if (w.onClose) w.onClose();
-  setTimeout(() => { w.remove(); if (!$("#sheets .sheet-wrap")) document.body.classList.remove("locked"); }, 380);
+  setTimeout(() => { w.remove(); syncLock(); }, 380);
+}
+/* a trava segue o que está na tela: só fica ligada se ainda existir alguma janela aberta (evita a página ficar presa) */
+function syncLock(){
+  const open = $$("#sheets .sheet-wrap").some(x => !x.closing);
+  document.documentElement.classList.toggle("locked", open);
+  document.body.classList.remove("locked");
 }
 function closeAllSheets(){ $$("#sheets .sheet-wrap").forEach(w => closeSheet(w)); }
 function enableDrag(w){
@@ -1808,7 +1876,7 @@ function itemForm(item, preset={}){
     const del = $("[data-del]", w); if (del) del.onclick = () => deleteItem(it, w);
     f.addEventListener("submit", async e => {
       e.preventDefault();
-      const name = f.name.value.trim();
+      const name = fmtName(f.name.value);
       if (!name) { f.name.focus(); return toast("Informe o nome do produto", true); }
       if (!planned && !f.date.value) return toast("Informe a data da compra", true);
       const link = normLink(f.link.value);
@@ -1898,7 +1966,7 @@ function roomForm(room){
     const f = $("#rf", w);
     $$("[data-ic]", w).forEach(b => b.onclick = () => { icon = b.dataset.ic; $$("[data-ic]", w).forEach(x => x.classList.toggle("on", x === b)); f.name.placeholder = "Ex.: " + (ROOM_EX[icon] || "Lavanderia"); });
     f.addEventListener("submit", async e => {
-      e.preventDefault(); const name = f.name.value.trim(); if (!name) return toast("Informe o nome do cômodo", true);
+      e.preventDefault(); const name = fmtName(f.name.value); if (!name) return toast("Informe o nome do cômodo", true);
       const btn = $("#rs", w); busy(btn, true);
       const q = isNew ? sb.from("rooms").insert({ project_id:S.project.id, name, icon, position: S.rooms.length ? Math.max(...S.rooms.map(r => r.position || 0)) + 1 : 0 }) : sb.from("rooms").update({ name, icon }).eq("id", room.id);
       const { error } = await q;
@@ -1932,7 +2000,7 @@ function storeForm(store, onSaved){
     const f = $("#sf", w), seg = $("[data-seg=kind]", w);
     seg.addEventListener("change", () => { const on = seg.dataset.value === "online"; $("#loc-l", w).textContent = (on ? "Site" : "Endereço") + " (opcional)"; f.location.placeholder = on ? LOC_EX.online : LOC_EX.fisica; });
     f.addEventListener("submit", async e => {
-      e.preventDefault(); const name = f.name.value.trim(); if (!name) return toast("Informe o nome da loja", true);
+      e.preventDefault(); const name = fmtName(f.name.value); if (!name) return toast("Informe o nome da loja", true);
       if (isNew && S.stores.some(s => s.name.toLowerCase() === name.toLowerCase())) return toast("Já existe uma loja com este nome", true);
       const btn = $("#ss", w); busy(btn, true);
       const row = { name, kind: seg.dataset.value || "fisica", location: f.location.value.trim() || null, notes: f.notes.value.trim() || null };
@@ -1968,7 +2036,7 @@ function newProjectForm(){
     const f = $("#pf", w);
     $("#pick", w).addEventListener("click", e => { const b = e.target.closest("[data-room]"); if (!b) return; const n = b.dataset.room; picked.has(n) ? picked.delete(n) : picked.add(n); const on = picked.has(n); b.classList.toggle("on", on); b.setAttribute("aria-checked", on); });
     const addR = () => {
-      const inp = $("#newroom", w), n = inp.value.trim(); if (!n) return;
+      const inp = $("#newroom", w), n = fmtName(inp.value); if (!n) return;
       if (list.some(r => r[0].toLowerCase() === n.toLowerCase())) return toast("Este cômodo já está na lista", true);
       const known = DEFAULT_ROOMS.find(r => n.toLowerCase().startsWith(r[0].toLowerCase()));
       list.push([n, known ? known[1] : "box"]); picked.add(n); inp.value = ""; $("#pick", w).innerHTML = rows();
@@ -1976,7 +2044,7 @@ function newProjectForm(){
     $("#addroom", w).onclick = addR;
     $("#newroom", w).addEventListener("keydown", e => { if (e.key === "Enter") { e.preventDefault(); addR(); } });
     f.addEventListener("submit", async e => {
-      e.preventDefault(); const name = f.name.value.trim(); if (!name) { f.name.focus(); return toast("Informe o nome do projeto", true); }
+      e.preventDefault(); const name = fmtName(f.name.value); if (!name) { f.name.focus(); return toast("Informe o nome do projeto", true); }
       const btn = $("#ps", w); busy(btn, true);
       try {
         const { data: proj, error } = await sb.from("projects").insert({ name }).select().single();
@@ -2012,7 +2080,7 @@ function projectSettings(){
     </div></form>`, w => {
     const f = $("#psf", w);
     f.addEventListener("submit", async e => {
-      e.preventDefault(); if (!isOwner()) return; if (offlineBlock()) return; const name = f.name.value.trim(); if (!name) return toast("Informe o nome do projeto", true);
+      e.preventDefault(); if (!isOwner()) return; if (offlineBlock()) return; const name = fmtName(f.name.value); if (!name) return toast("Informe o nome do projeto", true);
       const btn = $("#pss", w); busy(btn, true);
       const { error } = await sb.from("projects").update({ name }).eq("id", p.id);
       busy(btn, false); if (error) return toast(friendlyError(error), true);
@@ -2050,7 +2118,7 @@ function shareSheet(){
       ? `<select class="select" data-role="${m.id}"><option value="editor" data-icon="edit" ${m.role==="editor"?"selected":""}>Pode editar</option><option value="viewer" data-icon="eye" ${m.role==="viewer"?"selected":""}>Só visualizar</option></select><button type="button" class="iconbtn" data-rm="${m.id}" aria-label="Remover acesso" title="Remover acesso">${ic("x")}</button>`
       : `<span class="badge ${m.role==="owner"?"owner":""}">${ROLE[m.role] || m.role}</span>`;
     /* nome em cima e e-mail embaixo, como no resto do app */
-    return `<div class="member"><span class="avatar">${esc(initials(m.email))}</span><span class="mid"><b>${esc(me ? firstName(myName()) : nameFromEmail(m.email))}${me ? " (você)" : ""}</b><small>${esc(m.email)}</small></span>${ctrl}</div>`;
+    return `<div class="member"><span class="avatar">${esc(initials(personName(m.email)))}</span><span class="mid"><b>${esc(personName(m.email))}${me ? " (você)" : ""}</b><small>${esc(m.email)}</small></span>${ctrl}</div>`;
   }).join("");
   openSheet(`<div class="sheet-h"><h3>Compartilhar projeto</h3><button class="iconbtn" data-close aria-label="Fechar" title="Fechar">${ic("x")}</button></div>
     ${isOwner() ? `<form id="shf" novalidate>
@@ -2125,7 +2193,7 @@ function nameForm(){
     <div class="sheet-actions"><button class="btn primary" type="submit" id="nfs">Salvar</button></div></form>`, w => {
     const f = $("#nf", w);
     f.addEventListener("submit", async e => {
-      e.preventDefault(); const nome = f.nome.value.trim(); if (!nome) return toast("Informe seu nome", true);
+      e.preventDefault(); const nome = fmtName(f.nome.value); if (!nome) return toast("Informe seu nome", true);
       const btn = $("#nfs", w); busy(btn, true);
       const { data, error } = await sb.auth.updateUser({ data:{ nome } });
       busy(btn, false); if (error) return toast(friendlyError(error), true);
@@ -2144,17 +2212,17 @@ const ACT = {
   addItem: d => itemForm(null, { room: d.room || null, store: d.store || null, planned: !!d.planned }),
   buy: d => { const it = S.wish.find(i => i.id === d.id); if (it) itemForm(it, { buy:true }); },
   fav: d => toggleFav(S.wish.find(i => i.id === d.id)),
-  fFav: (d, b) => { S.filter.fav = !S.filter.fav; if (b) { b.classList.toggle("on", S.filter.fav); b.setAttribute("aria-pressed", S.filter.fav); } const el = $("#items-list"); if (el) el.innerHTML = itemsListHtml(); else render(); },
-  list: d => { if (S.list === d.mode) return; S.list = d.mode; lsSet("nl.list", S.list); S.filter.store = null; render(); },
+  fFav: (d, b) => { S.filter.fav = !S.filter.fav; if (b) { b.classList.toggle("on", S.filter.fav); b.setAttribute("aria-pressed", S.filter.fav); } const el = $("#items-list"); if (el) el.innerHTML = itemsListHtml(); else render(); keepInView(".filters"); },
+  list: d => { if (S.list === d.mode) return; S.list = d.mode; lsSet("nl.list", S.list); S.filter.store = null; render(); keepInView("#list-seg"); },
   item: d => itemDetail(d.id),
   addRoom: () => roomForm(null),
   editRoom: d => roomForm(roomById(d.id)),
   addStore: () => storeForm(null),
   store: d => openPage("store", d.id),
   editStore: d => { const st = storeById(d.id); if (st) storeForm(st); },
-  fRoom: d => { S.filter.room = d.id; const el = $("#items-list"); if (el) { $$(".chips [data-act=fRoom]").forEach(c => c.classList.toggle("on", c.dataset.id === d.id)); el.innerHTML = itemsListHtml(); } else render(); },
-  fStore: d => { S.filter.store = d.id || null; if (d.go) { S.filter.room = "all"; S.filter.q = ""; S.tab = "compras"; lsSet("nl.tab", S.tab); S.nav = "fwd"; } render(); },
-  dash: d => { S.dash = d.mode; render(); },
+  fRoom: d => { S.filter.room = d.id; const el = $("#items-list"); if (el) { $$(".chips [data-act=fRoom]").forEach(c => c.classList.toggle("on", c.dataset.id === d.id)); el.innerHTML = itemsListHtml(); } else render(); keepInView(".filters"); },
+  fStore: d => { S.filter.store = d.id || null; if (d.go) { S.filter.room = "all"; S.filter.q = ""; S.tab = "compras"; lsSet("nl.tab", S.tab); S.nav = "fwd"; } render(); if (!d.go) keepInView(".filters"); },
+  dash: d => { S.dash = d.mode; render(); keepInView("#dash-seg"); },
   projects: () => projectsSheet(),
   share: () => shareSheet(),
   menu: () => menuSheet(),
@@ -2167,8 +2235,8 @@ document.addEventListener("click", e => {
   const fn = ACT[a.dataset.act]; if (fn) { e.preventDefault(); fn(a.dataset, a); }
 });
 document.addEventListener("change", e => {
-  if (e.target.id === "f-room") { S.filter.room = e.target.value; const el = $("#items-list"); if (el) el.innerHTML = itemsListHtml(); return; }
-  if (e.target.id === "sort") { S.sort = e.target.value; lsSet("nl.sort", S.sort); const el = $("#items-list"); if (el) el.innerHTML = itemsListHtml(); }
+  if (e.target.id === "f-room") { S.filter.room = e.target.value; const el = $("#items-list"); if (el) el.innerHTML = itemsListHtml(); keepInView(".filters"); return; }
+  if (e.target.id === "sort") { S.sort = e.target.value; lsSet("nl.sort", S.sort); const el = $("#items-list"); if (el) el.innerHTML = itemsListHtml(); keepInView(".filters"); }
 });
 document.addEventListener("input", e => {
   if (e.target.id === "q") { S.filter.q = e.target.value; const el = $("#items-list"); if (el) el.innerHTML = itemsListHtml(); }
