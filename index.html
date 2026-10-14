@@ -609,6 +609,8 @@ span.w-btn.fav{cursor:default}
 .lightbox.show img{transform:none}
 .lightbox .car>div{display:grid;place-items:center;padding:calc(16px + env(safe-area-inset-top)) 16px calc(16px + env(safe-area-inset-bottom))}
 .lightbox .car img{position:static;inset:auto;object-fit:contain}
+/* tela cheia: o deslizar é feito pelo próprio app (no iPhone a rolagem nativa não responde dentro da tela cheia) */
+.car.man{overflow:hidden;touch-action:none}
 .lightbox .car-n{top:calc(20px + env(safe-area-inset-top));left:16px}
 .lightbox .car-dots{bottom:calc(20px + env(safe-area-inset-bottom))}
 .lightbox .iconbtn{z-index:2;position:absolute;top:calc(12px + env(safe-area-inset-top));right:12px;color:#fff;background:rgba(255,255,255,.12)}
@@ -878,6 +880,17 @@ function wireCar(box, start=0, onChange){
   car.addEventListener("pointermove", e => { if (x0 === null) return; moved = e.clientX - x0; if (Math.abs(moved) > 5 && !car.classList.contains("drag")) { car.classList.add("drag"); try { car.setPointerCapture(e.pointerId); } catch {} } if (car.classList.contains("drag")) car.scrollLeft = s0 - moved; });
   const end = () => { if (x0 === null) return; x0 = null; if (!car.classList.contains("drag")) return; car.classList.remove("drag"); const b = Math.round(s0 / car.clientWidth); go(Math.abs(moved) > 40 ? b + (moved < 0 ? 1 : -1) : b); };
   car.addEventListener("pointerup", end); car.addEventListener("pointercancel", end);
+  if (car.classList.contains("man") && n > 1) { /* deslizar com o dedo controlado pelo app */
+    let t0 = null;
+    car.addEventListener("touchstart", e => { if (e.touches.length !== 1) { t0 = null; return; } const t = e.touches[0]; t0 = { x:t.clientX, y:t.clientY, s:car.scrollLeft, on:false }; moved = 0; }, { passive:true });
+    car.addEventListener("touchmove", e => {
+      if (!t0) return; const t = e.touches[0], dx = t.clientX - t0.x, dy = t.clientY - t0.y;
+      if (!t0.on) { if (Math.abs(dx) < 6 || Math.abs(dx) < Math.abs(dy)) return; t0.on = true; car.classList.add("drag"); }
+      e.preventDefault(); moved = dx; car.scrollLeft = t0.s - dx;
+    }, { passive:false });
+    const tend = () => { if (!t0) return; const c = t0; t0 = null; if (!c.on) return; car.classList.remove("drag"); const b = Math.round(c.s / car.clientWidth); go(Math.abs(moved) > 40 ? b + (moved < 0 ? 1 : -1) : b); };
+    car.addEventListener("touchend", tend); car.addEventListener("touchcancel", tend);
+  }
   car.addEventListener("click", e => { if (Math.abs(moved) > 5) { e.stopPropagation(); e.preventDefault(); moved = 0; } }, true); /* arrastou: não conta como toque */
   if (start) requestAnimationFrame(() => { car.scrollLeft = start * car.clientWidth; mark(); }); else mark();
   return { cur, go };
@@ -1826,7 +1839,7 @@ function openLightbox(src, list, start=0){
   if (!src) return;
   const many = Array.isArray(list) && list.length > 1;
   const lb = document.createElement("div"); lb.className = "lightbox"; lb.setAttribute("role", "dialog"); lb.setAttribute("aria-label", many ? "Fotos" : "Foto");
-  lb.innerHTML = `${many ? carHtml(list) : `<img src="${esc(src)}" alt="">`}<button class="iconbtn" aria-label="Fechar" title="Fechar">${ic("x")}</button>`;
+  lb.innerHTML = `${many ? carHtml(list).replace('class="car"', 'class="car man"') : `<img src="${esc(src)}" alt="">`}<button class="iconbtn" aria-label="Fechar" title="Fechar">${ic("x")}</button>`;
   const car = many ? wireCar(lb, start) : null;
   const close = () => { lb.classList.remove("show"); document.removeEventListener("keydown", onKey, true); setTimeout(() => lb.remove(), 260); };
   const onKey = e => {
