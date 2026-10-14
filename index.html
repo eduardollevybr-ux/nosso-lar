@@ -510,9 +510,9 @@ a.btn{text-decoration:none}
 .link-in{position:relative}
 .link-in>svg{position:absolute;left:14px;top:50%;transform:translateY(-50%);color:var(--muted);width:19px;height:19px}
 .link-in .input{padding-left:42px}
-.link-in.multi .input{padding-right:104px}
-.link-add{position:absolute;right:6px;top:50%;transform:translateY(-50%);height:calc(var(--h-ctl) - 14px);padding:0 12px;border-radius:var(--r-sm);background:var(--brand);color:var(--brandInk);font-size:14px;font-weight:600;display:inline-flex;align-items:center;gap:4px}
-.link-add svg{width:16px;height:16px}
+.link-in.multi .input{padding-right:52px}
+.link-add{position:absolute;right:6px;top:50%;transform:translateY(-50%);height:calc(var(--h-ctl) - 14px);aspect-ratio:1;padding:0;border-radius:var(--r-sm);background:var(--brand);color:var(--brandInk);display:grid;place-items:center}
+.link-add svg{width:20px;height:20px}
 /* vários links: lista compacta, um embaixo do outro */
 .link-list{list-style:none;margin:8px 0 0;padding:0;display:flex;flex-direction:column;gap:6px}
 .link-list:empty{display:none}
@@ -607,7 +607,11 @@ span.w-btn.fav{cursor:default}
 /* a foto sempre cabe inteira na tela (largura e altura), sem precisar tirar o zoom */
 .lightbox img{display:block;width:auto;height:auto;max-width:calc(100vw - 32px);max-height:calc(100vh - 32px - env(safe-area-inset-top) - env(safe-area-inset-bottom));max-height:calc(100dvh - 32px - env(safe-area-inset-top) - env(safe-area-inset-bottom));border-radius:var(--r-md);object-fit:contain;transform:scale(.94);transition:transform .35s var(--ease)}
 .lightbox.show img{transform:none}
-.lightbox .iconbtn{position:absolute;top:calc(12px + env(safe-area-inset-top));right:12px;color:#fff;background:rgba(255,255,255,.12)}
+.lightbox .car>div{display:grid;place-items:center;padding:calc(16px + env(safe-area-inset-top)) 16px calc(16px + env(safe-area-inset-bottom))}
+.lightbox .car img{position:static;inset:auto;object-fit:contain}
+.lightbox .car-n{top:calc(20px + env(safe-area-inset-top));left:16px}
+.lightbox .car-dots{bottom:calc(20px + env(safe-area-inset-bottom))}
+.lightbox .iconbtn{z-index:2;position:absolute;top:calc(12px + env(safe-area-inset-top));right:12px;color:#fff;background:rgba(255,255,255,.12)}
 /* recortar foto: mostrar só a parte que interessa (exemplo: o produto dentro de um print) */
 .cropper{position:fixed;inset:0;z-index:96;background:#0d0906;color:#fff;display:flex;flex-direction:column;padding:env(safe-area-inset-top) 0 env(safe-area-inset-bottom);opacity:0;transition:opacity .25s;touch-action:none;user-select:none;-webkit-user-select:none}
 .cropper.show{opacity:1}
@@ -1618,7 +1622,7 @@ function wishListHtml(){
   if (!S.wish.length) return emptyBox({ icon:"bookmark", title:"Nenhum item na lista", text:"Guarde aqui o que ainda falta comprar, com o link do produto. Os itens da lista não entram no total do enxoval.", action:addBtn("Adicionar à lista", `data-act="addItem" data-planned="1"`) });
   if (!list.length) return emptyBox({ text: S.filter.fav && !favN ? "Nenhum item nos favoritos. Toque na estrela de um item para favoritar." : "Nenhum item encontrado com este filtro." });
   /* soma dos favoritos (valor × quantidade): atualiza na hora ao marcar ou desmarcar a estrela */
-  const favs = S.hasFav ? S.wish.filter(i => i.favorite) : [], ft = totals(favs);
+  const favs = S.hasFav && S.filter.fav ? S.wish.filter(i => i.favorite) : [], ft = totals(favs); /* só aparece com o filtro Favoritos ligado */
   const favSum = favs.length ? `<div class="card summary compact fav-sum"><div><div class="label">Total dos favoritos</div><div class="v">${money(ft.value)}</div></div><div class="side">${plural(favs.length, "favorito", "favoritos")}<br>${plural(ft.qty, "unidade", "unidades")}</div></div>` : "";
   const groups = new Map(); favFirst(list).forEach(i => { const k = i.room_id && roomById(i.room_id) ? i.room_id : "none"; if (!groups.has(k)) groups.set(k, []); groups.get(k).push(i); });
   const order = [...S.rooms.map(r => r.id), "none"].filter(k => groups.has(k));
@@ -1817,12 +1821,18 @@ function confirmBox({ title, text, ok="Confirmar", danger=false }){
     w.onClose = () => { if (!done) res(false); };
   });
 }
-function openLightbox(src){
+/* tela cheia: com várias fotos, abre no carrossel na foto que estava aberta (deslizar, arrastar ou setas do teclado) */
+function openLightbox(src, list, start=0){
   if (!src) return;
-  const lb = document.createElement("div"); lb.className = "lightbox"; lb.setAttribute("role", "dialog"); lb.setAttribute("aria-label", "Foto");
-  lb.innerHTML = `<img src="${esc(src)}" alt=""><button class="iconbtn" aria-label="Fechar" title="Fechar">${ic("x")}</button>`;
+  const many = Array.isArray(list) && list.length > 1;
+  const lb = document.createElement("div"); lb.className = "lightbox"; lb.setAttribute("role", "dialog"); lb.setAttribute("aria-label", many ? "Fotos" : "Foto");
+  lb.innerHTML = `${many ? carHtml(list) : `<img src="${esc(src)}" alt="">`}<button class="iconbtn" aria-label="Fechar" title="Fechar">${ic("x")}</button>`;
+  const car = many ? wireCar(lb, start) : null;
   const close = () => { lb.classList.remove("show"); document.removeEventListener("keydown", onKey, true); setTimeout(() => lb.remove(), 260); };
-  const onKey = e => { if (e.key === "Escape") { e.preventDefault(); e.stopImmediatePropagation(); close(); } };
+  const onKey = e => {
+    if (e.key === "Escape") { e.preventDefault(); e.stopImmediatePropagation(); close(); }
+    else if (car && (e.key === "ArrowRight" || e.key === "ArrowLeft")) { e.preventDefault(); e.stopImmediatePropagation(); car.go(car.cur() + (e.key === "ArrowRight" ? 1 : -1)); }
+  };
   lb._close = close;
   lb.addEventListener("click", close);
   document.addEventListener("keydown", onKey, true);
@@ -1885,7 +1895,7 @@ function itemForm(item, preset={}){
   openSheet(`<form id="itf" novalidate class="${planned ? "is-wish" : ""}">
     <div class="sheet-h"><h3 id="it-t">${title()}</h3>${S.hasFav && !preset.buy ? `<button type="button" class="iconbtn fav-ic ${fav ? "on" : ""}" id="it-fav" aria-pressed="${fav}" aria-label="${favT()}" title="${favT()}" ${planned ? "" : "hidden"}>${ic("star")}</button>` : ""}<button type="button" class="iconbtn" data-close aria-label="Fechar" title="Fechar">${ic("x")}</button></div>
     ${preset.buy ? "" : `<label class="switch-row"><span class="sw-ic">${ic("bookmark")}</span><span class="sw-tx"><b>Quero comprar</b><small>Ainda não comprei. Fica na lista e não entra no total</small></span><input type="checkbox" name="planned" ${planned ? "checked" : ""}><span class="sw" aria-hidden="true"></span></label>`}
-    <div class="wish-only"><div class="wish-in"><label class="field"><span>${multi ? "Links do produto (opcional)" : "Link do produto (opcional)"}</span><div class="link-in ${multi ? "multi" : ""}">${ic("link")}<input class="input" name="link" type="url" inputmode="url" autocapitalize="off" spellcheck="false" placeholder="Cole aqui o link do produto" value="${multi ? "" : esc(links[0] || "")}" autocomplete="off">${multi ? `<button type="button" class="link-add" data-addlink>${ic("plus")} Adicionar</button>` : ""}</div></label>${multi ? `<ul class="link-list" id="links">${links.map(linkLi).join("")}</ul>` : ""}</div></div>
+    <div class="wish-only"><div class="wish-in"><label class="field"><span>${multi ? "Links do produto (opcional)" : "Link do produto (opcional)"}</span><div class="link-in ${multi ? "multi" : ""}">${ic("link")}<input class="input" name="link" type="url" inputmode="url" autocapitalize="off" spellcheck="false" placeholder="Cole aqui o link do produto" value="${multi ? "" : esc(links[0] || "")}" autocomplete="off">${multi ? `<button type="button" class="link-add" data-addlink aria-label="Adicionar link" title="Adicionar link">${ic("plus")}</button>` : ""}</div></label>${multi ? `<ul class="link-list" id="links">${links.map(linkLi).join("")}</ul>` : ""}</div></div>
     <div id="phw">${photoHtml()}</div>
     <label class="field"><span>Nome do produto</span><input class="input" name="name" value="${esc(it.name)}" placeholder="Ex.: Jogo de panelas" maxlength="120" autocomplete="off"></label>
     <div class="row2" id="row-rd">
@@ -2055,7 +2065,7 @@ function itemDetail(id){
     const du = $("[data-dup]", w); if (du) du.onclick = () => { closeSheet(w); setTimeout(() => itemForm(null, { copy: it }), 150); };
     const fb = $("[data-fav]", w); if (fb) fb.onclick = async () => { if (await toggleFav(it)) { fb.classList.toggle("on", !!it.favorite); fb.setAttribute("aria-pressed", !!it.favorite); fb.setAttribute("aria-label", favT()); fb.title = favT(); } };
     const by = $("[data-buy]", w); if (by) by.onclick = () => { closeSheet(w); setTimeout(() => itemForm(it, { buy:true }), 150); };
-    const z = $("[data-zoom]", w); if (z) { wireCar(z, 0, k => { phCur = k; }); z.onclick = () => openLightbox(phs[phCur]); }
+    const z = $("[data-zoom]", w); if (z) { wireCar(z, 0, k => { phCur = k; }); z.onclick = () => openLightbox(phs[phCur], phs, phCur); }
     const d = $("[data-del]", w); if (d) d.onclick = () => deleteItem(it);
     $$("[data-go]", w).forEach(g => { const go = () => { closeAllSheets(); setTimeout(() => openPage(g.dataset.go, g.dataset.id), 150); };
       g.onclick = go; g.onkeydown = ev => { if (ev.key === "Enter" || ev.key === " ") { ev.preventDefault(); go(); } }; });
