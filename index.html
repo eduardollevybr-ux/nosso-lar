@@ -510,6 +510,36 @@ a.btn{text-decoration:none}
 .link-in{position:relative}
 .link-in>svg{position:absolute;left:14px;top:50%;transform:translateY(-50%);color:var(--muted);width:19px;height:19px}
 .link-in .input{padding-left:42px}
+.link-in.multi .input{padding-right:104px}
+.link-add{position:absolute;right:6px;top:50%;transform:translateY(-50%);height:calc(var(--h-ctl) - 14px);padding:0 12px;border-radius:var(--r-sm);background:var(--brand);color:var(--brandInk);font-size:14px;font-weight:600;display:inline-flex;align-items:center;gap:4px}
+.link-add svg{width:16px;height:16px}
+/* vários links: lista compacta, um embaixo do outro */
+.link-list{list-style:none;margin:8px 0 0;padding:0;display:flex;flex-direction:column;gap:6px}
+.link-list:empty{display:none}
+.link-list li{display:flex;align-items:center;gap:10px;min-height:40px;padding:4px 4px 4px 12px;border-radius:var(--r-sm);border:1px solid var(--line);background:var(--card);font-size:14px}
+.link-list li>svg{width:16px;height:16px;color:var(--muted);flex:none}
+.link-list a{flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--ink);text-decoration:none}
+.link-list a b{font-weight:600}
+.link-list a span{color:var(--muted)}
+.link-list button{width:32px;height:32px;border-radius:var(--r-sm);display:grid;place-items:center;color:var(--muted);flex:none}
+.link-list button svg{width:16px;height:16px}
+.wish-in .link-list{margin:calc(8px - var(--sp)) 0 var(--sp)}
+/* carrossel de fotos (deslizar para o lado) */
+.car{position:absolute;inset:0;display:flex;overflow-x:auto;overflow-y:hidden;scroll-snap-type:x mandatory;scrollbar-width:none;overscroll-behavior-x:contain}
+.car::-webkit-scrollbar{display:none}
+.car.drag{scroll-snap-type:none;cursor:grabbing}
+.car>div{flex:0 0 100%;height:100%;scroll-snap-align:center;position:relative}
+.car img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;user-select:none;-webkit-user-drag:none}
+.car-n{position:absolute;top:10px;left:10px;z-index:1;padding:3px 10px;border-radius:999px;background:rgba(20,12,8,.55);color:#fff;font-size:12px;font-weight:600;font-variant-numeric:tabular-nums;backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);pointer-events:none}
+.car-dots{position:absolute;left:0;right:0;bottom:12px;z-index:1;display:flex;justify-content:center;gap:6px;pointer-events:none}
+.photo.has .car-dots{top:17px;bottom:auto}
+.car-dots i{width:7px;height:7px;border-radius:999px;background:rgba(255,255,255,.55);transition:width .2s,background .2s}
+.car-dots i.on{width:18px;background:#fff}
+.detail-photo.multi{position:relative;aspect-ratio:4/3;max-height:52dvh}
+.detail-photo.multi .zoom{z-index:1}
+.kv .links-b a{display:flex;margin-top:6px;max-width:100%}
+.kv .links-b a span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}
+.fav-sum{margin-top:16px}
 .it.wish{cursor:pointer;transition:background .15s}
 .it.wish:hover{background:color-mix(in srgb,var(--soft) 50%,transparent)}
 .it.wish>.thumb,.it.wish>.mid,.it.wish>.val{opacity:.5;transition:opacity .2s}
@@ -806,7 +836,7 @@ try { matchMedia("(prefers-color-scheme: dark)").addEventListener("change", appl
 /* ================= ESTADO ================= */
 const S = {
   user:null, projects:[], project:null, role:null,
-  rooms:[], stores:[], items:[], wish:[], members:[], people:null, photos:{}, hasPlanned:false, hasFav:false, list: lsGet("nl.list", "bought"),
+  rooms:[], stores:[], items:[], wish:[], members:[], people:null, photos:{}, hasPlanned:false, hasFav:false, hasMulti:false, list: lsGet("nl.list", "bought"),
   tab: lsGet("nl.tab", "casa"), roomId:null, pages:[],
   filter:{ room:"all", store:null, q:"", fav:false }, dash:"rooms", sort: lsGet("nl.sort", "recent"),
   channel:null, nav:"", recovery:RECOVERY_AT_LOAD, booting:true
@@ -821,6 +851,33 @@ const storeById = id => S.stores.find(s => s.id === id);
 const allItems = () => [...S.items, ...S.wish];
 const normLink = v => { v = String(v || "").trim(); if (!v) return ""; if (!/^https?:\/\//i.test(v)) v = "https://" + v; try { const u = new URL(v); return /\./.test(u.hostname) ? u.href : ""; } catch { return ""; } };
 const linkHost = v => { try { return new URL(v).hostname.replace(/^www\./, ""); } catch { return String(v || ""); } };
+const linkPath = v => { try { const u = new URL(v); return (u.pathname + u.search).replace(/^\/$/, ""); } catch { return ""; } };
+/* vários links e fotos por item (colunas links e photo_paths); itens antigos usam link e photo_path */
+const itemLinks = i => Array.isArray(i.links) && i.links.length ? i.links : (i.link ? [i.link] : []);
+const itemPhotos = i => Array.isArray(i.photo_paths) && i.photo_paths.length ? i.photo_paths : (i.photo_path ? [i.photo_path] : []);
+const MAX_PHOTOS = 10;
+/* carrossel: as fotos lado a lado; no celular desliza com o dedo, no computador arrasta com o mouse */
+function carHtml(srcs){
+  return `<div class="car">${srcs.map(s => `<div><img src="${esc(s)}" alt="" draggable="false" loading="lazy"></div>`).join("")}</div>`
+    + (srcs.length > 1 ? `<span class="car-n">1/${srcs.length}</span><div class="car-dots">${srcs.map((_, k) => `<i class="${k ? "" : "on"}"></i>`).join("")}</div>` : "");
+}
+function wireCar(box, start=0, onChange){
+  const car = $(".car", box); if (!car) return { cur:() => 0 };
+  const n = car.children.length, num = $(".car-n", box), dots = $$(".car-dots i", box);
+  const cur = () => Math.max(0, Math.min(n - 1, Math.round(car.scrollLeft / Math.max(1, car.clientWidth))));
+  let last = -1;
+  const mark = () => { const k = cur(); if (k === last) return; last = k; if (num) num.textContent = `${k + 1}/${n}`; dots.forEach((d, j) => d.classList.toggle("on", j === k)); if (onChange) onChange(k); };
+  car.addEventListener("scroll", mark, { passive:true });
+  const go = k => car.scrollTo({ left: Math.max(0, Math.min(n - 1, k)) * car.clientWidth, behavior:"smooth" });
+  let x0 = null, s0 = 0, moved = 0;
+  car.addEventListener("pointerdown", e => { if (e.pointerType !== "mouse" || n < 2 || e.button !== 0) return; x0 = e.clientX; s0 = car.scrollLeft; moved = 0; });
+  car.addEventListener("pointermove", e => { if (x0 === null) return; moved = e.clientX - x0; if (Math.abs(moved) > 5 && !car.classList.contains("drag")) { car.classList.add("drag"); try { car.setPointerCapture(e.pointerId); } catch {} } if (car.classList.contains("drag")) car.scrollLeft = s0 - moved; });
+  const end = () => { if (x0 === null) return; x0 = null; if (!car.classList.contains("drag")) return; car.classList.remove("drag"); const b = Math.round(s0 / car.clientWidth); go(Math.abs(moved) > 40 ? b + (moved < 0 ? 1 : -1) : b); };
+  car.addEventListener("pointerup", end); car.addEventListener("pointercancel", end);
+  car.addEventListener("click", e => { if (Math.abs(moved) > 5) { e.stopPropagation(); e.preventDefault(); moved = 0; } }, true); /* arrastou: não conta como toque */
+  if (start) requestAnimationFrame(() => { car.scrollLeft = start * car.clientWidth; mark(); }); else mark();
+  return { cur, go };
+}
 
 let sb = null;
 try {
@@ -921,14 +978,14 @@ function saveUserCache(){
 function saveSnapshot(){
   if (!S.user || !S.project) return;
   const photos = {}; Object.entries(S.photos).forEach(([k, v]) => { if (/^https?:/.test(v)) photos[k] = v; });
-  lsSet(offProjKey(S.user.id, S.project.id), { project:S.project, rooms:S.rooms, stores:S.stores, items:allItems(), members:S.members, people:S.people, role:S.role, hasPlanned:S.hasPlanned, hasFav:S.hasFav, photos, photosAt:S.photosAt || 0, saved_at:Date.now() });
+  lsSet(offProjKey(S.user.id, S.project.id), { project:S.project, rooms:S.rooms, stores:S.stores, items:allItems(), members:S.members, people:S.people, role:S.role, hasPlanned:S.hasPlanned, hasFav:S.hasFav, hasMulti:S.hasMulti, photos, photosAt:S.photosAt || 0, saved_at:Date.now() });
 }
 function applySnapshot(pid){
   if (!S.user) return false;
   const c = lsGet(offProjKey(S.user.id, pid)); if (!c || !c.project) return false;
   S.project = c.project; S.rooms = c.rooms || []; S.stores = c.stores || []; S.members = c.members || []; S.people = c.people || null;
   const all = c.items || []; S.items = all.filter(x => !x.planned); S.wish = all.filter(x => x.planned);
-  S.role = c.role || "viewer"; S.hasPlanned = !!c.hasPlanned; S.hasFav = !!c.hasFav;
+  S.role = c.role || "viewer"; S.hasPlanned = !!c.hasPlanned; S.hasFav = !!c.hasFav; S.hasMulti = !!c.hasMulti;
   S.photos = Object.assign({}, c.photos || {}, S.photos); S.photosAt = c.photosAt || 0;
   return true;
 }
@@ -1062,7 +1119,7 @@ async function loadProjectData(){
   const pid = S.project.id;
   const fromCopy = () => { if (!applySnapshot(pid)) { S.rooms = []; S.stores = []; S.items = []; S.wish = []; S.members = []; toast("Este projeto ainda não foi aberto com internet neste aparelho", true); } };
   if (!sb || NET.offline) return fromCopy();
-  const [r, s, i, m, p, pl, fv, pp] = await Promise.all([
+  const [r, s, i, m, p, pl, fv, pp, mu] = await Promise.all([
     sb.from("rooms").select("*").eq("project_id", pid).order("position").order("created_at"),
     sb.from("stores").select("*").eq("project_id", pid).order("name"),
     sb.from("items").select("*").eq("project_id", pid).order("purchased_on", { ascending:false }).order("created_at", { ascending:false }),
@@ -1070,12 +1127,14 @@ async function loadProjectData(){
     sb.from("projects").select("id,name,owner_id,created_at").eq("id", pid).maybeSingle(),
     sb.from("items").select("planned,link").eq("project_id", pid).limit(1), /* confere se o banco já tem a lista */
     sb.from("items").select("favorite").eq("project_id", pid).limit(1), /* confere se o banco já tem as próximas compras */
-    sb.rpc("nl_project_people", { pid }) /* nome cadastrado de quem participa (função criada no Supabase) */
+    sb.rpc("nl_project_people", { pid }), /* nome cadastrado de quem participa (função criada no Supabase) */
+    sb.from("items").select("links,photo_paths").eq("project_id", pid).limit(1) /* confere se o banco já aceita vários links e fotos */
   ]);
   const err = [r, s, i, m, p].find(x => x.error);
   if (err && isNetErr(err.error)) { console.warn(err.error); setOffline(true); unsubscribe(); return fromCopy(); }
   if (pl.error && !isNetErr(pl.error)) S.hasPlanned = false; else if (!pl.error) S.hasPlanned = true;
   if (fv.error && !isNetErr(fv.error)) S.hasFav = false; else if (!fv.error) S.hasFav = true;
+  if (mu.error && !isNetErr(mu.error)) S.hasMulti = false; else if (!mu.error) S.hasMulti = true;
   if (err) { console.warn(err.error); toast("Não foi possível carregar todos os dados. Tente novamente", true); }
   if (!p.error && !p.data) { // projeto apagado ou acesso removido
     toast("Você não tem mais acesso a este projeto");
@@ -1098,7 +1157,7 @@ async function refreshPhotos(){
   if (!sb || NET.offline) return;
   // links das fotos valem 12 h: depois de 6 h gera todos de novo
   if (!S.photosAt || Date.now() - S.photosAt > 6 * 3600 * 1000) { Object.keys(S.photos).forEach(k => { if (/^https?:/.test(S.photos[k])) delete S.photos[k]; }); S.photosAt = 0; }
-  const need = [...new Set(allItems().map(i => i.photo_path).filter(p => p && !S.photos[p]))];
+  const need = [...new Set(allItems().flatMap(itemPhotos).filter(p => p && !S.photos[p]))];
   if (!need.length) { if (!S.photosAt) S.photosAt = Date.now(); return; }
   try {
     const { data, error } = await sb.storage.from(BUCKET).createSignedUrls(need, 60 * 60 * 12);
@@ -1558,9 +1617,12 @@ function wishListHtml(){
   const list = filteredItems(S.wish).filter(i => !S.filter.fav || i.favorite);
   if (!S.wish.length) return emptyBox({ icon:"bookmark", title:"Nenhum item na lista", text:"Guarde aqui o que ainda falta comprar, com o link do produto. Os itens da lista não entram no total do enxoval.", action:addBtn("Adicionar à lista", `data-act="addItem" data-planned="1"`) });
   if (!list.length) return emptyBox({ text: S.filter.fav && !favN ? "Nenhum item nos favoritos. Toque na estrela de um item para favoritar." : "Nenhum item encontrado com este filtro." });
+  /* soma dos favoritos (valor × quantidade): atualiza na hora ao marcar ou desmarcar a estrela */
+  const favs = S.hasFav ? S.wish.filter(i => i.favorite) : [], ft = totals(favs);
+  const favSum = favs.length ? `<div class="card summary compact fav-sum"><div><div class="label">Total dos favoritos</div><div class="v">${money(ft.value)}</div></div><div class="side">${plural(favs.length, "favorito", "favoritos")}<br>${plural(ft.qty, "unidade", "unidades")}</div></div>` : "";
   const groups = new Map(); favFirst(list).forEach(i => { const k = i.room_id && roomById(i.room_id) ? i.room_id : "none"; if (!groups.has(k)) groups.set(k, []); groups.get(k).push(i); });
   const order = [...S.rooms.map(r => r.id), "none"].filter(k => groups.has(k));
-  return `<div class="list-bar"><div class="list-note">${S.filter.fav ? qtyTxt(list.length) : `${qtyTxt(list.length)} na lista · não entram no total`}</div></div><div class="days">` + order.map(k => { const arr = groups.get(k), r = roomById(k);
+  return favSum + `<div class="list-bar"><div class="list-note">${S.filter.fav ? qtyTxt(list.length) : `${qtyTxt(list.length)} na lista · não entram no total`}</div></div><div class="days">` + order.map(k => { const arr = groups.get(k), r = roomById(k);
     return `<div class="day">${groupHead("room", k, r ? r.name : "Sem cômodo", qtyTxt(arr.length))}<div class="card group">${arr.map(wishRow).join("")}</div></div>`; }).join("") + `</div>`;
 }
 function itemsListHtml(){
@@ -1740,7 +1802,7 @@ function syncLock(){
 function closeAllSheets(){ $$("#sheets .sheet-wrap").forEach(w => closeSheet(w)); }
 function enableDrag(w){
   const sh = $(".sheet", w); let y0 = null, dy = 0;
-  sh.addEventListener("touchstart", e => { if (sh.scrollTop > 0 || e.target.closest("input,textarea,select,.icon-grid,.chips")) { y0 = null; return; } y0 = e.touches[0].clientY; dy = 0; }, { passive:true });
+  sh.addEventListener("touchstart", e => { if (sh.scrollTop > 0 || e.target.closest("input,textarea,select,.icon-grid,.chips,.car")) { y0 = null; return; } y0 = e.touches[0].clientY; dy = 0; }, { passive:true });
   sh.addEventListener("touchmove", e => { if (y0 === null) return; dy = Math.max(0, e.touches[0].clientY - y0); if (dy > 4) { sh.classList.add("dragging"); sh.style.transform = `translateY(${dy}px)`; } }, { passive:true });
   sh.addEventListener("touchend", () => { if (y0 === null) return; sh.classList.remove("dragging"); sh.style.transform = ""; if (dy > 110) closeSheet(w); y0 = null; });
 }
@@ -1797,17 +1859,24 @@ function itemForm(item, preset={}){
   if (offlineBlock()) return;
   const isNew = !item;
   const cp = preset.copy;
-  const it = item ? { ...item } : (cp ? { name:cp.name, room_id:cp.room_id, store_id:cp.store_id, quantity:cp.quantity, unit_price:cp.unit_price, purchased_on:todayStr(), notes:cp.notes || "", photo_path:null, planned:!!cp.planned, link:cp.link || "" } : null) || { name:"", room_id: preset.room || (curPage()?.kind === "room" && curPage().id !== "none" ? curPage().id : (!curPage() && S.tab === "compras" && S.filter.room !== "all" && S.filter.room !== "none" ? S.filter.room : null)), store_id: preset.store || (curPage()?.kind === "store" && curPage().id !== "none" ? curPage().id : null), quantity:1, unit_price:0, purchased_on: curPage()?.kind === "day" ? curPage().id : todayStr(), notes:"", photo_path:null, planned:!!preset.planned, link:"" };
+  const it = item ? { ...item } : (cp ? { name:cp.name, room_id:cp.room_id, store_id:cp.store_id, quantity:cp.quantity, unit_price:cp.unit_price, purchased_on:todayStr(), notes:cp.notes || "", photo_path:null, planned:!!cp.planned, link:cp.link || "", links:itemLinks(cp) } : null) || { name:"", room_id: preset.room || (curPage()?.kind === "room" && curPage().id !== "none" ? curPage().id : (!curPage() && S.tab === "compras" && S.filter.room !== "all" && S.filter.room !== "none" ? S.filter.room : null)), store_id: preset.store || (curPage()?.kind === "store" && curPage().id !== "none" ? curPage().id : null), quantity:1, unit_price:0, purchased_on: curPage()?.kind === "day" ? curPage().id : todayStr(), notes:"", photo_path:null, planned:!!preset.planned, link:"" };
   const wasPlanned = !!(item && item.planned);
   /* "Marcar como comprado": abre o mesmo item já como compra, com a data de hoje */
   if (preset.buy) { it.planned = false; it.purchased_on = todayStr(); }
   let planned = !!it.planned;
   let fav = !!it.favorite && !preset.buy; /* estrela de favorito já no cadastro (só na lista Quero comprar) */
   const favT = () => fav ? "Tirar dos favoritos" : "Adicionar aos favoritos";
-  let newFile = null, removePhoto = false, origFile = null, origStored = false; /* origFile: a foto antes do recorte, para poder recortar de novo */
-  const curPhoto = () => newFile ? URL.createObjectURL(newFile) : (!removePhoto && it.photo_path ? S.photos[it.photo_path] : null);
-  const photoHtml = () => { const src = curPhoto(); return `<div class="photo ${src?"has":""}" id="ph">${src ? `<img src="${esc(src)}" alt="">` : `${ic("image")}<span style="font-size:14px">Foto do produto (opcional)</span>`}
-      <div class="pbtns"><label>${ic("camera")} Câmera<input type="file" accept="image/*" capture="environment" hidden data-file></label><label>${ic("image")} Galeria<input type="file" accept="image/*" hidden data-file></label>${src ? `<button type="button" data-crop aria-label="Recortar foto" title="Recortar foto">${ic("crop")}</button><button type="button" data-rmph aria-label="Remover foto" title="Remover foto">${ic("trash")}</button>` : ""}</div></div>`; };
+  /* fotos do item: { path } já salva no Storage, { file } nova; orig guarda a foto antes do recorte, para poder recortar de novo */
+  let phs = (cp ? [] : itemPhotos(it)).map(path => ({ path })), cur = 0;
+  const dropped = []; /* fotos salvas que saíram do item: apagadas do Storage depois de salvar */
+  const multi = S.hasMulti, maxPh = multi ? MAX_PHOTOS : 1;
+  const srcOf = x => x.file ? (x.url || (x.url = URL.createObjectURL(x.file))) : (S.photos[x.path] || "");
+  const dropPhoto = x => { if (x.path) dropped.push(x.path); if (x.url) URL.revokeObjectURL(x.url); };
+  const photoHtml = () => { const has = phs.length > 0; return `<div class="photo ${has?"has":""}" id="ph">${has ? carHtml(phs.map(srcOf)) : `${ic("image")}<span style="font-size:14px">${multi ? "Fotos do produto (opcional)" : "Foto do produto (opcional)"}</span>`}
+      <div class="pbtns"><label>${ic("camera")} Câmera<input type="file" accept="image/*" capture="environment" hidden data-file></label><label>${ic("image")} Galeria<input type="file" accept="image/*" ${multi ? "multiple" : ""} hidden data-file></label>${has ? `<button type="button" data-crop aria-label="Recortar foto" title="Recortar foto">${ic("crop")}</button><button type="button" data-rmph aria-label="Remover foto" title="Remover foto">${ic("trash")}</button>` : ""}</div></div>`; };
+  /* links do produto: com vários links, cada um entra numa lista compacta embaixo do campo */
+  let links = itemLinks(it).slice();
+  const linkLi = (l, k) => `<li>${ic("link")}<a href="${esc(l)}" target="_blank" rel="noopener"><b>${esc(linkHost(l))}</b><span>${esc(linkPath(l))}</span></a><button type="button" data-rmlink="${k}" aria-label="Remover link" title="Remover link">${ic("x")}</button></li>`;
   const storeOpts = () => `<option value="" data-icon="box">Sem loja</option>` + S.stores.map(s => `<option value="${s.id}" data-icon="${s.kind === "online" ? "globe" : "store"}" ${s.id===it.store_id?"selected":""}>${esc(s.name)}</option>`).join("") + `<option value="__new" data-icon="plus">Nova loja</option>`;
   const priceStr = it.unit_price ? (+it.unit_price).toLocaleString("pt-BR", { minimumFractionDigits:2, maximumFractionDigits:2 }) : "";
   /* o título da janela repete o nome do botão que a abriu; o botão de salvar é sempre "Salvar" */
@@ -1816,7 +1885,7 @@ function itemForm(item, preset={}){
   openSheet(`<form id="itf" novalidate class="${planned ? "is-wish" : ""}">
     <div class="sheet-h"><h3 id="it-t">${title()}</h3>${S.hasFav && !preset.buy ? `<button type="button" class="iconbtn fav-ic ${fav ? "on" : ""}" id="it-fav" aria-pressed="${fav}" aria-label="${favT()}" title="${favT()}" ${planned ? "" : "hidden"}>${ic("star")}</button>` : ""}<button type="button" class="iconbtn" data-close aria-label="Fechar" title="Fechar">${ic("x")}</button></div>
     ${preset.buy ? "" : `<label class="switch-row"><span class="sw-ic">${ic("bookmark")}</span><span class="sw-tx"><b>Quero comprar</b><small>Ainda não comprei. Fica na lista e não entra no total</small></span><input type="checkbox" name="planned" ${planned ? "checked" : ""}><span class="sw" aria-hidden="true"></span></label>`}
-    <div class="wish-only"><div class="wish-in"><label class="field"><span>Link do produto (opcional)</span><div class="link-in">${ic("link")}<input class="input" name="link" type="url" inputmode="url" autocapitalize="off" spellcheck="false" placeholder="Cole aqui o link do produto" value="${esc(it.link || "")}" autocomplete="off"></div></label></div></div>
+    <div class="wish-only"><div class="wish-in"><label class="field"><span>${multi ? "Links do produto (opcional)" : "Link do produto (opcional)"}</span><div class="link-in ${multi ? "multi" : ""}">${ic("link")}<input class="input" name="link" type="url" inputmode="url" autocapitalize="off" spellcheck="false" placeholder="Cole aqui o link do produto" value="${multi ? "" : esc(links[0] || "")}" autocomplete="off">${multi ? `<button type="button" class="link-add" data-addlink>${ic("plus")} Adicionar</button>` : ""}</div></label>${multi ? `<ul class="link-list" id="links">${links.map(linkLi).join("")}</ul>` : ""}</div></div>
     <div id="phw">${photoHtml()}</div>
     <label class="field"><span>Nome do produto</span><input class="input" name="name" value="${esc(it.name)}" placeholder="Ex.: Jogo de panelas" maxlength="120" autocomplete="off"></label>
     <div class="row2" id="row-rd">
@@ -1851,53 +1920,94 @@ function itemForm(item, preset={}){
     f.store.addEventListener("change", () => { if (f.store.value !== "__new") return; f.store.value = it.store_id || ""; storeForm(null, s => { it.store_id = s.id; f.store.innerHTML = storeOpts(); f.store.value = s.id; }); });
     const wirePhoto = () => {
       const show = () => { $("#phw", w).innerHTML = photoHtml(); wirePhoto(); };
+      wireCar($("#ph", w), cur, k => { cur = k; });
       $$("[data-file]", w).forEach(inp => inp.onchange = async () => {
-        const file = inp.files && inp.files[0]; inp.value = ""; if (!file) return;
-        if (!/^image\//.test(file.type) && !/\.(heic|heif)$/i.test(file.name)) return toast("Escolha um arquivo de imagem", true);
-        const out = await cropImage(file); if (!out) return;
-        origFile = file; origStored = false; newFile = out; removePhoto = false; show();
+        const files = [...(inp.files || [])]; inp.value = ""; if (!files.length) return;
+        const imgs = files.filter(file => /^image\//.test(file.type) || /\.(heic|heif)$/i.test(file.name));
+        if (!imgs.length) return toast("Escolha um arquivo de imagem", true);
+        if (maxPh > 1 && phs.length >= maxPh) return toast(`Cada item aceita até ${maxPh} fotos`, true);
+        let add = [];
+        if (imgs.length === 1) { const out = await cropImage(imgs[0]); if (!out) return; add = [{ file:out, orig:imgs[0] }]; }
+        else add = imgs.map(file => ({ file, orig:file })); /* várias de uma vez: entram inteiras; dá para recortar cada uma depois */
+        if (maxPh === 1) { phs.forEach(dropPhoto); phs = add.slice(0, 1); cur = 0; }
+        else {
+          const room = maxPh - phs.length;
+          if (add.length > room) toast(`Cada item aceita até ${maxPh} fotos. Entraram ${room}.`, true);
+          cur = phs.length; phs = phs.concat(add.slice(0, room));
+        }
+        show();
       });
       const cb = $("[data-crop]", w); if (cb) cb.onclick = async () => {
+        const x = phs[cur]; if (!x) return;
         /* foto já salva: baixa a original para recortar (direto do Storage, sem passar pela cópia do aparelho) */
-        if (!origFile && it.photo_path && !removePhoto) {
+        if (!x.orig && x.path) {
           if (offlineBlock()) return;
           busy(cb, true);
-          try { const { data, error } = await sb.storage.from(BUCKET).download(it.photo_path); if (error || !data) throw error || new Error("download"); origFile = new File([data], "foto.jpg", { type:data.type || "image/jpeg" }); origStored = true; }
+          try { const { data, error } = await sb.storage.from(BUCKET).download(x.path); if (error || !data) throw error || new Error("download"); x.orig = new File([data], "foto.jpg", { type:data.type || "image/jpeg" }); x.origStored = true; }
           catch (e) { console.warn(e); busy(cb, false); return toast("Não foi possível abrir a foto", true); }
           busy(cb, false);
         }
-        if (!origFile) return;
-        const out = await cropImage(origFile); if (!out) return;
-        newFile = (out === origFile && origStored) ? null : out; show(); /* voltou à foto salva inteira: não envia de novo */
+        const src = x.orig || x.file; if (!src) return;
+        const out = await cropImage(src); if (!out) return;
+        if (x.url) { URL.revokeObjectURL(x.url); x.url = null; }
+        if (out === x.orig && x.origStored) delete x.file; /* voltou à foto salva inteira: não envia de novo */
+        else x.file = out;
+        show();
       };
-      const rm = $("[data-rmph]", w); if (rm) rm.onclick = () => { newFile = null; origFile = null; origStored = false; removePhoto = true; show(); };
+      const rm = $("[data-rmph]", w); if (rm) rm.onclick = () => { const x = phs[cur]; if (!x) return; dropPhoto(x); phs.splice(cur, 1); cur = Math.max(0, Math.min(cur, phs.length - 1)); show(); };
     };
     wirePhoto();
+    if (multi) {
+      const ul = $("#links", w);
+      const paintLinks = () => { ul.innerHTML = links.map(linkLi).join(""); };
+      /* aceita um ou vários links de uma vez (separados por espaço, vírgula ou linha) */
+      const addLinks = text => {
+        const parts = String(text || "").split(/[\s,]+/).filter(Boolean); if (!parts.length) return true;
+        const ok = parts.map(normLink);
+        if (ok.some(l => !l)) { toast("Confira o link", true); return false; }
+        const fresh = ok.filter((l, k) => !links.includes(l) && ok.indexOf(l) === k);
+        if (!fresh.length) { toast("Este link já está na lista", true); return false; }
+        links = links.concat(fresh); paintLinks(); return true;
+      };
+      const addTyped = () => { if (addLinks(f.link.value)) f.link.value = ""; };
+      $("[data-addlink]", w).onclick = e => { e.preventDefault(); addTyped(); f.link.focus(); };
+      f.link.addEventListener("keydown", e => { if (e.key === "Enter") { e.preventDefault(); addTyped(); } });
+      f.link.addEventListener("paste", e => { const t = (e.clipboardData || window.clipboardData)?.getData("text"); if (!t || f.link.value.trim()) return; e.preventDefault(); if (!addLinks(t)) f.link.value = t.trim(); });
+      ul.addEventListener("click", e => { const b = e.target.closest("[data-rmlink]"); if (!b) return; links.splice(+b.dataset.rmlink, 1); paintLinks(); });
+    }
     const del = $("[data-del]", w); if (del) del.onclick = () => deleteItem(it, w);
     f.addEventListener("submit", async e => {
       e.preventDefault();
       const name = fmtName(f.name.value);
       if (!name) { f.name.focus(); return toast("Informe o nome do produto", true); }
       if (!planned && !f.date.value) return toast("Informe a data da compra", true);
-      const link = normLink(f.link.value);
-      if (f.link.value.trim() && planned && !link) return toast("Confira o link", true);
+      /* link digitado e não adicionado: entra junto ao salvar */
+      const typed = f.link.value.trim().split(/[\s,]+/).filter(Boolean).map(normLink);
+      if (planned && typed.some(l => !l)) return toast("Confira o link", true);
+      const allLinks = multi ? [...new Set(links.concat(typed.filter(Boolean)))] : typed.filter(Boolean).slice(0, 1);
       if ((planned || wasPlanned) && !S.hasPlanned) return toast("A lista Quero comprar ainda não está ativa no banco de dados", true);
       const btn = $("#its", w); busy(btn, true);
-      let uploaded = null;
+      const uploaded = [];
       try {
         const row = { name, room_id: f.room.value || null, store_id: (f.store.value && f.store.value !== "__new") ? f.store.value : null, quantity: qty(), unit_price: parseMoney(f.price.value), purchased_on: planned ? (it.purchased_on || todayStr()) : f.date.value, notes: f.notes.value.trim() || null };
-        if (S.hasPlanned) { row.planned = planned; row.link = link || null; }
+        if (S.hasPlanned) { row.planned = planned; row.link = allLinks[0] || null; }
+        if (multi) row.links = allLinks.length ? allLinks : null;
         if (S.hasFav) row.favorite = planned && fav; /* comprou: sai dos favoritos */
-        const oldPath = it.photo_path || null;
-        if (newFile) { uploaded = await uploadPhoto(newFile); row.photo_path = uploaded; }
-        else if (removePhoto) row.photo_path = null;
+        /* envia as fotos novas na ordem do carrossel; a primeira vira a capa (photo_path) */
+        const paths = [], replaced = [];
+        for (const x of phs) {
+          if (x.file) { const np = await uploadPhoto(x.file); uploaded.push(np); paths.push(np); if (x.path) replaced.push(x.path); }
+          else if (x.path) paths.push(x.path);
+        }
+        row.photo_path = paths[0] || null;
+        if (multi) row.photo_paths = paths.length ? paths : null;
         if (isNew) { const { error } = await sb.from("items").insert({ ...row, project_id: S.project.id }); if (error) throw error; }
         else { const { error } = await sb.from("items").update(row).eq("id", it.id); if (error) throw error; }
-        if (oldPath && (newFile || removePhoto)) removePhotos([oldPath]);
+        removePhotos([...dropped, ...replaced].filter(p => !paths.includes(p)));
         closeAllSheets();
         toast(wasPlanned && !planned ? "Marcado como comprado" : planned ? (isNew ? "Item adicionado à lista" : "Item atualizado") : (isNew ? "Compra registrada" : "Compra atualizada"));
         await loadProjectData(); render();
-      } catch (err) { console.warn(err); if (uploaded) removePhotos([uploaded]); toast(friendlyError(err), true); busy(btn, false); }
+      } catch (err) { console.warn(err); removePhotos(uploaded); toast(friendlyError(err), true); busy(btn, false); }
     });
   });
 }
@@ -1907,7 +2017,7 @@ async function deleteItem(it, formSheet){
   if (!(await confirmBox({ title: wish ? "Excluir item da lista?" : "Excluir compra?", text:`Esta ação exclui <b>${esc(it.name)}</b> ${wish ? "da lista Quero comprar" : "do enxoval"}.`, ok:"Excluir", danger:true }))) return;
   const { error } = await sb.from("items").delete().eq("id", it.id);
   if (error) return toast(friendlyError(error), true);
-  if (it.photo_path) removePhotos([it.photo_path]);
+  removePhotos(itemPhotos(it));
   closeAllSheets(); toast(wish ? "Item excluído" : "Compra excluída");
   await loadProjectData(); render();
 }
@@ -1916,9 +2026,11 @@ async function deleteItem(it, formSheet){
 function itemDetail(id){
   const it = allItems().find(i => i.id === id); if (!it) return;
   const wish = !!it.planned;
-  const r = roomById(it.room_id), s = storeById(it.store_id), ph = it.photo_path && S.photos[it.photo_path];
-  /* ações sempre na mesma ordem: excluir (ícone), ação secundária, ação principal */
-  const linkBtn = it.link ? `<a class="btn soft" href="${esc(it.link)}" target="_blank" rel="noopener">${ic("external")} Abrir link</a>` : "";
+  const r = roomById(it.room_id), s = storeById(it.store_id);
+  const phs = itemPhotos(it).map(p => S.photos[p]).filter(Boolean), links = itemLinks(it);
+  let phCur = 0;
+  /* ações sempre na mesma ordem: excluir (ícone), ação secundária, ação principal; com vários links, eles ficam na lista abaixo */
+  const linkBtn = links.length === 1 ? `<a class="btn soft" href="${esc(links[0])}" target="_blank" rel="noopener">${ic("external")} Abrir link</a>` : "";
   const delBtn = `<button class="btn danger icon" data-del aria-label="Excluir" title="Excluir">${ic("trash")}</button>`;
   const actions = !canEdit() ? (wish && linkBtn ? `<div class="sheet-actions">${linkBtn}</div>` : "")
     : wish ? `<div class="sheet-actions"><button class="btn primary" data-buy>${ic("check")} Marcar como comprado</button></div><div class="sheet-actions">${delBtn}${linkBtn}<button class="btn soft" data-edit>${ic("edit")} Editar</button></div>`
@@ -1927,12 +2039,14 @@ function itemDetail(id){
   const favTop = wish && S.hasFav && (canEdit() || it.favorite) ? (canEdit() ? `<button class="iconbtn fav-ic ${it.favorite ? "on" : ""}" data-fav aria-pressed="${!!it.favorite}" aria-label="${favT()}" title="${favT()}">${ic("star")}</button>` : `<span class="iconbtn fav-ic on" title="Favorito" aria-label="Favorito">${ic("star")}</span>`) : "";
   openSheet(`<div class="sheet-h"><h3>${esc(it.name)}</h3>${favTop}<button class="iconbtn" data-close aria-label="Fechar" title="Fechar">${ic("x")}</button></div>
     ${wish ? `<div class="wish-tag">${ic("bookmark")} Quero comprar · não entra no total</div>` : ""}
-    ${ph ? `<div class="detail-photo" data-zoom role="button" aria-label="Ver foto em tela cheia"><img src="${esc(ph)}" alt=""><span class="zoom">${ic("expand")}</span></div>` : ""}
+    ${phs.length > 1 ? `<div class="detail-photo multi" data-zoom role="button" aria-label="Ver foto em tela cheia">${carHtml(phs)}<span class="zoom">${ic("expand")}</span></div>`
+      : phs.length ? `<div class="detail-photo" data-zoom role="button" aria-label="Ver foto em tela cheia"><img src="${esc(phs[0])}" alt=""><span class="zoom">${ic("expand")}</span></div>` : ""}
     <div class="card summary compact ${wish ? "ghost" : ""}"><div><div class="label">${wish ? "Total estimado" : "Total"}</div><div class="v">${money(itemTotal(it))}</div></div><div class="side">${(+it.quantity).toLocaleString("pt-BR")} × ${money(it.unit_price)}</div></div>
     <div class="card kv">
       ${kvGo("room", r ? r.id : "none", "Cômodo", r ? r.name : "Sem cômodo")}
       ${kvGo("store", s ? s.id : "none", "Loja", s ? s.name : "Sem loja")}
-      ${wish ? (it.link ? `<div><span>Link</span><b><a class="kv-link" href="${esc(it.link)}" target="_blank" rel="noopener">${esc(linkHost(it.link))} ${ic("external")}</a></b></div>` : "") : kvGo("day", it.purchased_on, "Data da compra", fmtDate(it.purchased_on))}
+      ${wish ? (links.length > 1 ? `<div class="block links-b"><span>Links</span>${links.map(l => `<a class="kv-link" href="${esc(l)}" target="_blank" rel="noopener">${ic("external")}<span>${esc(linkHost(l) + linkPath(l))}</span></a>`).join("")}</div>`
+        : links.length ? `<div><span>Link</span><b><a class="kv-link" href="${esc(links[0])}" target="_blank" rel="noopener">${esc(linkHost(links[0]))} ${ic("external")}</a></b></div>` : "") : kvGo("day", it.purchased_on, "Data da compra", fmtDate(it.purchased_on))}
       ${it.created_by_email ? `<div><span>Adicionado por</span><b title="${esc(it.created_by_email)}">${esc(whoName(it.created_by_email))}</b></div>` : ""}
       ${it.notes ? `<div class="block"><span>Observações</span><p>${esc(it.notes)}</p></div>` : ""}
     </div>
@@ -1941,7 +2055,7 @@ function itemDetail(id){
     const du = $("[data-dup]", w); if (du) du.onclick = () => { closeSheet(w); setTimeout(() => itemForm(null, { copy: it }), 150); };
     const fb = $("[data-fav]", w); if (fb) fb.onclick = async () => { if (await toggleFav(it)) { fb.classList.toggle("on", !!it.favorite); fb.setAttribute("aria-pressed", !!it.favorite); fb.setAttribute("aria-label", favT()); fb.title = favT(); } };
     const by = $("[data-buy]", w); if (by) by.onclick = () => { closeSheet(w); setTimeout(() => itemForm(it, { buy:true }), 150); };
-    const z = $("[data-zoom]", w); if (z) z.onclick = () => openLightbox(ph);
+    const z = $("[data-zoom]", w); if (z) { wireCar(z, 0, k => { phCur = k; }); z.onclick = () => openLightbox(phs[phCur]); }
     const d = $("[data-del]", w); if (d) d.onclick = () => deleteItem(it);
     $$("[data-go]", w).forEach(g => { const go = () => { closeAllSheets(); setTimeout(() => openPage(g.dataset.go, g.dataset.id), 150); };
       g.onclick = go; g.onkeydown = ev => { if (ev.key === "Enter" || ev.key === " ") { ev.preventDefault(); go(); } }; });
