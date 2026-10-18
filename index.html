@@ -1716,9 +1716,9 @@ function filteredItems(src, noRoom){
 }
 /* ================= LISTAS DA ABA COMPRAS =================
    Compradas: grade de cartões com foto. Quero comprar: abas de cômodo com cartões.
-   Sem divisão por datas e com páginas no lugar da rolagem sem fim. */
-/* itens por página: 14 no computador (2 linhas de 7) e 20 no celular */
-const perPage = () => (window.innerWidth >= 900 ? 14 : 20);
+   Sem divisão por datas. Compradas em páginas; Quero comprar mostra a lista inteira. */
+/* itens por página nas compradas: 21 no computador (3 linhas de 7) e 20 no celular */
+const perPage = () => (window.innerWidth >= 900 ? 21 : 20);
 /* mais recentes: dia em que entrou como comprada (preenchido sozinho) e, no mesmo dia, a hora do cadastro */
 const recentKey = i => String(i.purchased_on || "") + "|" + String(i.created_at || "");
 const byRecent = arr => [...arr].sort((a, b) => recentKey(b).localeCompare(recentKey(a)));
@@ -1756,7 +1756,7 @@ function wishBody(list){
   const groups = wishGroups(list), cur = groups.find(g => g.k === S.wroom), arr = cur ? cur.arr : favFirst(list);
   return `<div class="chips wtabs" role="group" aria-label="Filtrar por cômodo"><button class="chip ${cur ? "" : "on"}" data-act="wtab" data-k="" aria-pressed="${!cur}">Todos <span class="seg-n">${list.length}</span></button>${groups.map(g => `<button class="chip ${cur && cur.k === g.k ? "on" : ""}" data-act="wtab" data-k="${g.k}" aria-pressed="${!!(cur && cur.k === g.k)}">${ic(g.icon)}${esc(g.name)} <span class="seg-n">${g.arr.length}</span></button>`).join("")}</div>
     ${cur ? `<div class="card summary compact mt"><div><div class="label">Falta em ${esc(cur.name)}</div><div class="v">${money(totals(cur.arr).value)}</div></div><div class="side">${qtyTxt(cur.arr.length)}</div></div>` : ""}
-    <div class="wgrid">${pageOf(arr).map(i => wishCard(i, !cur)).join("")}</div>${pager(arr.length)}`;
+    <div class="wgrid">${arr.map(i => wishCard(i, !cur)).join("")}</div>`;
 }
 function wishListHtml(){
   const favN = S.wish.filter(i => i.favorite).length;
@@ -1767,7 +1767,7 @@ function wishListHtml(){
   /* soma dos favoritos (valor × quantidade): só aparece com o filtro Favoritos ligado */
   const favs = S.hasFav && S.filter.fav ? S.wish.filter(i => i.favorite) : [], ft = totals(favs);
   const favSum = favs.length ? `<div class="card summary compact fav-sum"><div><div class="label">Total dos favoritos</div><div class="v">${money(ft.value)}</div></div><div class="side">${plural(favs.length, "favorito", "favoritos")}<br>${plural(ft.qty, "unidade", "unidades")}</div></div>` : "";
-  return favSum + `<div class="list-bar"><div class="list-note">${S.filter.fav ? qtyTxt(list.length) : `${qtyTxt(list.length)} na lista · não entram no total`}</div></div>` + wishBody(list);
+  return favSum + wishBody(list);
 }
 function itemsListHtml(){
   if (S.list === "wish") return wishListHtml();
