@@ -510,7 +510,7 @@ body.is-offline .auth{padding-top:calc(48px + env(safe-area-inset-top))}
 @media (max-width:899px){body main.view.has-fab{padding-bottom:calc(170px + env(safe-area-inset-bottom))}}
 
 /* ordenação da lista de compras */
-.list-bar{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:16px 4px 0}
+.list-bar{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;padding:16px 4px 0}
 .list-bar .list-note{padding:0}
 .sort-w{flex:none}
 .sort-w .select{height:var(--h-sm);border-radius:999px;font-size:14px;font-weight:600;padding:0 32px 0 12px;width:auto;background-color:var(--card);background-position:right 10px center;background-size:16px}
@@ -536,7 +536,6 @@ a.btn{text-decoration:none}
 .wish-only>.wish-in{overflow:hidden;min-height:0;padding:0 5px;margin:0 -5px}
 .is-wish .wish-only{grid-template-rows:1fr;opacity:1}
 .is-wish .bought-only{display:none}
-.is-wish #row-rd{grid-template-columns:minmax(0,1fr)}
 #row-rd{row-gap:0}
 /* celular: cômodo e data um embaixo do outro, para o nome do cômodo não ficar cortado */
 @media (max-width:419px){#row-rd{grid-template-columns:minmax(0,1fr)}}
@@ -704,6 +703,47 @@ span.w-btn.fav{cursor:default}
   .lightbox .iconbtn:hover{background:rgba(255,255,255,.22)}
   .cr-top .iconbtn:hover,.cr-bot .btn.soft:hover{background:rgba(255,255,255,.22)}
 }
+/* ---------- aba Compras: ordem, páginas e cartões ---------- */
+.sort-c{display:flex;gap:6px;flex-wrap:wrap}
+.sort-c .chip{height:34px;font-size:13px;padding:0 12px}
+.chip.on .seg-n{background:rgba(255,255,255,.22);color:inherit}
+/* paginação (no lugar da rolagem sem fim) */
+.pager{display:flex;align-items:center;justify-content:center;gap:8px;margin-top:var(--sp-lg)}
+.pg-ns{display:flex;gap:4px}
+.pg-n{min-width:40px;height:40px;padding:0 6px;border-radius:var(--r-sm);background:var(--soft);color:var(--ink2);font-weight:600;font-size:14px}
+.pg-n.on{background:var(--brand);color:var(--brandInk)}
+.pg-a{width:44px;height:44px;border-radius:var(--r-sm);border:1px solid var(--line);background:var(--card);color:var(--brand);display:grid;place-items:center}
+.pg-a:disabled{opacity:.35;cursor:default}
+.pg-a svg{width:18px;height:18px}
+.pg-info{text-align:center;font-size:12px;color:var(--muted);margin-top:8px}
+/* cartões com foto (compradas e quero comprar): 2 por linha no celular, 7 no computador */
+.pgrid,.wgrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:var(--sp)}
+@media (min-width:600px){.pgrid,.wgrid{grid-template-columns:repeat(4,minmax(0,1fr));gap:14px}}
+@media (min-width:900px){.pgrid,.wgrid{grid-template-columns:repeat(7,minmax(0,1fr))}}
+.pc,.wc{display:flex;flex-direction:column;text-align:left;min-width:0;background:var(--card);border:1px solid color-mix(in srgb,var(--line) 55%,transparent);border-radius:var(--r-md);padding:6px;box-shadow:var(--shadow);cursor:pointer;transition:transform .2s var(--ease)}
+@media (hover:hover){.pc:hover,.wc:hover{transform:translateY(-2px)}}
+.pc-ph,.wc-ph{position:relative;aspect-ratio:4/3;border-radius:var(--r-sm);background:var(--soft);display:grid;place-items:center;color:var(--brand2);overflow:hidden}
+.pc-ph img,.wc-ph img{width:100%;height:100%;object-fit:cover;display:block}
+.pc-ph svg,.wc-ph svg{width:34px;height:34px;stroke-width:1.5}
+.pc-q{position:absolute;top:6px;right:6px;background:var(--card);color:var(--brand);font-size:11px;font-weight:700;border-radius:999px;padding:2px 7px}
+.pc-n,.wc-n{font-size:14px;font-weight:600;margin:8px 4px 0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pc-s,.wc-s{font-size:12px;color:var(--muted);margin:2px 4px 0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pc-v{font-size:15px;margin:4px;font-variant-numeric:tabular-nums}
+.wc-ph{background:transparent;border:1.5px dashed color-mix(in srgb,var(--brand2) 50%,transparent)}
+.wc .w-acts{margin:8px 2px 2px}
+.wc.is-fav{border-color:color-mix(in srgb,#C8913A 45%,transparent)}
+/* quero comprar: abas de cômodo */
+.wtabs{margin-top:var(--sp)}
+/* total dos favoritos: marrom mais escuro, igual nos dois temas */
+.summary.fav-sum{background:radial-gradient(120% 140% at 0% 0%,#6B4730 0%,#4A3020 55%,#33200F 100%);color:#FFFFFF;box-shadow:0 14px 34px -12px rgba(51,32,15,.55)}
+.summary.fav-sum .label{color:rgba(255,255,255,.75)}
+/* busca: X para limpar o texto (aparece só quando há algo digitado) */
+.search .input{padding-right:46px}
+.search input::-webkit-search-cancel-button{-webkit-appearance:none;appearance:none;display:none}
+.search-x{position:absolute;right:6px;top:50%;transform:translateY(-50%);width:36px;height:36px;border-radius:50%;display:grid;place-items:center;color:var(--muted);transition:background .15s,color .15s}
+.search-x:hover{background:var(--soft);color:var(--ink)}
+.search .search-x svg{position:static;transform:none;width:18px;height:18px;color:currentColor}
+.search input:placeholder-shown~.search-x{display:none}
 @media (prefers-reduced-motion:reduce){*{animation-duration:.01ms!important;transition-duration:.01ms!important}}
 </style>
 </head>
@@ -796,6 +836,8 @@ const moneyShort = v => { v = +v || 0;
   return BRL.format(v); };
 const pad = n => String(n).padStart(2, "0");
 const todayStr = () => { const d = new Date(); return d.getFullYear() + "-" + pad(d.getMonth()+1) + "-" + pad(d.getDate()); };
+/* dia de um registro, sem hora (exemplo: 18/10/2026) */
+const fmtWhen = v => { if (!v) return ""; const d = new Date(v); return isNaN(d) ? "" : d.toLocaleDateString("pt-BR"); };
 const fmtDate = d => { if (!d) return ""; const [y,m,dd] = d.split("-"); return `${dd}/${m}/${y}`; };
 const dayTitle = d => {
   if (d === todayStr()) return "Hoje";
@@ -878,6 +920,7 @@ const S = {
   rooms:[], stores:[], items:[], wish:[], members:[], people:null, photos:{}, hasPlanned:false, hasFav:false, hasMulti:false, list: lsGet("nl.list", "bought"),
   tab: lsGet("nl.tab", "casa"), roomId:null, pages:[],
   filter:{ room:"all", store:null, q:"", fav:false }, dash:"rooms", sort: lsGet("nl.sort", "recent"),
+  pg:0, wroom:null,
   channel:null, nav:"", recovery:RECOVERY_AT_LOAD, booting:true
 };
 const canEdit = () => S.role === "owner" || S.role === "editor";
@@ -1406,7 +1449,7 @@ function openPage(kind, id){
 }
 function viewPage(){
   const pg = S.pages[S.pages.length - 1];
-  const html = pg.kind === "room" ? viewRoom(pg.id) : pg.kind === "store" ? viewStore(pg.id) : viewDay(pg.id);
+  const html = pg.kind === "room" ? viewRoom(pg.id) : pg.kind === "store" ? viewStore(pg.id) : "";
   if (html) return html;
   S.pages.pop(); return S.pages.length ? viewPage() : tabBody(); /* o registro foi excluído: volta um nível */
 }
@@ -1448,17 +1491,6 @@ function viewStore(id){
     + (st.notes ? `<p class="note">${esc(st.notes)}</p>` : "")
     + (list.length ? groupedList(list) : emptyBox({ slim:true, text:`Nenhuma compra registrada ${none ? "sem loja" : "nesta loja"}.` }))
     + wishSection(wl, !none ? `data-store="${id}"` : "");
-}
-function viewDay(d){
-  const list = S.items.filter(i => i.purchased_on === d);
-  if (!list.length) return "";
-  const t = totals(list);
-  const groups = new Map(); list.forEach(i => { const k = i.room_id && roomById(i.room_id) ? i.room_id : "none"; if (!groups.has(k)) groups.set(k, []); groups.get(k).push(i); });
-  const order = [...S.rooms.map(r => r.id), "none"].filter(k => groups.has(k));
-  const title = dayTitle(d), line = pageLine(t, 0, [title === "Hoje" || title === "Ontem" ? fmtDate(d) : ""]);
-  return pageHead("calendar", title, line, "")
-    + `<div class="days">` + order.map(k => { const arr = groups.get(k), r = roomById(k);
-      return `<div class="day">${groupHead("room", k, r ? r.name : "Sem cômodo", money(arr.reduce((a,i)=>a+itemTotal(i),0)))}<div class="card group">${arr.map(itemRow).join("")}</div></div>`; }).join("") + `</div>`;
 }
 /* depois de trocar lista, painel ou filtro: se a página ficou rolada para baixo,
    volta até os botões de troca, em vez de deixar a pessoa "presa" no fim da lista nova (telas menores) */
@@ -1601,14 +1633,14 @@ function viewHouse(){
   </div>
   <div class="recent">
     <div class="section-t"><h3>Últimas compras</h3>${S.items.length ? `<button class="btn soft sm" data-act="tab" data-tab="compras">Ver todas</button>` : ""}</div>
-    ${S.items.length ? `<div class="card group">${S.items.slice(0,12).map(itemRow).join("")}</div>` : emptyBox({ mt:false, text:"As compras registradas aparecem aqui.", action:addBtn("Nova compra", `data-act="addItem"`) })}
+    ${S.items.length ? `<div class="card group">${byRecent(S.items).slice(0,12).map(itemRow).join("")}</div>` : emptyBox({ mt:false, text:"As compras registradas aparecem aqui.", action:addBtn("Nova compra", `data-act="addItem"`) })}
   </div>
   </div>`;
 }
-function wishRow(i){
+function wishRow(i, showRoom){
   const r = roomById(i.room_id), s = storeById(i.store_id);
   const pg = curPage();
-  const sub = [+i.unit_price ? money(itemTotal(i)) : null, s && pg?.kind !== "store" ? s.name : null, pg?.kind !== "room" && !(!pg && S.tab === "compras" && S.list === "wish") ? (r ? r.name : "Sem cômodo") : null].filter(Boolean).join(" · ");
+  const sub = [+i.unit_price ? money(itemTotal(i)) : null, s && pg?.kind !== "store" ? s.name : null, showRoom === true || (pg?.kind !== "room" && !(!pg && S.tab === "compras" && S.list === "wish")) ? (r ? r.name : "Sem cômodo") : null].filter(Boolean).join(" · ");
   const ph = i.photo_path && S.photos[i.photo_path];
   return `<div class="it wish ${i.favorite ? "is-fav" : ""}" data-act="item" data-id="${i.id}" role="button" tabindex="0">
     <span class="thumb">${ph ? `<img src="${esc(ph)}" alt="" loading="lazy">` : ic(r ? r.icon : "bookmark")}</span>
@@ -1644,21 +1676,20 @@ function itemRow(i){
   return `<button class="it" data-act="item" data-id="${i.id}">
     <span class="thumb">${ph ? `<img src="${esc(ph)}" alt="" loading="lazy">` : ic(r ? r.icon : "box")}</span>
     <span class="mid"><div class="nm">${esc(i.name)}</div><div class="sub">${esc(sub)}</div></span>
-    <span class="val"><b>${money(itemTotal(i))}</b><small>${+i.quantity !== 1 ? `${(+i.quantity).toLocaleString("pt-BR")} × ${money(i.unit_price)}` : fmtDate(i.purchased_on)}</small></span>
+    <span class="val"><b>${money(itemTotal(i))}</b>${+i.quantity !== 1 ? `<small>${(+i.quantity).toLocaleString("pt-BR")} × ${money(i.unit_price)}</small>` : ""}</span>
   </button>`;
 }
-/* título de grupo (dia ou cômodo) que também abre a tela daquele dia/cômodo */
+/* título de grupo (cômodo) que também abre a tela daquele cômodo */
 function groupHead(kind, id, title, right){
   const cur = curPage();
   if (cur && cur.kind === kind && cur.id === id) return `<div class="day-h"><b>${esc(title)}</b><span>${right}</span></div>`;
   return `<button class="day-h go" data-act="page" data-kind="${kind}" data-id="${esc(id)}"><b>${esc(title)}${ic("right")}</b><span>${right}</span></button>`;
 }
+/* lista contínua, sem divisão por datas: as mais recentes primeiro */
 function groupedList(list){
   if (!list.length) return "";
-  const days = new Map(); list.forEach(i => { const d = i.purchased_on; if (!days.has(d)) days.set(d, []); days.get(d).push(i); });
-  return `<div class="days">` + [...days.entries()].map(([d, arr]) => `<div class="day">${groupHead("day", d, dayTitle(d), money(arr.reduce((a,i)=>a+itemTotal(i),0)))}<div class="card group">${arr.map(itemRow).join("")}</div></div>`).join("") + `</div>`;
+  return `<div class="card group two mt">${byRecent(list).map(itemRow).join("")}</div>`;
 }
-
 /* ---------- cômodo ---------- */
 function viewRoom(id){
   const none = id === "none";
@@ -1673,41 +1704,80 @@ function viewRoom(id){
 }
 
 /* ---------- compras ---------- */
-function filteredItems(src){
+function filteredItems(src, noRoom){
   const f = S.filter, q = f.q.trim().toLowerCase();
   return (src || S.items).filter(i => {
-    if (f.room === "none" && i.room_id && roomById(i.room_id)) return false;
-    if (f.room !== "all" && f.room !== "none" && i.room_id !== f.room) return false;
+    if (!noRoom && f.room === "none" && i.room_id && roomById(i.room_id)) return false;
+    if (!noRoom && f.room !== "all" && f.room !== "none" && i.room_id !== f.room) return false;
     if (f.store && i.store_id !== f.store) return false;
     if (q) { const s = storeById(i.store_id), r = roomById(i.room_id); if (![i.name, i.notes, s?.name, r?.name].join(" ").toLowerCase().includes(q)) return false; }
     return true;
   });
 }
+/* ================= LISTAS DA ABA COMPRAS =================
+   Compradas: grade de cartões com foto. Quero comprar: abas de cômodo com cartões.
+   Sem divisão por datas e com páginas no lugar da rolagem sem fim. */
+/* itens por página: 14 no computador (2 linhas de 7) e 20 no celular */
+const perPage = () => (window.innerWidth >= 900 ? 14 : 20);
+/* mais recentes: dia em que entrou como comprada (preenchido sozinho) e, no mesmo dia, a hora do cadastro */
+const recentKey = i => String(i.purchased_on || "") + "|" + String(i.created_at || "");
+const byRecent = arr => [...arr].sort((a, b) => recentKey(b).localeCompare(recentKey(a)));
+const byName = arr => [...arr].sort((a, b) => String(a.name).localeCompare(String(b.name), "pt-BR"));
+const photoOf = i => { const p = itemPhotos(i)[0]; return p ? S.photos[p] : ""; };
+const thumbIn = (i, icon) => { const ph = photoOf(i); return ph ? `<img src="${esc(ph)}" alt="" loading="lazy">` : ic(icon); };
+function relist(){ const el = $("#items-list"); if (el) el.innerHTML = itemsListHtml(); else render(); }
+function sortedBought(list){ return S.sort === "value" ? [...list].sort((a, b) => itemTotal(b) - itemTotal(a)) : S.sort === "name" ? byName(list) : byRecent(list); }
+function pageOf(list){ const n = Math.max(1, Math.ceil(list.length / perPage())); S.pg = Math.max(0, Math.min(S.pg, n - 1)); return list.slice(S.pg * perPage(), S.pg * perPage() + perPage()); }
+function pager(total){
+  const per = perPage(), n = Math.ceil(total / per); if (n <= 1) return "";
+  const p = S.pg, a = Math.max(0, Math.min(p - 2, n - 5)), b = Math.min(n, a + 5), nums = [];
+  for (let k = a; k < b; k++) nums.push(`<button class="pg-n ${k === p ? "on" : ""}" data-act="pg" data-p="${k}" aria-label="Página ${k + 1}" ${k === p ? `aria-current="page"` : ""}>${k + 1}</button>`);
+  return `<nav class="pager" aria-label="Páginas"><button class="pg-a" data-act="pg" data-p="${p - 1}" ${p === 0 ? "disabled" : ""} aria-label="Página anterior">${ic("back")}</button><div class="pg-ns">${nums.join("")}</div><button class="pg-a" data-act="pg" data-p="${p + 1}" ${p >= n - 1 ? "disabled" : ""} aria-label="Próxima página">${ic("right")}</button></nav><div class="pg-info">${p * per + 1} a ${Math.min(total, (p + 1) * per)} de ${total}</div>`;
+}
+
+/* ---------- compradas: cartão com foto ---------- */
+function boughtCard(i){
+  const r = roomById(i.room_id), s = storeById(i.store_id);
+  return `<button class="pc" data-act="item" data-id="${i.id}"><span class="pc-ph">${thumbIn(i, r ? r.icon : "box")}${+i.quantity !== 1 ? `<span class="pc-q">${(+i.quantity).toLocaleString("pt-BR")}x</span>` : ""}</span><span class="pc-n">${esc(i.name)}</span><span class="pc-s">${esc((s ? s.name : "Sem loja") + " · " + (r ? r.name : "Sem cômodo"))}</span><b class="pc-v">${money(itemTotal(i))}</b></button>`;
+}
+
+/* ---------- quero comprar: abas de cômodo ---------- */
+function wishGroups(list){
+  const g = new Map();
+  favFirst(list).forEach(i => { const k = i.room_id && roomById(i.room_id) ? i.room_id : "none"; if (!g.has(k)) g.set(k, []); g.get(k).push(i); });
+  return [...S.rooms.map(r => r.id), "none"].filter(k => g.has(k)).map(k => { const r = roomById(k); return { k, name: r ? r.name : "Sem cômodo", icon: r ? r.icon : "box", arr: g.get(k) }; });
+}
+function wishCard(i, showRoom){
+  const r = roomById(i.room_id), lk = itemLinks(i)[0];
+  const sub = [+i.unit_price ? money(itemTotal(i)) : "Sem valor estimado", showRoom ? (r ? r.name : "Sem cômodo") : ""].filter(Boolean).join(" · ");
+  return `<div class="wc ${i.favorite ? "is-fav" : ""}" data-act="item" data-id="${i.id}" role="button" tabindex="0"><span class="wc-ph">${thumbIn(i, r ? r.icon : "bookmark")}</span><span class="wc-n">${esc(i.name)}</span><span class="wc-s">${esc(sub)}</span><span class="w-acts">${favBtn(i)}${lk ? `<a class="w-btn" href="${esc(lk)}" target="_blank" rel="noopener" aria-label="Abrir link" title="Abrir link">${ic("external")}</a>` : ""}${canEdit() ? `<button class="w-btn buy" data-act="buy" data-id="${i.id}" aria-label="Marcar como comprado" title="Marcar como comprado">${ic("check")}</button>` : ""}</span></div>`;
+}
+function wishBody(list){
+  const groups = wishGroups(list), cur = groups.find(g => g.k === S.wroom), arr = cur ? cur.arr : favFirst(list);
+  return `<div class="chips wtabs" role="group" aria-label="Filtrar por cômodo"><button class="chip ${cur ? "" : "on"}" data-act="wtab" data-k="" aria-pressed="${!cur}">Todos <span class="seg-n">${list.length}</span></button>${groups.map(g => `<button class="chip ${cur && cur.k === g.k ? "on" : ""}" data-act="wtab" data-k="${g.k}" aria-pressed="${!!(cur && cur.k === g.k)}">${ic(g.icon)}${esc(g.name)} <span class="seg-n">${g.arr.length}</span></button>`).join("")}</div>
+    ${cur ? `<div class="card summary compact mt"><div><div class="label">Falta em ${esc(cur.name)}</div><div class="v">${money(totals(cur.arr).value)}</div></div><div class="side">${qtyTxt(cur.arr.length)}</div></div>` : ""}
+    <div class="wgrid">${pageOf(arr).map(i => wishCard(i, !cur)).join("")}</div>${pager(arr.length)}`;
+}
 function wishListHtml(){
   const favN = S.wish.filter(i => i.favorite).length;
-  const list = filteredItems(S.wish).filter(i => !S.filter.fav || i.favorite);
+  /* o cômodo aqui é escolhido pelas abas; o filtro de cômodo do topo não vale para esta lista */
+  const list = filteredItems(S.wish, true).filter(i => !S.filter.fav || i.favorite);
   if (!S.wish.length) return emptyBox({ icon:"bookmark", title:"Nenhum item na lista", text:"Guarde aqui o que ainda falta comprar, com o link do produto. Os itens da lista não entram no total do enxoval.", action:addBtn("Adicionar à lista", `data-act="addItem" data-planned="1"`) });
   if (!list.length) return emptyBox({ text: S.filter.fav && !favN ? "Nenhum item nos favoritos. Toque na estrela de um item para favoritar." : "Nenhum item encontrado com este filtro." });
-  /* soma dos favoritos (valor × quantidade): atualiza na hora ao marcar ou desmarcar a estrela */
-  const favs = S.hasFav && S.filter.fav ? S.wish.filter(i => i.favorite) : [], ft = totals(favs); /* só aparece com o filtro Favoritos ligado */
+  /* soma dos favoritos (valor × quantidade): só aparece com o filtro Favoritos ligado */
+  const favs = S.hasFav && S.filter.fav ? S.wish.filter(i => i.favorite) : [], ft = totals(favs);
   const favSum = favs.length ? `<div class="card summary compact fav-sum"><div><div class="label">Total dos favoritos</div><div class="v">${money(ft.value)}</div></div><div class="side">${plural(favs.length, "favorito", "favoritos")}<br>${plural(ft.qty, "unidade", "unidades")}</div></div>` : "";
-  const groups = new Map(); favFirst(list).forEach(i => { const k = i.room_id && roomById(i.room_id) ? i.room_id : "none"; if (!groups.has(k)) groups.set(k, []); groups.get(k).push(i); });
-  const order = [...S.rooms.map(r => r.id), "none"].filter(k => groups.has(k));
-  return favSum + `<div class="list-bar"><div class="list-note">${S.filter.fav ? qtyTxt(list.length) : `${qtyTxt(list.length)} na lista · não entram no total`}</div></div><div class="days">` + order.map(k => { const arr = groups.get(k), r = roomById(k);
-    return `<div class="day">${groupHead("room", k, r ? r.name : "Sem cômodo", qtyTxt(arr.length))}<div class="card group">${arr.map(wishRow).join("")}</div></div>`; }).join("") + `</div>`;
+  return favSum + `<div class="list-bar"><div class="list-note">${S.filter.fav ? qtyTxt(list.length) : `${qtyTxt(list.length)} na lista · não entram no total`}</div></div>` + wishBody(list);
 }
 function itemsListHtml(){
   if (S.list === "wish") return wishListHtml();
   const list = filteredItems(), t = totals(list);
   if (!S.items.length) return emptyBox({ icon:"list", title:"Nenhuma compra ainda", text:"As compras registradas do enxoval aparecem aqui.", action:addBtn("Nova compra", `data-act="addItem"`) });
   if (!list.length) return emptyBox({ text:"Nenhuma compra encontrada com este filtro." });
-  const SORTS = [["recent","Mais recentes","calendar"],["value","Maior valor","chart"],["name","Nome (A a Z)","list"]];
-  const sortSel = `<div class="sort-w"><select class="select" id="sort" aria-label="Ordenar compras">${SORTS.map(([v,l,i]) => `<option value="${v}" data-icon="${i}" ${S.sort===v?"selected":""}>${l}</option>`).join("")}</select></div>`;
-  let body;
-  if (S.sort === "value") body = `<div class="card group mt">${[...list].sort((a,b) => itemTotal(b) - itemTotal(a)).map(itemRow).join("")}</div>`;
-  else if (S.sort === "name") body = `<div class="card group mt">${[...list].sort((a,b) => String(a.name).localeCompare(String(b.name), "pt-BR")).map(itemRow).join("")}</div>`;
-  else body = groupedList(list);
-  return `<div class="list-bar"><div class="list-note">${buysTxt(list.length)} · <b>${money(t.value)}</b></div>${sortSel}</div>` + body;
+  const SORTS = [["recent","Mais recentes"],["value","Maior valor"],["name","A a Z"]];
+  const sortBtns = `<div class="sort-c" role="group" aria-label="Ordenar compras">${SORTS.map(([v, l]) => `<button class="chip ${S.sort === v ? "on" : ""}" data-act="sort" data-v="${v}" aria-pressed="${S.sort === v}">${l}</button>`).join("")}</div>`;
+  const sorted = sortedBought(list);
+  return `<div class="list-bar">${sortBtns}<div class="list-note">${buysTxt(list.length)} · <b>${money(t.value)}</b></div></div><div class="pgrid">${pageOf(sorted).map(boughtCard).join("")}</div>` + pager(sorted.length);
 }
 function viewItems(){
   const f = S.filter, st = f.store ? storeById(f.store) : null;
@@ -1717,13 +1787,13 @@ function viewItems(){
     <div class="seg ics list-seg" id="list-seg"><span class="pill"></span>
       <button data-act="list" data-mode="bought" class="${S.list!=="wish"?"on":""}">${ic("bag")} Compradas</button>
       <button data-act="list" data-mode="wish" class="${S.list==="wish"?"on":""}">${ic("bookmark")} Quero comprar${S.wish.length ? `<span class="seg-n">${S.wish.length}</span>` : ""}</button></div>
-    <div class="filters"><div class="search">${ic("search")}<input class="input" id="q" type="search" placeholder="${S.list === "wish" ? "Buscar item, loja ou cômodo" : "Buscar compra, loja ou cômodo"}" aria-label="Buscar" value="${esc(f.q)}" autocomplete="off"></div>
+    <div class="filters"><div class="search">${ic("search")}<input class="input" id="q" type="search" placeholder="${S.list === "wish" ? "Buscar item, loja ou cômodo" : "Buscar compra, loja ou cômodo"}" aria-label="Buscar" value="${esc(f.q)}" autocomplete="off"><button type="button" class="search-x" data-act="clearSearch" aria-label="Limpar busca" title="Limpar busca">${ic("x")}</button></div>
     <div class="f-row">
-      <div class="room-w"><select class="select" id="f-room" aria-label="Filtrar por cômodo">
+      ${S.list === "wish" ? "" : `<div class="room-w"><select class="select" id="f-room" aria-label="Filtrar por cômodo">
         <option value="all" data-icon="home" ${f.room==="all"?"selected":""}>Todos</option>
         ${S.rooms.map(r => `<option value="${r.id}" data-icon="${esc(r.icon)}" ${f.room===r.id?"selected":""}>${esc(r.name)}</option>`).join("")}
         ${hasNone || f.room === "none" ? `<option value="none" data-icon="box" ${f.room==="none"?"selected":""}>Sem cômodo</option>` : ""}
-      </select></div>
+      </select></div>`}
       ${S.list === "wish" && S.hasFav && S.wish.length ? (n => `<button class="fav-f ${f.fav ? "on" : ""}" data-act="fFav" aria-pressed="${!!f.fav}">${ic("star")}<span>Favoritos</span>${n ? `<span class="seg-n">${n}</span>` : ""}</button>`)(S.wish.filter(i => i.favorite).length) : ""}
     </div></div>
     ${st ? `<div class="chips mt-sm"><button class="chip on" data-act="fStore" data-id="" aria-label="Tirar filtro da loja ${esc(st.name)}">${ic("store")}${esc(st.name)} ${ic("x")}</button></div>` : ""}
@@ -1733,11 +1803,10 @@ function viewItems(){
 /* ---------- painel ---------- */
 function viewDash(){
   const t = totals(S.items);
-  const mode = S.dash;
+  const mode = S.dash === "stores" ? "stores" : "rooms";
   const seg = `<div class="seg ics dash-seg" id="dash-seg"><span class="pill"></span>
     <button data-act="dash" data-mode="rooms" class="${mode==="rooms"?"on":""}">${ic("home")} Cômodos</button>
-    <button data-act="dash" data-mode="stores" class="${mode==="stores"?"on":""}">${ic("store")} Lojas</button>
-    <button data-act="dash" data-mode="days" class="${mode==="days"?"on":""}">${ic("calendar")} Dias</button></div>`;
+    <button data-act="dash" data-mode="stores" class="${mode==="stores"?"on":""}">${ic("store")} Lojas</button></div>`;
   let inner = "";
   if (!S.items.length) inner = emptyBox({ mt:false, icon:"chart", title:"Nenhuma compra ainda", text:"Os gráficos aparecem assim que houver compras registradas.", action:addBtn("Nova compra", `data-act="addItem"`) });
   else if (mode === "rooms") {
@@ -1748,13 +1817,6 @@ function viewDash(){
     const per = byKey(S.items, i => i.store_id && storeById(i.store_id) ? i.store_id : "none");
     const rows = [...per.entries()].map(([k, v]) => { const s = storeById(k); return { k, v, name: s ? s.name : "Sem loja", icon: s ? (s.kind === "online" ? "globe" : "store") : "box" }; }).sort((a,b) => b.v.value - a.v.value);
     inner = barsCard(rows, t.value, r => `data-act="page" data-kind="store" data-id="${r.k}"`, true);
-  } else {
-    const per = byKey(S.items, i => i.purchased_on);
-    const days = [...per.entries()].sort((a,b) => a[0] < b[0] ? 1 : -1);
-    const last = days.slice(0, 10).reverse(), mx = Math.max(...last.map(d => d[1].value), 1);
-    const cols = `<div class="card"><div class="cols">${last.map(([d, v]) => `<button class="col" data-act="page" data-kind="day" data-id="${d}" title="${fmtDate(d)}: ${money(v.value)}" aria-label="${fmtDate(d)}: ${money(v.value)}"><i data-h="${Math.max(3, v.value / mx * 100).toFixed(1)}"></i><small>${d.slice(8)}/${d.slice(5,7)}</small></button>`).join("")}</div><div class="chart-note">Últimos ${last.length} dias com compras</div></div>`;
-    const rows = days.map(([d, v]) => ({ k:d, v, name: dayTitle(d), icon:"calendar" }));
-    inner = `<div class="dash-days">${cols}${barsCard(rows, t.value, r => `data-act="page" data-kind="day" data-id="${r.k}"`, false)}</div>`;
   }
   return `<div class="page-t"><h2>Painel</h2></div>
   <div class="dash-top">
@@ -1967,9 +2029,8 @@ function itemForm(item, preset={}){
     <label class="field"><span>Nome do produto</span><input class="input" name="name" value="${esc(it.name)}" placeholder="Ex.: Jogo de panelas" maxlength="120" autocomplete="off"></label>
     <div class="row2" id="row-rd">
       <label class="field"><span>Cômodo</span><select class="select" name="room"><option value="" data-icon="box">Sem cômodo</option>${S.rooms.map(r => `<option value="${r.id}" data-icon="${esc(r.icon)}" ${r.id===it.room_id?"selected":""}>${esc(r.name)}</option>`).join("")}</select></label>
-      <label class="field bought-only"><span>Data da compra</span><input class="input" type="date" name="date" value="${esc(it.purchased_on)}"></label>
+      <label class="field"><span>Loja</span><select class="select" name="store">${storeOpts()}</select></label>
     </div>
-    <label class="field"><span>Loja</span><select class="select" name="store">${storeOpts()}</select></label>
     <div class="row2">
       <label class="field"><span>Quantidade</span><div class="stepper"><button type="button" data-q="-1" aria-label="Diminuir quantidade">${ic("minus")}</button><input name="qty" inputmode="numeric" value="${+it.quantity || 1}" aria-label="Quantidade"><button type="button" data-q="1" aria-label="Aumentar quantidade">${ic("plus")}</button></div></label>
       <label class="field"><span id="price-l">${planned ? "Valor estimado (R$)" : "Valor unitário (R$)"}</span><input class="input" name="price" inputmode="numeric" placeholder="0,00" value="${priceStr}"></label>
@@ -2057,7 +2118,6 @@ function itemForm(item, preset={}){
       e.preventDefault();
       const name = fmtName(f.name.value);
       if (!name) { f.name.focus(); return toast("Informe o nome do produto", true); }
-      if (!planned && !f.date.value) return toast("Informe a data da compra", true);
       /* link digitado e não adicionado: entra junto ao salvar */
       const typed = f.link.value.trim().split(/[\s,]+/).filter(Boolean).map(normLink);
       if (planned && typed.some(l => !l)) return toast("Confira o link", true);
@@ -2066,7 +2126,7 @@ function itemForm(item, preset={}){
       const btn = $("#its", w); busy(btn, true);
       const uploaded = [];
       try {
-        const row = { name, room_id: f.room.value || null, store_id: (f.store.value && f.store.value !== "__new") ? f.store.value : null, quantity: qty(), unit_price: parseMoney(f.price.value), purchased_on: planned ? (it.purchased_on || todayStr()) : f.date.value, notes: f.notes.value.trim() || null };
+        const row = { name, room_id: f.room.value || null, store_id: (f.store.value && f.store.value !== "__new") ? f.store.value : null, quantity: qty(), unit_price: parseMoney(f.price.value), purchased_on: it.purchased_on || todayStr(), notes: f.notes.value.trim() || null };
         if (S.hasPlanned) { row.planned = planned; row.link = allLinks[0] || null; }
         if (multi) row.links = allLinks.length ? allLinks : null;
         if (S.hasFav) row.favorite = planned && fav; /* comprou: sai dos favoritos */
@@ -2123,8 +2183,9 @@ function itemDetail(id){
       ${kvGo("room", r ? r.id : "none", "Cômodo", r ? r.name : "Sem cômodo")}
       ${kvGo("store", s ? s.id : "none", "Loja", s ? s.name : "Sem loja")}
       ${wish ? (links.length > 1 ? `<div class="block links-b"><span>Links</span>${links.map(l => `<a class="kv-link" href="${esc(l)}" target="_blank" rel="noopener">${ic("external")}<span>${esc(linkHost(l) + linkPath(l))}</span></a>`).join("")}</div>`
-        : links.length ? `<div><span>Link</span><b><a class="kv-link" href="${esc(links[0])}" target="_blank" rel="noopener">${esc(linkHost(links[0]))} ${ic("external")}</a></b></div>` : "") : kvGo("day", it.purchased_on, "Data da compra", fmtDate(it.purchased_on))}
-      ${it.created_by_email ? `<div><span>Adicionado por</span><b title="${esc(it.created_by_email)}">${esc(whoName(it.created_by_email))}</b></div>` : ""}
+        : links.length ? `<div><span>Link</span><b><a class="kv-link" href="${esc(links[0])}" target="_blank" rel="noopener">${esc(linkHost(links[0]))} ${ic("external")}</a></b></div>` : "") : ""}
+      ${it.created_by_email ? `<div><span>Adicionado por</span><b>${esc(personName(it.created_by_email))}</b></div>` : ""}
+      ${fmtWhen(it.updated_at || it.created_at) ? `<div><span>Última alteração</span><b>${fmtWhen(it.updated_at || it.created_at)}</b></div>` : ""}
       ${it.notes ? `<div class="block"><span>Observações</span><p>${esc(it.notes)}</p></div>` : ""}
     </div>
     ${actions}`, w => {
@@ -2403,8 +2464,8 @@ const ACT = {
   addItem: d => itemForm(null, { room: d.room || null, store: d.store || null, planned: !!d.planned }),
   buy: d => { const it = S.wish.find(i => i.id === d.id); if (it) itemForm(it, { buy:true }); },
   fav: d => toggleFav(S.wish.find(i => i.id === d.id)),
-  fFav: (d, b) => { S.filter.fav = !S.filter.fav; if (b) { b.classList.toggle("on", S.filter.fav); b.setAttribute("aria-pressed", S.filter.fav); } const el = $("#items-list"); if (el) el.innerHTML = itemsListHtml(); else render(); keepInView(".filters"); },
-  list: d => { if (S.list === d.mode) return; S.list = d.mode; lsSet("nl.list", S.list); S.filter.store = null; render(); keepInView("#list-seg"); },
+  fFav: (d, b) => { S.filter.fav = !S.filter.fav; S.pg = 0; if (b) { b.classList.toggle("on", S.filter.fav); b.setAttribute("aria-pressed", S.filter.fav); } const el = $("#items-list"); if (el) el.innerHTML = itemsListHtml(); else render(); keepInView(".filters"); },
+  list: d => { if (S.list === d.mode) return; S.list = d.mode; S.pg = 0; lsSet("nl.list", S.list); S.filter.store = null; render(); keepInView("#list-seg"); },
   item: d => itemDetail(d.id),
   addRoom: () => roomForm(null),
   editRoom: d => roomForm(roomById(d.id)),
@@ -2414,6 +2475,10 @@ const ACT = {
   fRoom: d => { S.filter.room = d.id; const el = $("#items-list"); if (el) { $$(".chips [data-act=fRoom]").forEach(c => c.classList.toggle("on", c.dataset.id === d.id)); el.innerHTML = itemsListHtml(); } else render(); keepInView(".filters"); },
   fStore: d => { S.filter.store = d.id || null; if (d.go) { S.filter.room = "all"; S.filter.q = ""; S.tab = "compras"; lsSet("nl.tab", S.tab); S.nav = "fwd"; } render(); if (!d.go) keepInView(".filters"); },
   dash: d => { S.dash = d.mode; render(); keepInView("#dash-seg"); },
+  sort: d => { S.sort = d.v; lsSet("nl.sort", S.sort); S.pg = 0; relist(); },
+  pg: d => { S.pg = Math.max(0, +d.p || 0); relist(); keepInView("#items-list"); },
+  wtab: d => { S.wroom = d.k || null; S.pg = 0; relist(); },
+  clearSearch: (d, b) => { const i = b.closest(".search")?.querySelector("input"); if (!i) return; i.value = ""; i.dispatchEvent(new Event("input", { bubbles:true })); i.focus(); },
   projects: () => projectsSheet(),
   share: () => shareSheet(),
   menu: () => menuSheet(),
@@ -2426,11 +2491,11 @@ document.addEventListener("click", e => {
   const fn = ACT[a.dataset.act]; if (fn) { e.preventDefault(); fn(a.dataset, a); }
 });
 document.addEventListener("change", e => {
-  if (e.target.id === "f-room") { S.filter.room = e.target.value; const el = $("#items-list"); if (el) el.innerHTML = itemsListHtml(); keepInView(".filters"); return; }
+  if (e.target.id === "f-room") { S.filter.room = e.target.value; S.pg = 0; const el = $("#items-list"); if (el) el.innerHTML = itemsListHtml(); keepInView(".filters"); return; }
   if (e.target.id === "sort") { S.sort = e.target.value; lsSet("nl.sort", S.sort); const el = $("#items-list"); if (el) el.innerHTML = itemsListHtml(); keepInView(".filters"); }
 });
 document.addEventListener("input", e => {
-  if (e.target.id === "q") { S.filter.q = e.target.value; const el = $("#items-list"); if (el) el.innerHTML = itemsListHtml(); }
+  if (e.target.id === "q") { S.filter.q = e.target.value; S.pg = 0; const el = $("#items-list"); if (el) el.innerHTML = itemsListHtml(); }
 });
 window.addEventListener("resize", () => placeTabPill(null));
 new MutationObserver(() => { ["#dash-seg", "#list-seg"].forEach(id => { const seg = $(id); if (seg && !seg.dataset.wired) { seg.dataset.wired = "1"; wireSeg(seg.parentElement); } }); }).observe($("#app"), { childList:true, subtree:false });
@@ -2533,7 +2598,7 @@ if (!sb && !S.cacheShown) $("#app").innerHTML = `<div class="auth"><div class="a
 if ("serviceWorker" in navigator && /^https?:$/.test(location.protocol)) {
   window.addEventListener("load", () => navigator.serviceWorker.register("sw.js").catch(e => console.warn(e)));
 }
-document.addEventListener("keydown", e => { if (e.key === "Escape") closeSheet(); if ((e.key === "Enter" || e.key === " ") && e.target.matches && e.target.matches(".it.wish")) { e.preventDefault(); e.target.click(); } });
+document.addEventListener("keydown", e => { if (e.key === "Escape") closeSheet(); if ((e.key === "Enter" || e.key === " ") && e.target.matches && e.target.matches(".it.wish, .wc")) { e.preventDefault(); e.target.click(); } });
 
 })();
 </script>
