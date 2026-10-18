@@ -1,8 +1,8 @@
 /* Nosso Lar: guarda uma cópia do app no aparelho para abrir e consultar sem internet */
-const VERSION = "nossolar-v3";
+const VERSION = "nossolar-v4";
 const PHOTOS = "nossolar-fotos-v1"; // fotos já vistas (fica entre versões)
 const PHOTOS_MAX = 400;
-const SHELL = ["./", "./index.html", "./manifest.json", "./icon-192.png", "./icon-512.png",
+const SHELL = ["./", "./index.html", "./manifest.json", "./icon-192.png", "./icon-512.png", "./icon-round-192.png", "./icon-round-512.png",
   "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js",
   "https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"];
 
