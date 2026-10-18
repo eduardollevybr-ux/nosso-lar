@@ -54,7 +54,8 @@
   --accent:#A47551; --danger:#E0735F; --dangerSoft:#3A221C; --shadow:0 1px 2px rgba(0,0,0,.3),0 10px 30px rgba(0,0,0,.35);
   --glass:rgba(34,26,21,.78); color-scheme:dark;
 }
-@media (min-width:900px){:root{--pad:28px}}
+/* computador: margens laterais proporcionais à tela e conteúdo mais largo */
+@media (min-width:900px){:root{--pad:clamp(28px,3vw,56px);--maxw:1680px}}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html,body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--font);font-size:16px;line-height:1.35;-webkit-font-smoothing:antialiased;-webkit-text-size-adjust:100%}
 body{min-height:100dvh;overscroll-behavior-y:none;background:var(--bg)}
@@ -238,7 +239,7 @@ main.view{max-width:var(--maxw);margin:0 auto;padding:16px var(--pad) calc(40px 
 .home>.recent{grid-area:recent}
 .recent .section-t{margin-top:8px}
 @media (min-width:900px){
-  .home{grid-template-columns:minmax(0,1.75fr) minmax(320px,1fr);grid-template-areas:"house sum" "house recent";grid-template-rows:auto 1fr;gap:24px;align-items:start}
+  .home{grid-template-columns:minmax(0,2fr) minmax(360px,1fr);grid-template-areas:"house sum" "house recent";grid-template-rows:auto 1fr;gap:24px;align-items:start}
   .home>.summary{padding:24px}
   .home>.summary .v{font-size:36px}
   .recent .section-t{margin-top:0}
@@ -271,9 +272,41 @@ main.view{max-width:var(--maxw);margin:0 auto;padding:16px var(--pad) calc(40px 
 @keyframes tileIn{from{opacity:0;transform:translateY(14px) scale(.96)}to{opacity:1;transform:none}}
 .door{display:flex;justify-content:center;margin-top:12px}
 .door span{width:56px;height:8px;border-radius:999px;background:var(--line)}
+/* últimas compras: celular mostra 5; no computador a tela Casa mostra quantas couberem */
+.recent .group>.it:nth-child(n+6){display:none}
+/* computador: a tela Casa cabe inteira na altura da janela, sem rolagem da página */
+@media (min-width:900px) and (min-height:540px){
+  body.home-fit #app{display:flex;flex-direction:column;height:100vh;height:100dvh;overflow:hidden}
+  body.home-fit .top{flex:none}
+  body.home-fit main.view{flex:1;min-height:0;width:100%;display:flex;flex-direction:column;padding-top:clamp(12px,2.2vh,24px);padding-bottom:clamp(16px,2.6vh,28px)}
+  body.home-fit .page-t{flex:none;margin-bottom:clamp(10px,1.8vh,20px)}
+  body.home-fit .home{flex:1;min-height:0;grid-template-rows:auto minmax(0,1fr);align-items:stretch;gap:clamp(14px,2.2vh,24px) 24px}
+  body.home-fit .house{display:flex;flex-direction:column;min-height:0}
+  body.home-fit .roof{flex:none;height:clamp(52px,9vh,96px)}
+  body.home-fit .house-body{flex:1;min-height:0;display:flex;flex-direction:column;padding:clamp(12px,1.8vh,18px)}
+  body.home-fit .rooms{flex:1;min-height:0;grid-auto-rows:minmax(112px,1fr);overflow-y:auto;scrollbar-width:thin;padding:8px;margin:-8px}
+  body.home-fit .room{min-height:0;padding:clamp(12px,1.6vh,16px)}
+  body.home-fit .house-body>.empty{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center}
+  body.home-fit .door{flex:none;margin-top:clamp(8px,1.4vh,12px)}
+  body.home-fit .home>.summary{padding:clamp(16px,2.4vh,24px) 24px}
+  body.home-fit .home>.summary .v{font-size:clamp(28px,4vh,36px)}
+  body.home-fit .recent{display:flex;flex-direction:column;min-height:0}
+  body.home-fit .recent .section-t{flex:none;margin-bottom:clamp(6px,1vh,10px)}
+  body.home-fit .recent>.group{flex:0 1 auto;min-height:0;overflow:hidden}
+  body.home-fit .recent .group>.it:nth-child(n+6){display:flex}
+  body.home-fit .recent .group>.it.cut{display:none}
+}
+/* computador com janela baixa: casa e resumo mais compactos */
+@media (min-width:900px) and (min-height:540px) and (max-height:760px){
+  body.home-fit .room .ic{width:34px;height:34px}
+  body.home-fit .room .nm{margin-top:6px}
+  body.home-fit .room .share{margin-top:6px}
+  body.home-fit .recent .it{padding-top:9px;padding-bottom:9px}
+}
 
 /* listas (mesma linha em compras, lojas, projetos e pessoas) */
 .days{columns:2 440px;column-gap:24px}
+@media (min-width:1500px){.days{columns:3 400px}}
 .day{break-inside:avoid;padding-bottom:2px}
 .day-h{display:flex;justify-content:space-between;align-items:baseline;margin:0 4px 8px;padding-top:18px;font-size:13px;font-weight:600;color:var(--muted)}
 .day-h b{color:var(--ink2);font-weight:600}
@@ -920,7 +953,7 @@ function showAuth(mode, keepMsg=""){
     forgot:`<button type="button" data-go="login">Voltar para o login</button>`,
     newpass:``
   }[mode];
-  document.body.classList.add("auth-on");
+  document.body.classList.add("auth-on"); document.body.classList.remove("home-fit");
   $("#app").innerHTML = `
   <div class="auth"><form class="auth-box" id="au-form" method="post" action="#" novalidate>
     <div class="logo sm">${ic("logo")}</div>
@@ -1327,7 +1360,7 @@ let lastKey = "";
 function render(){
   if (!S.user) return;
   const app = $("#app");
-  if (!S.project) { app.innerHTML = viewWelcome(); lastKey = "welcome"; return; }
+  if (!S.project) { document.body.classList.remove("home-fit"); app.innerHTML = viewWelcome(); lastKey = "welcome"; return; }
   const pg = curPage();
   const key = S.tab + ":" + (S.tab === "casa" ? (S.roomId || "") : "") + ":" + (pg && S.pages.length ? pg.kind + "=" + pg.id : "");
   const sameView = key === lastKey;
@@ -1337,12 +1370,14 @@ function render(){
   const body = S.pages.length ? viewPage() : tabBody();
   const fab = canEdit() ? `<button class="fab" data-act="addItem" ${addAttrsNow()}>${ic("plus")}</button>` : "";
   document.body.classList.remove("auth-on"); syncLock();
+  document.body.classList.toggle("home-fit", !S.pages.length && S.tab === "casa" && !S.roomId);
   app.innerHTML = header() + `<main class="view ${anim} ${fab ? "has-fab" : ""}" id="view">${body}</main>` + fab;
   if (!sameView) window.scrollTo(0, 0); else if (Math.abs(window.scrollY - y) > 1) window.scrollTo(0, y);
   markScrolled();
   lastKey = key; S.nav = "";
   syncBackGuard();
   placeTabPill(oldPill);
+  fitRecent();
   if (!sameView) countUp();
   requestAnimationFrame(() => requestAnimationFrame(() => {
     $$("[data-w]").forEach(el => el.style.width = el.dataset.w + "%");
@@ -1434,6 +1469,25 @@ function keepInView(sel){
   if (t < head) window.scrollTo(0, Math.max(0, window.scrollY + t - head - 12));
 }
 /* sombra no topo quando a página rola */
+/* tela Casa no computador: cômodos em linhas equilibradas e só as últimas compras que cabem inteiras no espaço */
+function fitRecent(){
+  const rm = $(".home .rooms");
+  if (rm) {
+    rm.style.gridTemplateColumns = "";
+    if (document.body.classList.contains("home-fit") && getComputedStyle(rm).overflowY === "auto") {
+      const n = rm.children.length, gap = parseFloat(getComputedStyle(rm).columnGap) || 12;
+      const max = Math.max(1, Math.floor((rm.clientWidth - 16 + gap) / (180 + gap)));
+      const cols = Math.ceil(n / Math.ceil(n / max));
+      rm.style.gridTemplateColumns = `repeat(${cols},minmax(0,1fr))`;
+    }
+  }
+  const g = $(".recent>.group"); if (!g) return;
+  const rows = $$(".it", g); rows.forEach(r => r.classList.remove("cut"));
+  if (!document.body.classList.contains("home-fit") || getComputedStyle(g).overflow !== "hidden") return;
+  const b = g.getBoundingClientRect().bottom + 1;
+  rows.forEach((r, k) => { if (k && r.getBoundingClientRect().bottom > b) r.classList.add("cut"); });
+}
+let fitT; window.addEventListener("resize", () => { clearTimeout(fitT); fitT = setTimeout(fitRecent, 60); });
 function markScrolled(){ const t = $(".top"); if (t) t.classList.toggle("scrolled", window.scrollY > 4); }
 window.addEventListener("scroll", markScrolled, { passive:true });
 /* valores principais "sobem" do zero ao abrir a tela */
@@ -1547,7 +1601,7 @@ function viewHouse(){
   </div>
   <div class="recent">
     <div class="section-t"><h3>Últimas compras</h3>${S.items.length ? `<button class="btn soft sm" data-act="tab" data-tab="compras">Ver todas</button>` : ""}</div>
-    ${S.items.length ? `<div class="card group">${S.items.slice(0,5).map(itemRow).join("")}</div>` : emptyBox({ mt:false, text:"As compras registradas aparecem aqui.", action:addBtn("Nova compra", `data-act="addItem"`) })}
+    ${S.items.length ? `<div class="card group">${S.items.slice(0,12).map(itemRow).join("")}</div>` : emptyBox({ mt:false, text:"As compras registradas aparecem aqui.", action:addBtn("Nova compra", `data-act="addItem"`) })}
   </div>
   </div>`;
 }
