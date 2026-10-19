@@ -180,13 +180,26 @@ input[type=date].input{display:flex;align-items:center;line-height:var(--h-ctl);
 .tabs .pill{position:absolute;top:4px;bottom:4px;border-radius:var(--r-in);background:var(--card);box-shadow:0 1px 3px rgba(0,0,0,.1);transition:left .4s cubic-bezier(.3,1.3,.5,1),width .4s cubic-bezier(.3,1.3,.5,1)}
 /* celular e tablet: barra de navegação fixa na parte de baixo */
 @media (max-width:899px){
-  /* barra de navegação presa na borda de baixo da tela, de ponta a ponta */
-  .tabs{position:fixed;left:0;right:0;bottom:0;z-index:30;margin:0;gap:4px;border-radius:0;padding:6px max(10px,calc((100vw - 560px)/2)) calc(6px + env(safe-area-inset-bottom));background:var(--card);border:0;border-top:1px solid var(--line);box-shadow:0 -6px 24px rgba(40,25,15,.07)}
-  .tabs .pill{top:6px;bottom:calc(6px + env(safe-area-inset-bottom));border-radius:var(--r-md);background:var(--soft);box-shadow:none}
-  .tabs button{height:62px;border-radius:var(--r-md);font-size:13px;gap:4px}
-  .tabs button svg{width:25px;height:25px}
-  body main.view{padding-bottom:calc(104px + env(safe-area-inset-bottom))}
+  /* barra no estilo do FLUX: cápsula flutuante só com ícones, logo acima da linha do iPhone;
+     a aba ativa fica numa bolha que desliza até a aba tocada e o + fica no meio da barra */
+  :root .tabs{position:fixed;z-index:30;left:50%;right:auto;bottom:max(8px,calc(env(safe-area-inset-bottom,0px) - 14px));transform:translateX(-50%);width:min(calc(100% - 24px),350px);margin:0;display:flex;align-items:center;gap:2px;padding:5px;border-radius:999px;background:var(--nav-bar);border:1px solid var(--nav-line);box-shadow:var(--nav-shadow)}
+  :root .tabs .pill{top:5px;bottom:5px;border-radius:999px;background:var(--nav-pill);box-shadow:none}
+  :root .tabs button{flex:1;min-width:0;height:54px;padding:0;border-radius:999px;flex-direction:row;justify-content:center;gap:0;color:var(--muted)}
+  :root .tabs button svg{width:26px;height:26px}
+  :root .tabs button>span{display:none}
+  :root .tabs button.on{color:var(--nav-ic)}
+  :root .tabs .tab-add{display:grid;place-items:center}
+  :root .tabs .tab-add>span{display:grid;place-items:center;width:46px;height:46px;border-radius:50%;background:var(--brand);color:var(--brandInk);box-shadow:0 6px 16px -4px color-mix(in srgb,var(--brand) 70%,transparent);transition:transform .2s cubic-bezier(.3,1.4,.5,1)}
+  :root .tabs .tab-add>span svg{width:24px;height:24px;stroke-width:2.4}
+  :root .tabs .tab-add:active>span{transform:scale(.9)}
+  /* o conteúdo some suavemente atrás da barra */
+  body:has(#tabs)::after{content:"";position:fixed;z-index:19;left:0;right:0;bottom:0;height:calc(70px + env(safe-area-inset-bottom,0px));background:linear-gradient(to bottom,transparent,var(--bg) 75%);pointer-events:none}
+  body main.view{padding-bottom:calc(96px + env(safe-area-inset-bottom))}
 }
+:root{--nav-bar:#FFFFFF;--nav-pill:color-mix(in srgb,var(--brand) 14%,var(--card));--nav-ic:var(--brand);--nav-line:rgba(60,40,25,.08);--nav-shadow:0 10px 30px rgba(60,40,25,.16)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--nav-bar:#0F0B09;--nav-pill:color-mix(in srgb,var(--brand) 22%,#0F0B09);--nav-line:rgba(255,255,255,.07);--nav-shadow:0 10px 34px rgba(0,0,0,.75)}}
+:root[data-theme="dark"]{--nav-bar:#0F0B09;--nav-pill:color-mix(in srgb,var(--brand) 22%,#0F0B09);--nav-line:rgba(255,255,255,.07);--nav-shadow:0 10px 34px rgba(0,0,0,.75)}
+.tabs .tab-add{display:none}
 @media (min-width:600px){
   .tabs button{flex-direction:row;gap:8px;height:40px;font-size:14px;padding:0 14px}
   .tabs button svg{width:18px;height:18px}
@@ -1428,7 +1441,7 @@ function render(){
   const oldPill = $("#tabpill") ? { left: $("#tabpill").style.left, width: $("#tabpill").style.width } : null;
   const anim = sameView ? "" : (S.nav === "fwd" ? "view-fwd" : S.nav === "back" ? "view-back" : "view-anim");
   const body = S.pages.length ? viewPage() : tabBody();
-  const fab = canEdit() ? `<button class="fab" data-act="addItem" ${addAttrsNow()}>${ic("plus")}</button>` : "";
+  const fab = ""; /* o + agora fica no meio da barra de baixo (estilo FLUX) */
   document.body.classList.remove("auth-on"); syncLock();
   document.body.classList.toggle("home-fit", !S.pages.length && S.tab === "casa" && !S.roomId);
   app.innerHTML = header() + `<main class="view ${anim} ${fab ? "has-fab" : ""}" id="view">${body}</main>` + fab;
@@ -1587,7 +1600,7 @@ function header(){
     <button class="proj-btn" data-act="projects" aria-label="Trocar de projeto" title="Trocar de projeto">
       <div class="t"><div class="n">${esc(S.project.name)}</div><div class="s"><span>${esc(peopleLine())}</span>${role}</div></div>${ic("down")}
     </button>
-    <nav class="tabs" id="tabs" aria-label="Navegação"><span class="pill" id="tabpill"></span>${TABS.map(([k,i,l]) => `<button data-act="tab" data-tab="${k}" class="${S.tab===k?"on":""}">${ic(i)}<span>${l}</span></button>`).join("")}</nav>
+    <nav class="tabs" id="tabs" aria-label="Navegação"><span class="pill" id="tabpill"></span>${TABS.map(([k,i,l],n) => (n === 2 && canEdit() ? `<button class="tab-add" data-act="addItem" ${addAttrsNow()}><span>${ic("plus")}</span></button>` : "") + `<button data-act="tab" data-tab="${k}" class="${S.tab===k?"on":""}" aria-label="${l}">${ic(i)}<span>${l}</span></button>`).join("")}</nav>
     <div class="top-act">
       ${canEdit() ? `<button class="btn primary sm add-btn" data-act="addItem" ${addAttrsNow()}>${ic("plus")}<span>${addLabel()}</span></button>` : ""}
       <button class="iconbtn" data-act="share" aria-label="Compartilhar projeto" title="Compartilhar projeto">${ic("users")}</button>
