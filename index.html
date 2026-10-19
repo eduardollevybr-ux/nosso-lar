@@ -4,6 +4,10 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1">
 <meta name="theme-color" content="#F7F3EE" id="meta-theme">
+<script>
+/* aplica o tema antes de desenhar a tela, para a barra superior já nascer na cor certa */
+(function(){try{var t=JSON.parse(localStorage.getItem("nl.theme")||'"system"');if(t==="light"||t==="dark")document.documentElement.setAttribute("data-theme",t);var d=t==="dark"||(t!=="light"&&matchMedia("(prefers-color-scheme: dark)").matches);var m=document.getElementById("meta-theme");if(m)m.setAttribute("content",d?"#15100D":"#F7F3EE");}catch(e){}})();
+</script>
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
@@ -909,10 +913,23 @@ function applyTheme(){
   if (t === "system") document.documentElement.removeAttribute("data-theme");
   else document.documentElement.setAttribute("data-theme", t);
   const dark = t === "dark" || (t === "system" && matchMedia("(prefers-color-scheme: dark)").matches);
-  $("#meta-theme").setAttribute("content", dark ? "#15100D" : "#F7F3EE");
+  setBarColor(dark ? "#15100D" : "#F7F3EE");
+}
+/* o iPhone guarda a cor antiga da barra superior quando só o valor muda;
+   trocar a etiqueta inteira por uma nova obriga o sistema a ler a cor de novo */
+function setBarColor(color){
+  const old = document.querySelectorAll('meta[name="theme-color"]');
+  const m = document.createElement("meta");
+  m.name = "theme-color"; m.id = "meta-theme"; m.content = color;
+  old.forEach(el => el.remove());
+  document.head.appendChild(m);
+  document.documentElement.style.backgroundColor = color;
 }
 applyTheme();
 try { matchMedia("(prefers-color-scheme: dark)").addEventListener("change", applyTheme); } catch {}
+/* ao voltar para o app (trocar de app, desbloquear o celular), confere a cor de novo */
+window.addEventListener("pageshow", applyTheme);
+document.addEventListener("visibilitychange", () => { if (document.visibilityState === "visible") applyTheme(); });
 
 /* ================= ESTADO ================= */
 const S = {
