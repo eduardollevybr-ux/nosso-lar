@@ -182,23 +182,22 @@ input[type=date].input{display:flex;align-items:center;line-height:var(--h-ctl);
 @media (max-width:899px){
   /* barra no estilo do FLUX: cápsula flutuante só com ícones, logo acima da linha do iPhone;
      a aba ativa fica numa bolha que desliza até a aba tocada e o + fica no meio da barra */
-  :root .tabs{position:fixed;z-index:30;left:50%;right:auto;bottom:max(8px,calc(env(safe-area-inset-bottom,0px) - 14px));transform:translateX(-50%);width:min(calc(100% - 24px),350px);margin:0;display:flex;align-items:center;gap:2px;padding:5px;border-radius:999px;background:var(--nav-bar);border:1px solid var(--nav-line);box-shadow:var(--nav-shadow)}
+  :root .tabs{-webkit-backdrop-filter:var(--nav-blur);backdrop-filter:var(--nav-blur);position:fixed;z-index:30;left:50%;right:auto;bottom:max(8px,calc(env(safe-area-inset-bottom,0px) - 14px));transform:translateX(-50%);width:min(calc(100% - 24px),350px);margin:0;display:flex;align-items:center;gap:2px;padding:5px;border-radius:999px;background:var(--nav-bar);border:1px solid var(--nav-line);box-shadow:var(--nav-shadow)}
   :root .tabs .pill{top:5px;bottom:5px;border-radius:999px;background:var(--nav-pill);box-shadow:none}
-  :root .tabs button{flex:1;min-width:0;height:54px;padding:0;border-radius:999px;flex-direction:row;justify-content:center;gap:0;color:var(--muted)}
+  :root .tabs button{flex:1;min-width:0;height:54px;padding:0;border-radius:999px;flex-direction:row;justify-content:center;gap:0;color:var(--nav-mute)}
   :root .tabs button svg{width:26px;height:26px}
   :root .tabs button>span{display:none}
   :root .tabs button.on{color:var(--nav-ic)}
   :root .tabs .tab-add{display:grid;place-items:center}
-  :root .tabs .tab-add>span{display:grid;place-items:center;width:46px;height:46px;border-radius:50%;background:var(--brand);color:var(--brandInk);box-shadow:0 6px 16px -4px color-mix(in srgb,var(--brand) 70%,transparent);transition:transform .2s cubic-bezier(.3,1.4,.5,1)}
+  :root .tabs .tab-add>span{display:grid;place-items:center;width:46px;height:46px;border-radius:50%;background:var(--nav-add);color:var(--nav-addInk);box-shadow:var(--nav-addSh);transition:transform .2s cubic-bezier(.3,1.4,.5,1)}
   :root .tabs .tab-add>span svg{width:24px;height:24px;stroke-width:2.4}
   :root .tabs .tab-add:active>span{transform:scale(.9)}
   /* o conteúdo some suavemente atrás da barra */
   body:has(#tabs)::after{content:"";position:fixed;z-index:19;left:0;right:0;bottom:0;height:calc(70px + env(safe-area-inset-bottom,0px));background:linear-gradient(to bottom,transparent,var(--bg) 75%);pointer-events:none}
   body main.view{padding-bottom:calc(96px + env(safe-area-inset-bottom))}
 }
-:root{--nav-bar:#FFFFFF;--nav-pill:color-mix(in srgb,var(--brand) 14%,var(--card));--nav-ic:var(--brand);--nav-line:rgba(60,40,25,.08);--nav-shadow:0 10px 30px rgba(60,40,25,.16)}
-@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--nav-bar:#0F0B09;--nav-pill:color-mix(in srgb,var(--brand) 22%,#0F0B09);--nav-line:rgba(255,255,255,.07);--nav-shadow:0 10px 34px rgba(0,0,0,.75)}}
-:root[data-theme="dark"]{--nav-bar:#0F0B09;--nav-pill:color-mix(in srgb,var(--brand) 22%,#0F0B09);--nav-line:rgba(255,255,255,.07);--nav-shadow:0 10px 34px rgba(0,0,0,.75)}
+/* cores da barra de baixo: só cores do próprio site (variam com o tema claro/escuro) */
+:root{--nav-bar:var(--card);--nav-pill:var(--soft);--nav-ic:var(--brand);--nav-mute:var(--muted);--nav-line:var(--line);--nav-shadow:0 10px 30px rgba(40,25,15,.14);--nav-add:var(--brand);--nav-addInk:var(--brandInk);--nav-addSh:0 6px 16px -4px color-mix(in srgb,var(--brand) 70%,transparent);--nav-blur:none}
 .tabs .tab-add{display:none}
 @media (min-width:600px){
   .tabs button{flex-direction:row;gap:8px;height:40px;font-size:14px;padding:0 14px}
