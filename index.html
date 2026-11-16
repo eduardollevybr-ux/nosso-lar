@@ -2024,7 +2024,7 @@ function swapParts(...ids){
   const view = $("#view"); if (!view) return render();
   const tpl = document.createElement("template");
   tpl.innerHTML = S.pages.length ? viewPage() : tabBody();
-  ids.forEach(id => { const cur = $("#" + id, view), nu = tpl.content.querySelector("#" + id); if (cur && nu) fadeSwap(cur, () => { keepX(cur, () => { cur.innerHTML = nu.innerHTML; }); enhanceSelects(cur); animBars(cur); fitRecent(); }); else if (cur && !nu) render(); });
+  ids.forEach(id => { const cur = $("#" + id, view), nu = tpl.content.querySelector("#" + id); if (cur && nu) fxSwap(cur, () => { keepX(cur, () => { cur.innerHTML = nu.innerHTML; }); enhanceSelects(cur); animBars(cur); fitRecent(); }); else if (cur && !nu) render(); });
 }
 /* marca a aba escolhida e leva a bolha até ela */
 function segOn(seg, attr, val){
@@ -2056,19 +2056,63 @@ function softIn(root){
   if (!root || !document.documentElement.hasAttribute("data-style") || matchMedia("(prefers-reduced-motion: reduce)").matches) return;
   $$(SOFT_SEL, root).slice(0, 16).forEach((el, i) => { el.style.setProperty("--i", i); el.classList.remove("soft-in"); void el.offsetWidth; el.classList.add("soft-in"); el.addEventListener("animationend", () => el.classList.remove("soft-in"), { once:true }); });
 }
-function fadeSwap(el, apply){
+/* ===== troca animada do conteúdo filtrado (opção escolhida: C, Reorganizar) =====
+   A deslizar para o lado do filtro escolhido · B dissolver · C reorganizar (cada item vai para o novo lugar)
+   D cascata suave · E aproximar */
+const FX_NAMES = { A:"Deslizar", B:"Dissolver", C:"Reorganizar", D:"Cascata", E:"Aproximar" };
+const fxMode = () => "C"; /* escolhida: Reorganizar */
+let fxDir = 1;
+function fxDirFrom(btns, val, attr){ const arr = [...btns], a = arr.findIndex(b => b.classList.contains("on")), n = arr.findIndex(b => b.getAttribute(attr) === val); fxDir = n >= a ? 1 : -1; }
+const fxKey = el => el.dataset.id || el.dataset.k || el.getAttribute("data-mode") || "";
+function fxSwap(el, apply){
   if (!el) return;
   const reduce = !document.documentElement.hasAttribute("data-style") || matchMedia("(prefers-reduced-motion: reduce)").matches;
   if (reduce) { apply(); return; }
-  const tk = (el._fx = (el._fx || 0) + 1);
-  el.style.minHeight = el.offsetHeight + "px";
-  el.classList.remove("fx-in"); el.classList.add("fx-out");
-  setTimeout(() => {
-    if (el._fx !== tk) return;
+  const mode = fxMode(), dir = fxDir, tk = (el._fx = (el._fx || 0) + 1);
+  /* limpa uma animação anterior que ainda não terminou */
+  $$(".fx-ghost", el).forEach(g => g.remove()); el.style.height = ""; el.style.overflow = "";
+  const oldH = el.offsetHeight;
+  const done = ms => setTimeout(() => { if (el._fx !== tk) return; $$(".fx-ghost", el).forEach(g => g.remove()); el.style.height = ""; el.style.overflow = ""; el.classList.remove("fx-run"); }, ms);
+  const growH = (ms) => { const nh = el.scrollHeight; if (Math.abs(nh - oldH) < 2) return; el.style.height = oldH + "px"; void el.offsetWidth; el.style.transition = `height ${ms}ms cubic-bezier(.16,1,.3,1)`; el.style.height = nh + "px"; setTimeout(() => { if (el._fx === tk) el.style.transition = ""; }, ms); };
+  if (mode === "C") {
+    /* reorganizar: os itens que continuam deslizam até o novo lugar, os que saem encolhem e os novos crescem */
+    const base = el.getBoundingClientRect(), old = new Map(), olds = [];
+    $$("[data-id]", el).forEach(n => { if (n.closest(".fx-ghost")) return; const r = n.getBoundingClientRect(); old.set(fxKey(n), r); olds.push([n, r]); });
     apply();
-    el.classList.remove("fx-out"); void el.offsetWidth; el.classList.add("fx-in");
-    setTimeout(() => { if (el._fx === tk) { el.classList.remove("fx-in"); el.style.minHeight = ""; } }, 380);
-  }, 130);
+    el.classList.add("fx-run"); el.style.position = "relative";
+    const nb = el.getBoundingClientRect(), keep = new Set();
+    $$("[data-id]", el).forEach((n, i) => {
+      const r0 = old.get(fxKey(n)), r1 = n.getBoundingClientRect();
+      if (r0) { keep.add(fxKey(n)); const dx = r0.left - r1.left, dy = r0.top - r1.top;
+        if (dx || dy) n.animate([{ transform:`translate(${dx}px,${dy}px)` }, { transform:"none" }], { duration:520, easing:"cubic-bezier(.2,1.15,.3,1)" }); }
+      else n.animate([{ opacity:0, transform:"scale(.82)" }, { opacity:1, transform:"none" }], { duration:420, delay:120 + Math.min(i, 8) * 25, easing:"cubic-bezier(.2,1.2,.3,1)", fill:"backwards" });
+    });
+    olds.forEach(([n, r]) => { if (keep.has(fxKey(n))) return; const g = n.cloneNode(true); g.classList.add("fx-ghost"); g.removeAttribute("data-act"); Object.assign(g.style, { position:"absolute", left:(r.left - nb.left) + "px", top:(r.top - nb.top) + "px", width:r.width + "px", height:r.height + "px", margin:0, pointerEvents:"none", zIndex:0 });
+      el.appendChild(g); g.animate([{ opacity:1, transform:"none" }, { opacity:0, transform:"scale(.82)" }], { duration:260, easing:"ease-in", fill:"forwards" }); });
+    growH(520); done(620); return;
+  }
+  /* as demais: o conteúdo antigo vira uma cópia por cima, que sai enquanto o novo entra */
+  const ghost = document.createElement("div"); ghost.className = "fx-ghost"; ghost.innerHTML = el.innerHTML;
+  $$("[id]", ghost).forEach(n => n.removeAttribute("id"));
+  Object.assign(ghost.style, { position:"absolute", left:0, top:0, width:"100%", pointerEvents:"none" });
+  apply();
+  el.classList.add("fx-run"); el.style.position = "relative"; if (mode === "A") el.style.overflow = "clip";
+  el.appendChild(ghost);
+  const kids = [...el.children].filter(c => c !== ghost);
+  const OUT = { A:[{ opacity:1, transform:"none" }, { opacity:0, transform:`translateX(${-dir * 28}%)` }],
+                B:[{ opacity:1 }, { opacity:0 }],
+                D:[{ opacity:1 }, { opacity:0 }],
+                E:[{ opacity:1, transform:"none" }, { opacity:0, transform:"scale(.95)" }] }[mode];
+  const IN  = { A:[{ opacity:0, transform:`translateX(${dir * 28}%)` }, { opacity:1, transform:"none" }],
+                B:[{ opacity:0, transform:"scale(.995)" }, { opacity:1, transform:"none" }],
+                E:[{ opacity:0, transform:"scale(1.035)" }, { opacity:1, transform:"none" }] }[mode];
+  const tOut = { A:300, B:220, D:140, E:220 }[mode], tIn = { A:420, B:320, E:380 }[mode];
+  ghost.animate(OUT, { duration:tOut, easing: mode === "A" ? "cubic-bezier(.4,0,.2,1)" : "ease-out", fill:"forwards" });
+  if (mode === "D") {
+    const items = $$(".pgrid>*,.wgrid>*,.w-sec,.card.group>*,.bars>*,.pager", el).filter(n => !n.closest(".fx-ghost"));
+    items.slice(0, 14).forEach((n, i) => n.animate([{ opacity:0, transform:"translateY(10px)" }, { opacity:1, transform:"none" }], { duration:380, delay:90 + i * 30, easing:"cubic-bezier(.16,1,.3,1)", fill:"backwards" }));
+  } else kids.forEach(k => k.animate(IN, { duration:tIn, delay: mode === "B" ? 60 : 0, easing: mode === "A" ? "cubic-bezier(.16,1,.3,1)" : "cubic-bezier(.2,.9,.3,1)", fill:"backwards" }));
+  growH(420); done(Math.max(tOut, (tIn || 0) + 60, 520));
 }
 function riseIn(root, sel){
   if (!root || !document.documentElement.hasAttribute("data-style")) return;
@@ -2410,7 +2454,15 @@ const byRecent = arr => [...arr].sort((a, b) => recentKey(b).localeCompare(recen
 const byName = arr => [...arr].sort((a, b) => String(a.name).localeCompare(String(b.name), "pt-BR"));
 const photoOf = i => { const p = itemPhotos(i)[0]; return p ? S.photos[p] : ""; };
 const thumbIn = (i, icon) => { const ph = photoOf(i); return ph ? `<img src="${esc(ph)}" alt="" loading="lazy">` : ic(icon); };
-function relist(){ const el = $("#items-list"); if (!el) return render(); const html = itemsListHtml(); fadeSwap(el, () => keepX(el, () => { el.innerHTML = html; })); }
+function relist(){
+  const el = $("#items-list"); if (!el) return render();
+  const tpl = document.createElement("template"); tpl.innerHTML = itemsListHtml();
+  const body = $("#b-body,#w-body", el), nb = tpl.content.querySelector("#b-body,#w-body");
+  if (body && nb && body.id === nb.id && el.children.length === tpl.content.children.length) {
+    keepX(el, () => [...el.children].forEach((c, i) => { const n = tpl.content.children[i]; if (c !== body && n && c.outerHTML !== n.outerHTML) c.replaceWith(n.cloneNode(true)); }));
+    fxSwap(body, () => { body.innerHTML = nb.innerHTML; });
+  } else fxSwap(el, () => keepX(el, () => { el.innerHTML = tpl.innerHTML; }));
+}
 function sortedBought(list){ return S.sort === "value" ? [...list].sort((a, b) => itemTotal(b) - itemTotal(a)) : S.sort === "name" ? byName(list) : byRecent(list); }
 function pageOf(list){ const n = Math.max(1, Math.ceil(list.length / perPage())); S.pg = Math.max(0, Math.min(S.pg, n - 1)); return list.slice(S.pg * perPage(), S.pg * perPage() + perPage()); }
 function pager(total){
@@ -2440,7 +2492,7 @@ function wishCard(i, showRoom){
 function wishBody(list){
   const groups = wishGroups(list), cur = groups.find(g => g.k === S.wroom), arr = cur ? cur.arr : favFirst(list);
   return `<div class="chips wtabs" role="group" aria-label="Filtrar por cômodo"><button class="chip ${cur ? "" : "on"}" data-act="wtab" data-k="" aria-pressed="${!cur}">Todos <span class="seg-n">${list.length}</span></button>${groups.map(g => `<button class="chip ${cur && cur.k === g.k ? "on" : ""}" data-act="wtab" data-k="${g.k}" aria-pressed="${!!(cur && cur.k === g.k)}">${ic(g.icon)}${esc(g.name)} <span class="seg-n">${g.arr.length}</span></button>`).join("")}</div>
-    ${wishSections(arr, !cur)}`;
+    <div id="w-body">${wishSections(arr, !cur)}</div>`;
 }
 /* quero comprar: favoritos (próximas compras) numa seção no topo; o resto embaixo, mais apagado */
 function wishSections(arr, showRoom){
@@ -2465,7 +2517,7 @@ function itemsListHtml(){
   const SORTS = [["recent","Mais recentes"],["value","Maior valor"],["name","A a Z"]];
   const sortBtns = `<div class="sort-c" role="group" aria-label="Ordenar compras">${SORTS.map(([v, l]) => `<button class="chip ${S.sort === v ? "on" : ""}" data-act="sort" data-v="${v}" aria-pressed="${S.sort === v}">${l}</button>`).join("")}</div>`;
   const sorted = sortedBought(list);
-  return `<div class="list-bar">${sortBtns}<div class="list-note">${buysTxt(list.length)} · <b>${money(t.value)}</b></div></div><div class="pgrid">${pageOf(sorted).map(boughtCard).join("")}</div>` + pager(sorted.length);
+  return `<div class="list-bar">${sortBtns}<div class="list-note">${buysTxt(list.length)} · <b>${money(t.value)}</b></div></div><div id="b-body"><div class="pgrid">${pageOf(sorted).map(boughtCard).join("")}</div>${pager(sorted.length)}</div>`;
 }
 function viewItems(){
   const f = S.filter, st = f.store ? storeById(f.store) : null;
@@ -3174,21 +3226,21 @@ const ACT = {
   buy: d => { const it = S.wish.find(i => i.id === d.id); if (it) itemForm(it, { buy:true }); },
   fav: d => toggleFav(S.wish.find(i => i.id === d.id)),
   fFav: (d, b) => { S.filter.fav = !S.filter.fav; S.pg = 0; if (b) { b.classList.toggle("on", S.filter.fav); b.setAttribute("aria-pressed", S.filter.fav); } const el = $("#items-list"); if (el) el.innerHTML = itemsListHtml(); else render(); keepInView(".filters"); },
-  list: d => { if (S.list === d.mode) return; S.list = d.mode; S.pg = 0; lsSet("nl.list", S.list); S.filter.store = null; segOn($("#list-seg"), "data-mode", d.mode); swapParts("list-area"); syncAddBtns(); keepInView("#list-seg"); },
+  list: d => { if (S.list === d.mode) return; fxDir = d.mode === "wish" ? 1 : -1; S.list = d.mode; S.pg = 0; lsSet("nl.list", S.list); S.filter.store = null; segOn($("#list-seg"), "data-mode", d.mode); swapParts("list-area"); syncAddBtns(); keepInView("#list-seg"); },
   item: d => itemDetail(d.id),
   addRoom: () => roomForm(null),
   editRoom: d => roomForm(roomById(d.id)),
   addStore: () => storeForm(null),
   store: d => openPage("store", d.id),
   editStore: d => { const st = storeById(d.id); if (st) storeForm(st); },
-  fRoom: d => { S.filter.room = d.id; S.pg = 0; const el = $("#items-list"); if (el) { $$(".chips [data-act=fRoom]").forEach(c => { c.classList.toggle("on", c.dataset.id === d.id); c.setAttribute("aria-pressed", c.dataset.id === d.id); }); relist(); } else render(); },
+  fRoom: d => { fxDirFrom($$(".rchips [data-act=fRoom]"), d.id, "data-id"); S.filter.room = d.id; S.pg = 0; const el = $("#items-list"); if (el) { $$(".chips [data-act=fRoom]").forEach(c => { c.classList.toggle("on", c.dataset.id === d.id); c.setAttribute("aria-pressed", c.dataset.id === d.id); }); relist(); } else render(); },
   fStore: d => { S.filter.store = d.id || null; if (d.go) { S.filter.room = "all"; S.filter.q = ""; S.tab = "compras"; lsSet("nl.tab", S.tab); S.nav = "fwd"; } render(); if (!d.go) keepInView(".filters"); },
-  dash: d => { if (S.dash === d.mode) return; S.dash = d.mode; segOn($("#dash-seg"), "data-mode", d.mode); swapParts("dash-body"); keepInView("#dash-seg"); },
-  sort: d => { S.sort = d.v; lsSet("nl.sort", S.sort); S.pg = 0; relist(); },
-  pg: d => { S.pg = Math.max(0, +d.p || 0); relist(); keepInView("#items-list"); },
+  dash: d => { if (S.dash === d.mode) return; fxDir = d.mode === "stores" ? 1 : -1; S.dash = d.mode; segOn($("#dash-seg"), "data-mode", d.mode); swapParts("dash-body"); keepInView("#dash-seg"); },
+  sort: d => { fxDirFrom($$("[data-act=sort]"), d.v, "data-v"); S.sort = d.v; lsSet("nl.sort", S.sort); S.pg = 0; relist(); },
+  pg: d => { fxDir = (+d.p || 0) >= S.pg ? 1 : -1; S.pg = Math.max(0, +d.p || 0); relist(); keepInView("#items-list"); },
   toWish: () => { S.list = "wish"; lsSet("nl.list", S.list); S.pg = 0; ACT.tab({ tab:"compras" }); },
-  rlist: d => { if (S.rlist === d.v) return; S.rlist = d.v; segOn($(".rseg"), "data-v", d.v); swapParts("rl-body"); },
-  wtab: d => { S.wroom = d.k || null; S.pg = 0; relist(); },
+  rlist: d => { if (S.rlist === d.v) return; fxDir = d.v === "wish" ? 1 : -1; S.rlist = d.v; segOn($(".rseg"), "data-v", d.v); swapParts("rl-body"); },
+  wtab: d => { fxDirFrom($$(".wtabs [data-act=wtab]"), d.k || "", "data-k"); S.wroom = d.k || null; S.pg = 0; relist(); },
   clearSearch: (d, b) => { const i = b.closest(".search")?.querySelector("input"); if (!i) return; i.value = ""; i.dispatchEvent(new Event("input", { bubbles:true })); i.focus(); },
   projects: () => projectsSheet(),
   share: () => shareSheet(),
