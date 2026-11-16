@@ -1999,6 +1999,44 @@ function cropImage(file){
 
 /* ================= RENDER ================= */
 let lastKey = "";
+/* ===== atualizar só um pedaço da tela, sem redesenhar o app inteiro =====
+   as fileiras de filtros que deslizam para o lado guardam a posição em que estavam */
+function keepX(root, fn){
+  const rows = $$(".chips,.wtabs,.rchips,.sort-c", root || document).map(el => el.scrollLeft);
+  const y = window.scrollY;
+  fn();
+  $$(".chips,.wtabs,.rchips,.sort-c", root || document).forEach((el, k) => { if (rows[k]) el.scrollLeft = rows[k]; });
+  if (Math.abs(window.scrollY - y) > 1) window.scrollTo(0, y);
+}
+/* troca só as partes pedidas (pelo id) pelo conteúdo novo da mesma tela */
+function swapParts(...ids){
+  const view = $("#view"); if (!view) return render();
+  const tpl = document.createElement("template");
+  tpl.innerHTML = S.pages.length ? viewPage() : tabBody();
+  keepX(view, () => ids.forEach(id => { const cur = $("#" + id, view), nu = tpl.content.querySelector("#" + id); if (cur && nu) cur.innerHTML = nu.innerHTML; else if (cur && !nu) render(); }));
+  enhanceSelects(view); animBars(view); fitRecent();
+}
+/* marca a aba escolhida e leva a bolha até ela */
+function segOn(seg, attr, val){
+  if (!seg) return;
+  $$("button[" + attr + "]", seg).forEach(b => { const on = b.getAttribute(attr) === val; b.classList.toggle("on", on); if (b.hasAttribute("aria-pressed")) b.setAttribute("aria-pressed", on); });
+  const on = $("button.on", seg), pill = $(".pill", seg);
+  if (on && pill) { pill.style.left = on.offsetLeft + "px"; pill.style.width = on.offsetWidth + "px"; }
+}
+function animBars(root){
+  requestAnimationFrame(() => requestAnimationFrame(() => {
+    $$("[data-w]", root).forEach(el => el.style.width = el.dataset.w + "%");
+    $$("[data-h]", root).forEach(el => el.style.height = el.dataset.h + "%");
+  }));
+}
+/* botões de adicionar do topo e da barra: "Nova compra" ou "Adicionar à lista", conforme a lista aberta */
+function syncAddBtns(){
+  $$(".add-btn[data-act=addItem],.tab-add[data-act=addItem]").forEach(b => {
+    if (wishMode()) b.setAttribute("data-planned", "1"); else b.removeAttribute("data-planned");
+    b.setAttribute("aria-label", addLabel());
+    if (b.classList.contains("add-btn")) { const t = $("span", b); if (t) t.textContent = addLabel(); }
+  });
+}
 /* entrada em cascata (como no FLUX): blocos e linhas sobem um depois do outro */
 let prevTab = null;
 const RISE_SEL = ".hero-t,.caps>*,.house-h,.rooms>*,.card.group>*,.pgrid>*,.wgrid>*,.w-sec,.bars>*,.dash-top>*,.rseg,.pg-hero,.list-bar,.rchips,.wtabs";
@@ -2021,7 +2059,8 @@ function render(){
   const fab = ""; /* o + agora fica no meio da barra de baixo (estilo FLUX) */
   document.body.classList.remove("auth-on"); syncLock();
   document.body.classList.toggle("home-fit", !S.pages.length && S.tab === "casa" && !S.roomId);
-  app.innerHTML = header() + `<main class="view ${anim} ${fab ? "has-fab" : ""}" id="view">${body}</main>` + fab;
+  const draw = () => { app.innerHTML = header() + `<main class="view ${anim} ${fab ? "has-fab" : ""}" id="view">${body}</main>` + fab; };
+  if (sameView) keepX(app, draw); else draw();
   if (!sameView) window.scrollTo(0, 0); else if (Math.abs(window.scrollY - y) > 1) window.scrollTo(0, y);
   markScrolled();
   lastKey = key; S.nav = "";
@@ -2079,10 +2118,10 @@ function pageSub(t, wishCount, extra=[]){
 function pageTabs(list, wl, emptyTxt, addAttrs){
   const wish = S.rlist === "wish";
   const tabs = `<div class="seg nopill rseg" role="group" aria-label="Lista"><button data-act="rlist" data-v="bought" class="${wish ? "" : "on"}" aria-pressed="${!wish}">${ic("bag")} Compradas</button><button data-act="rlist" data-v="wish" class="${wish ? "on" : ""}" aria-pressed="${wish}">${ic("bookmark")} Quero comprar</button></div>`;
-  if (!wish) return tabs + (list.length ? groupedList(list) : emptyBox({ slim:true, text:emptyTxt, action: addAttrs ? addBtn("Nova compra", `data-act="addItem" ${addAttrs}`) : "" }));
+  if (!wish) return tabs + `<div id="rl-body">` + (list.length ? groupedList(list) : emptyBox({ slim:true, text:emptyTxt, action: addAttrs ? addBtn("Nova compra", `data-act="addItem" ${addAttrs}`) : "" })) + `</div>`;
   const wf = favFirst(wl);
   const addRow = canEdit() && addAttrs ? `<button class="it add-row" data-act="addItem" ${addAttrs} data-planned="1"><span class="store-ic">${ic("plus")}</span><span class="mid"><div class="nm">Adicionar à lista</div></span></button>` : "";
-  return tabs + (wf.length || addRow ? `<div class="card group two flat">${wf.map(i => wishRow(i)).join("")}${addRow}</div>` : emptyBox({ slim:true, text:"Nenhum item na lista." }));
+  return tabs + `<div id="rl-body">` + (wf.length || addRow ? `<div class="card group two flat">${wf.map(i => wishRow(i)).join("")}${addRow}</div>` : emptyBox({ slim:true, text:"Nenhum item na lista." })) + `</div>`;
 }
 /* resumo de uma tela de detalhe: sempre na mesma ordem (valor · compras · itens · lista · extras) */
 function pageLine(t, wishCount, extra=[]){
@@ -2341,7 +2380,7 @@ const byRecent = arr => [...arr].sort((a, b) => recentKey(b).localeCompare(recen
 const byName = arr => [...arr].sort((a, b) => String(a.name).localeCompare(String(b.name), "pt-BR"));
 const photoOf = i => { const p = itemPhotos(i)[0]; return p ? S.photos[p] : ""; };
 const thumbIn = (i, icon) => { const ph = photoOf(i); return ph ? `<img src="${esc(ph)}" alt="" loading="lazy">` : ic(icon); };
-function relist(){ const el = $("#items-list"); if (el) { el.innerHTML = itemsListHtml(); riseIn(el, ".pgrid>*,.wgrid>*,.w-sec,.card.group>*"); } else render(); }
+function relist(){ const el = $("#items-list"); if (el) keepX(el, () => { el.innerHTML = itemsListHtml(); }); else render(); }
 function sortedBought(list){ return S.sort === "value" ? [...list].sort((a, b) => itemTotal(b) - itemTotal(a)) : S.sort === "name" ? byName(list) : byRecent(list); }
 function pageOf(list){ const n = Math.max(1, Math.ceil(list.length / perPage())); S.pg = Math.max(0, Math.min(S.pg, n - 1)); return list.slice(S.pg * perPage(), S.pg * perPage() + perPage()); }
 function pager(total){
@@ -2406,14 +2445,14 @@ function viewItems(){
     <div class="seg ics list-seg" id="list-seg"><span class="pill"></span>
       <button data-act="list" data-mode="bought" class="${S.list!=="wish"?"on":""}">${ic("bag")} Compradas</button>
       <button data-act="list" data-mode="wish" class="${S.list==="wish"?"on":""}">${ic("bookmark")} Quero comprar</button></div>
-    <div class="filters"><div class="search">${ic("search")}<input class="input" id="q" type="search" placeholder="${S.list === "wish" ? "Buscar item, loja ou cômodo" : "Buscar compra, loja ou cômodo"}" aria-label="Buscar" value="${esc(f.q)}" autocomplete="off"><button type="button" class="search-x" data-act="clearSearch" aria-label="Limpar busca" title="Limpar busca">${ic("x")}</button></div>
+    <div id="list-area"><div class="filters"><div class="search">${ic("search")}<input class="input" id="q" type="search" placeholder="${S.list === "wish" ? "Buscar item, loja ou cômodo" : "Buscar compra, loja ou cômodo"}" aria-label="Buscar" value="${esc(f.q)}" autocomplete="off"><button type="button" class="search-x" data-act="clearSearch" aria-label="Limpar busca" title="Limpar busca">${ic("x")}</button></div>
     ${S.list === "wish" ? "" : `<div class="chips rchips" role="group" aria-label="Filtrar por cômodo">
         <button class="chip ${f.room==="all"?"on":""}" data-act="fRoom" data-id="all" aria-pressed="${f.room==="all"}">Todos</button>
         ${S.rooms.map(r => `<button class="chip ${f.room===r.id?"on":""}" data-act="fRoom" data-id="${r.id}" aria-pressed="${f.room===r.id}">${ic(r.icon)}${esc(r.name)}</button>`).join("")}
         ${hasNone || f.room === "none" ? `<button class="chip ${f.room==="none"?"on":""}" data-act="fRoom" data-id="none" aria-pressed="${f.room==="none"}">${ic("box")}Sem cômodo</button>` : ""}
       </div>`}</div>
     ${st ? `<div class="chips mt-sm"><button class="chip on" data-act="fStore" data-id="" aria-label="Tirar filtro da loja ${esc(st.name)}">${ic("store")}${esc(st.name)} ${ic("x")}</button></div>` : ""}
-    <div id="items-list">${itemsListHtml()}</div>`;
+    <div id="items-list">${itemsListHtml()}</div></div>`;
 }
 
 /* ---------- painel ---------- */
@@ -2440,7 +2479,7 @@ function viewDash(){
     <div class="card kpi"><span class="k-ic">${ic("bag")}</span><div class="label">Compras</div><div class="v">${t.count}</div></div>
     <div class="card kpi"><span class="k-ic">${ic("box")}</span><div class="label">Itens</div><div class="v">${(+t.qty).toLocaleString("pt-BR")}</div></div>
     <div class="card kpi"><span class="k-ic">${ic("chart")}</span><div class="label" title="Média por compra">Média</div><div class="v" title="${money(t.count ? t.value / t.count : 0)}">${moneyShort(t.count ? t.value / t.count : 0)}</div></div>
-  </div>${seg}<div class="dash-body">${inner}</div>`;
+  </div>${seg}<div class="dash-body" id="dash-body">${inner}</div>`;
 }
 function barsCard(rows, total, attrs, two){
   const mx = Math.max(...rows.map(r => r.v.value), 1);
@@ -3105,20 +3144,20 @@ const ACT = {
   buy: d => { const it = S.wish.find(i => i.id === d.id); if (it) itemForm(it, { buy:true }); },
   fav: d => toggleFav(S.wish.find(i => i.id === d.id)),
   fFav: (d, b) => { S.filter.fav = !S.filter.fav; S.pg = 0; if (b) { b.classList.toggle("on", S.filter.fav); b.setAttribute("aria-pressed", S.filter.fav); } const el = $("#items-list"); if (el) el.innerHTML = itemsListHtml(); else render(); keepInView(".filters"); },
-  list: d => { if (S.list === d.mode) return; S.list = d.mode; S.pg = 0; lsSet("nl.list", S.list); S.filter.store = null; render(); keepInView("#list-seg"); },
+  list: d => { if (S.list === d.mode) return; S.list = d.mode; S.pg = 0; lsSet("nl.list", S.list); S.filter.store = null; segOn($("#list-seg"), "data-mode", d.mode); swapParts("list-area"); syncAddBtns(); keepInView("#list-seg"); },
   item: d => itemDetail(d.id),
   addRoom: () => roomForm(null),
   editRoom: d => roomForm(roomById(d.id)),
   addStore: () => storeForm(null),
   store: d => openPage("store", d.id),
   editStore: d => { const st = storeById(d.id); if (st) storeForm(st); },
-  fRoom: d => { S.filter.room = d.id; S.pg = 0; const el = $("#items-list"); if (el) { $$(".chips [data-act=fRoom]").forEach(c => c.classList.toggle("on", c.dataset.id === d.id)); el.innerHTML = itemsListHtml(); } else render(); keepInView(".filters"); },
+  fRoom: d => { S.filter.room = d.id; S.pg = 0; const el = $("#items-list"); if (el) { $$(".chips [data-act=fRoom]").forEach(c => { c.classList.toggle("on", c.dataset.id === d.id); c.setAttribute("aria-pressed", c.dataset.id === d.id); }); relist(); } else render(); },
   fStore: d => { S.filter.store = d.id || null; if (d.go) { S.filter.room = "all"; S.filter.q = ""; S.tab = "compras"; lsSet("nl.tab", S.tab); S.nav = "fwd"; } render(); if (!d.go) keepInView(".filters"); },
-  dash: d => { S.dash = d.mode; render(); keepInView("#dash-seg"); },
+  dash: d => { if (S.dash === d.mode) return; S.dash = d.mode; segOn($("#dash-seg"), "data-mode", d.mode); swapParts("dash-body"); keepInView("#dash-seg"); },
   sort: d => { S.sort = d.v; lsSet("nl.sort", S.sort); S.pg = 0; relist(); },
   pg: d => { S.pg = Math.max(0, +d.p || 0); relist(); keepInView("#items-list"); },
   toWish: () => { S.list = "wish"; lsSet("nl.list", S.list); S.pg = 0; ACT.tab({ tab:"compras" }); },
-  rlist: d => { if (S.rlist === d.v) return; S.rlist = d.v; S.nav = ""; render(); keepInView(".rseg"); },
+  rlist: d => { if (S.rlist === d.v) return; S.rlist = d.v; segOn($(".rseg"), "data-v", d.v); swapParts("rl-body"); },
   wtab: d => { S.wroom = d.k || null; S.pg = 0; relist(); },
   clearSearch: (d, b) => { const i = b.closest(".search")?.querySelector("input"); if (!i) return; i.value = ""; i.dispatchEvent(new Event("input", { bubbles:true })); i.focus(); },
   projects: () => projectsSheet(),
