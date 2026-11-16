@@ -2078,7 +2078,7 @@ function pageSub(t, wishCount, extra=[]){
 /* abas Compradas e Quero comprar dentro do cômodo e da loja */
 function pageTabs(list, wl, emptyTxt, addAttrs){
   const wish = S.rlist === "wish";
-  const tabs = `<div class="seg nopill rseg" role="group" aria-label="Lista"><button data-act="rlist" data-v="bought" class="${wish ? "" : "on"}" aria-pressed="${!wish}">${ic("bag")} Compradas</button><button data-act="rlist" data-v="wish" class="${wish ? "on" : ""}" aria-pressed="${wish}">${ic("bookmark")} Quero comprar${wl.length ? `<span class="seg-n">${wl.length}</span>` : ""}</button></div>`;
+  const tabs = `<div class="seg nopill rseg" role="group" aria-label="Lista"><button data-act="rlist" data-v="bought" class="${wish ? "" : "on"}" aria-pressed="${!wish}">${ic("bag")} Compradas</button><button data-act="rlist" data-v="wish" class="${wish ? "on" : ""}" aria-pressed="${wish}">${ic("bookmark")} Quero comprar</button></div>`;
   if (!wish) return tabs + (list.length ? groupedList(list) : emptyBox({ slim:true, text:emptyTxt, action: addAttrs ? addBtn("Nova compra", `data-act="addItem" ${addAttrs}`) : "" }));
   const wf = favFirst(wl);
   const addRow = canEdit() && addAttrs ? `<button class="it add-row" data-act="addItem" ${addAttrs} data-planned="1"><span class="store-ic">${ic("plus")}</span><span class="mid"><div class="nm">Adicionar à lista</div></span></button>` : "";
@@ -2405,7 +2405,7 @@ function viewItems(){
   return `<div class="page-t"><h2>Compras</h2></div>
     <div class="seg ics list-seg" id="list-seg"><span class="pill"></span>
       <button data-act="list" data-mode="bought" class="${S.list!=="wish"?"on":""}">${ic("bag")} Compradas</button>
-      <button data-act="list" data-mode="wish" class="${S.list==="wish"?"on":""}">${ic("bookmark")} Quero comprar${S.wish.length ? `<span class="seg-n">${S.wish.length}</span>` : ""}</button></div>
+      <button data-act="list" data-mode="wish" class="${S.list==="wish"?"on":""}">${ic("bookmark")} Quero comprar</button></div>
     <div class="filters"><div class="search">${ic("search")}<input class="input" id="q" type="search" placeholder="${S.list === "wish" ? "Buscar item, loja ou cômodo" : "Buscar compra, loja ou cômodo"}" aria-label="Buscar" value="${esc(f.q)}" autocomplete="off"><button type="button" class="search-x" data-act="clearSearch" aria-label="Limpar busca" title="Limpar busca">${ic("x")}</button></div>
     ${S.list === "wish" ? "" : `<div class="chips rchips" role="group" aria-label="Filtrar por cômodo">
         <button class="chip ${f.room==="all"?"on":""}" data-act="fRoom" data-id="all" aria-pressed="${f.room==="all"}">Todos</button>
