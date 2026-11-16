@@ -1317,7 +1317,11 @@ html.theme-anim *,html.theme-anim *::before,html.theme-anim *::after{transition:
 :root[data-style] .soft-in{animation:softIn .42s var(--ease-out) both;animation-delay:calc(var(--i,0) * 28ms)}
 /* o filtro escolhido dá um toque de mola */
 @keyframes chipOn{0%{transform:scale(1)}40%{transform:scale(1.08)}100%{transform:scale(1)}}
-:root[data-style] .rchips .chip.on,:root[data-style] .wtabs .chip.on{animation:chipOn .38s var(--spring)}
+:root[data-style] .chip{transition:background-color .25s ease,border-color .25s ease,color .25s ease,transform .22s var(--spring)}
+/* troca suave do conteúdo filtrado */
+:root[data-style] .fx-out{opacity:0;filter:blur(3px);transform:translateY(4px);transition:opacity .13s ease,filter .13s ease,transform .13s ease}
+@keyframes fxIn{from{opacity:0;filter:blur(6px);transform:translateY(8px)}}
+:root[data-style] .fx-in{animation:fxIn .36s var(--ease-out) both}
 </style>
 </head>
 <body>
@@ -2020,8 +2024,7 @@ function swapParts(...ids){
   const view = $("#view"); if (!view) return render();
   const tpl = document.createElement("template");
   tpl.innerHTML = S.pages.length ? viewPage() : tabBody();
-  keepX(view, () => ids.forEach(id => { const cur = $("#" + id, view), nu = tpl.content.querySelector("#" + id); if (cur && nu) { cur.innerHTML = nu.innerHTML; softIn(cur); } else if (cur && !nu) render(); }));
-  enhanceSelects(view); animBars(view); fitRecent();
+  ids.forEach(id => { const cur = $("#" + id, view), nu = tpl.content.querySelector("#" + id); if (cur && nu) fadeSwap(cur, () => { keepX(cur, () => { cur.innerHTML = nu.innerHTML; }); enhanceSelects(cur); animBars(cur); fitRecent(); }); else if (cur && !nu) render(); });
 }
 /* marca a aba escolhida e leva a bolha até ela */
 function segOn(seg, attr, val){
@@ -2052,6 +2055,20 @@ const SOFT_SEL = ".pgrid>*,.wgrid>*,.w-sec,.card.group>*,.bars>*,.list-bar,.page
 function softIn(root){
   if (!root || !document.documentElement.hasAttribute("data-style") || matchMedia("(prefers-reduced-motion: reduce)").matches) return;
   $$(SOFT_SEL, root).slice(0, 16).forEach((el, i) => { el.style.setProperty("--i", i); el.classList.remove("soft-in"); void el.offsetWidth; el.classList.add("soft-in"); el.addEventListener("animationend", () => el.classList.remove("soft-in"), { once:true }); });
+}
+function fadeSwap(el, apply){
+  if (!el) return;
+  const reduce = !document.documentElement.hasAttribute("data-style") || matchMedia("(prefers-reduced-motion: reduce)").matches;
+  if (reduce) { apply(); return; }
+  const tk = (el._fx = (el._fx || 0) + 1);
+  el.style.minHeight = el.offsetHeight + "px";
+  el.classList.remove("fx-in"); el.classList.add("fx-out");
+  setTimeout(() => {
+    if (el._fx !== tk) return;
+    apply();
+    el.classList.remove("fx-out"); void el.offsetWidth; el.classList.add("fx-in");
+    setTimeout(() => { if (el._fx === tk) { el.classList.remove("fx-in"); el.style.minHeight = ""; } }, 380);
+  }, 130);
 }
 function riseIn(root, sel){
   if (!root || !document.documentElement.hasAttribute("data-style")) return;
@@ -2393,7 +2410,7 @@ const byRecent = arr => [...arr].sort((a, b) => recentKey(b).localeCompare(recen
 const byName = arr => [...arr].sort((a, b) => String(a.name).localeCompare(String(b.name), "pt-BR"));
 const photoOf = i => { const p = itemPhotos(i)[0]; return p ? S.photos[p] : ""; };
 const thumbIn = (i, icon) => { const ph = photoOf(i); return ph ? `<img src="${esc(ph)}" alt="" loading="lazy">` : ic(icon); };
-function relist(){ const el = $("#items-list"); if (el) { keepX(el, () => { el.innerHTML = itemsListHtml(); }); softIn(el); } else render(); }
+function relist(){ const el = $("#items-list"); if (!el) return render(); const html = itemsListHtml(); fadeSwap(el, () => keepX(el, () => { el.innerHTML = html; })); }
 function sortedBought(list){ return S.sort === "value" ? [...list].sort((a, b) => itemTotal(b) - itemTotal(a)) : S.sort === "name" ? byName(list) : byRecent(list); }
 function pageOf(list){ const n = Math.max(1, Math.ceil(list.length / perPage())); S.pg = Math.max(0, Math.min(S.pg, n - 1)); return list.slice(S.pg * perPage(), S.pg * perPage() + perPage()); }
 function pager(total){
