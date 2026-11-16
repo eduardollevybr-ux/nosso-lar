@@ -1,12 +1,12 @@
 <!doctype html>
-<html lang="pt-BR">
+<html lang="pt-BR" data-style="1">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1">
-<meta name="theme-color" content="#F7F3EE" id="meta-theme">
+<meta name="theme-color" content="#FFFFFF" id="meta-theme">
 <script>
 /* aplica o tema antes de desenhar a tela, para a barra superior já nascer na cor certa */
-(function(){try{var t=JSON.parse(localStorage.getItem("nl.theme")||'"system"');if(t==="light"||t==="dark")document.documentElement.setAttribute("data-theme",t);var d=t==="dark"||(t!=="light"&&matchMedia("(prefers-color-scheme: dark)").matches);var m=document.getElementById("meta-theme");if(m)m.setAttribute("content",d?"#15100D":"#F7F3EE");}catch(e){}})();
+(function(){try{var t=JSON.parse(localStorage.getItem("nl.theme")||'"system"');if(t==="light"||t==="dark")document.documentElement.setAttribute("data-theme",t);var d=t==="dark"||(t!=="light"&&matchMedia("(prefers-color-scheme: dark)").matches);var m=document.getElementById("meta-theme");if(m)m.setAttribute("content",d?"#1A110C":"#FBF6F1");}catch(e){}})();
 </script>
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
@@ -22,7 +22,7 @@
 <meta name="format-detection" content="telephone=no">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&display=swap" rel="stylesheet">
 <style>
 :root{
   --bg:#F7F3EE; --bg2:#EFE7DD; --card:#FFFFFF; --ink:#2B211B; --ink2:#5A4A3F; --muted:#8C7D71;
@@ -761,9 +761,554 @@ span.w-btn.fav{cursor:default}
 .search .search-x svg{position:static;transform:none;width:18px;height:18px;color:currentColor}
 .search input:placeholder-shown~.search-x{display:none}
 @media (prefers-reduced-motion:reduce){*{animation-duration:.01ms!important;transition-duration:.01ms!important}}
+/* =====================================================================
+   ESTILO FLUX: fundo branco puro no claro e preto puro no escuro,
+   letra DM Sans, botões em cápsula, cartões chapados com linha fina, sem sombras
+   e sem degradês, com o marrom do Nosso Lar como cor de destaque.
+   ===================================================================== */
+:root[data-style]{
+  --bg:#FFFFFF; --bg2:#ECE3DA; --card:#FFFFFF; --ink:#241B15; --ink2:#4A3E35; --muted:#6E645B;
+  --line:#ECE4DC; --soft:#F5EFE9; --danger:#C8392E; --dangerSoft:#FBE6E2;
+  --nav-bar:rgba(255,255,255,.8); --nav-blur:blur(18px) saturate(1.5); --nav-line:rgba(122,82,54,.10); --nav-shadow:0 12px 32px rgba(74,48,32,.14);
+  --shadow:none; --glass:rgba(255,255,255,.82);
+  --sheet:#FFFFFF; --sheet-in:#F5EFE9; --overlay:rgba(36,27,21,.38);
+  --r-xl:28px; --r:20px; --r-md:14px; --r-ctl:14px; --r-sm:10px; --r-in:999px;
+  --font:"DM Sans",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+  --spring:cubic-bezier(.2,1.25,.3,1);
+  --brandInk:#FFFFFF;
+}
+@media (prefers-color-scheme:dark){
+  :root[data-style]:not([data-theme="light"]){
+    --bg:#0F0A07; --bg2:#2A1E16; --card:rgba(255,236,218,.045); --ink:#F4EBE2; --ink2:#DCCDBF; --muted:#AD9A8A;
+    --line:rgba(255,236,218,.10); --soft:rgba(255,236,218,.07); --danger:#F07A66; --dangerSoft:rgba(240,122,102,.14);
+    --glass:rgba(15,10,7,.7); --sheet:#1B130E; --sheet-in:#281D16; --overlay:rgba(8,5,3,.6); --on:rgba(255,236,218,.13);
+    --nav-bar:rgba(31,22,16,.78); --nav-blur:blur(18px) saturate(1.4); --nav-pill:rgba(255,236,218,.10); --nav-line:rgba(255,236,218,.10); --nav-shadow:0 12px 34px rgba(0,0,0,.45);
+  }
+}
+:root[data-style][data-theme="dark"]{
+  --bg:#0F0A07; --bg2:#2A1E16; --card:rgba(255,236,218,.045); --ink:#F4EBE2; --ink2:#DCCDBF; --muted:#AD9A8A;
+  --line:rgba(255,236,218,.10); --soft:rgba(255,236,218,.07); --danger:#F07A66; --dangerSoft:rgba(240,122,102,.14);
+  --glass:rgba(15,10,7,.7); --sheet:#1B130E; --sheet-in:#281D16; --overlay:rgba(8,5,3,.6); --on:rgba(255,236,218,.13);
+  --nav-bar:rgba(31,22,16,.78); --nav-blur:blur(18px) saturate(1.4); --nav-pill:rgba(255,236,218,.10); --nav-line:rgba(255,236,218,.10); --nav-shadow:0 12px 34px rgba(0,0,0,.45);
+}
+
+/* cor de destaque: marrom do Nosso Lar (claro e escuro) */
+:root[data-style="1"]{--brand:#7A5236;--brand2:#A47551;--fav-dark:#4A3020}
+@media (prefers-color-scheme:dark){
+  :root[data-style="1"]:not([data-theme="light"]){--brand:#C99A70;--brand2:#E0B891;--brandInk:#1B130E;--fav-dark:#4A3020}
+}
+:root[data-style="1"][data-theme="dark"]{--brand:#C99A70;--brand2:#E0B891;--brandInk:#1B130E;--fav-dark:#4A3020}
+
+/* letra e números */
+:root[data-style] body{letter-spacing:-.005em}
+:root[data-style] .page-t h2,:root[data-style] .room-hero h2,:root[data-style] .proj-btn .n{letter-spacing:-.02em;font-weight:700}
+:root[data-style] .label{letter-spacing:.06em}
+
+/* topo: sem sombra, só a linha fina ao rolar */
+:root[data-style] .top.scrolled{box-shadow:none;border-bottom-color:var(--line)}
+
+/* cartões chapados com linha fina */
+:root[data-style] .card,:root[data-style] .house-body,:root[data-style] .pc,:root[data-style] .wc{box-shadow:none;border:1px solid var(--line)}
+:root[data-style] .roof .r1{stroke:var(--line)}
+
+/* resumo: bloco de cor lisa, sem degradê, sem sombra */
+:root[data-style] .summary{background:var(--brand);box-shadow:none}
+:root[data-style] .summary::before{display:none}
+:root[data-style] .summary::after{opacity:.08}
+:root[data-style] .summary.ghost{background:var(--soft);color:var(--ink)}
+:root[data-style] .summary.fav-sum{background:var(--fav-dark);color:#FFFFFF;box-shadow:none}
+
+/* cômodos da casa */
+:root[data-style] .room{background:var(--soft);transition:transform .22s var(--spring),background .2s}
+:root[data-style] .room:active{transform:scale(.94)}
+@media (hover:hover){:root[data-style] .room:not(.add):hover{transform:none;box-shadow:none;background:var(--bg2)}}
+:root[data-style] .room .ic{border-radius:50%}
+:root[data-style] .room .share i,:root[data-style] .bar .fill,:root[data-style] .col i{background:var(--brand)}
+:root[data-style] .room.add{border:2px dashed var(--line)}
+
+/* ícones redondos (como no FLUX); fotos continuam com canto arredondado */
+:root[data-style] .store-ic,:root[data-style] .kpi .k-ic,:root[data-style] .switch-row .sw-ic,:root[data-style] .room-hero .ic{border-radius:50%;box-shadow:none}
+:root[data-style] .room-hero .ic{background:var(--soft)}
+
+/* botões em cápsula; o secundário é só o contorno */
+:root[data-style] .btn{border-radius:999px;font-weight:700;transition:transform .22s var(--spring),background .2s,border-color .2s}
+:root[data-style] .btn:active{transform:scale(.94)}
+:root[data-style] .btn.soft{background:transparent;border:2px solid var(--line)}
+:root[data-style] .btn.danger{background:transparent;border:2px solid color-mix(in srgb,var(--danger) 35%,transparent)}
+:root[data-style] .btn.sm,:root[data-style] .btn.add-btn{border-radius:999px}
+@media (hover:hover){
+  :root[data-style] .btn.soft:hover{background:var(--soft)}
+  :root[data-style] .btn.danger:hover{background:var(--dangerSoft)}
+  :root[data-style] .btn.primary:hover{background:color-mix(in srgb,var(--brand) 86%,var(--ink))}
+}
+:root[data-style] .iconbtn{transition:transform .22s var(--spring),background .2s}
+
+/* campos preenchidos, sem anel de foco (só a borda na cor de destaque) */
+:root[data-style] .input,:root[data-style] .select,:root[data-style] .stepper,:root[data-style] .fav-f{background-color:var(--soft);border-color:transparent}
+:root[data-style] .input:focus,:root[data-style] .select:focus,:root[data-style] .dd-btn.open{border-color:var(--brand);box-shadow:none}
+@media (hover:hover){:root[data-style] .input:not(:focus):not(:disabled):hover,:root[data-style] .select:not(.open):hover,:root[data-style] .stepper:hover{border-color:var(--line)}}
+:root[data-style] .field>span{color:var(--muted);font-weight:500}
+:root[data-style] .total-line{background:var(--soft)}
+
+/* abas e seletores em cápsula */
+:root[data-style] .seg{border-radius:999px}
+:root[data-style] .seg .pill{box-shadow:none;background:var(--card)}
+:root[data-style] .seg button.on{color:var(--ink)}
+@media (min-width:900px){
+  :root[data-style] .tabs{border-radius:999px}
+  :root[data-style] .tabs .pill{border-radius:999px;box-shadow:none}
+}
+:root[data-style]{--nav-shadow:0 10px 30px rgba(0,0,0,.12);--nav-addSh:none}
+
+/* filtros em cápsula com contorno */
+:root[data-style] .chip{border:2px solid var(--line);background:transparent}
+:root[data-style] .chip.on{background:var(--brand);border-color:var(--brand);color:var(--brandInk)}
+:root[data-style] .pg-n{border-radius:999px}
+:root[data-style] .pg-n.on{background:var(--brand);color:var(--brandInk)}
+:root[data-style] .pg-a{border-radius:999px;border:2px solid var(--line);background:transparent}
+
+/* janelas que sobem: fundo próprio, sem sombra, escurecido do FLUX */
+:root[data-style] .sheet{background:var(--sheet);box-shadow:none}
+:root[data-style] .sheet-bg{background:var(--overlay)}
+:root[data-style] .sheet .input,:root[data-style] .sheet .select,:root[data-style] .sheet .stepper,:root[data-style] .sheet .fav-f{background-color:var(--sheet-in)}
+:root[data-style] .sheet .card{background:transparent}
+:root[data-style] .sheet-h h3{font-size:22px;font-weight:700}
+:root[data-style] .dd-menu{border:0;box-shadow:0 14px 40px rgba(0,0,0,.18);background:var(--sheet)}
+
+/* botão flutuante redondo */
+:root[data-style] .fab{border-radius:50%;box-shadow:0 10px 28px -8px color-mix(in srgb,var(--brand) 60%,transparent)}
+
+/* avisos e detalhes */
+:root[data-style] #net-pill{box-shadow:none}
+:root[data-style] .switch-row{border-color:var(--line)}
+:root[data-style] .sw::after{box-shadow:none}
+:root[data-style] .icon-grid button{border-width:2px}
+
+:root[data-style] .sheet .seg{background:var(--sheet-in)}
+/* ===== telas escolhidas no protótipo (opção A; Compradas B; Quero comprar C) ===== */
+/* total grande solto, sem caixa (Casa e Painel) */
+.hero-t{padding:2px 4px 6px;min-width:0}
+.hero-t .v{font-size:40px;font-weight:700;letter-spacing:-.03em;line-height:1.05;margin-top:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.caps{display:flex;flex-wrap:wrap;gap:6px;margin-top:12px}
+.cap{height:30px;padding:0 12px;border-radius:999px;background:var(--soft);color:var(--ink);font-size:13px;font-weight:600;display:inline-flex;align-items:center;gap:5px;white-space:nowrap}
+.cap svg{width:14px;height:14px}
+.cap.b{color:var(--brand)}
+button.cap{cursor:pointer}
+.home>.hero-t{grid-area:sum}
+@media (min-width:900px){.home>.hero-t .v{font-size:44px}}
+/* casa: cômodos em grade, sem o desenho do telhado */
+.house-h{margin:8px 4px 10px}
+.house-h .chip{height:34px;font-size:13px}
+.house-h .chip svg{width:15px;height:15px}
+:root[data-style] .house-body{background:transparent;border:0;border-radius:0;padding:0;box-shadow:none}
+.room .cnt{display:none}
+:root[data-style] .room .ic{background:var(--bg)}
+@media (min-width:900px) and (min-height:540px){body.home-fit .house-body{padding:0}}
+/* cabeçalho do cômodo e da loja: ícone redondo, nome e valor grande */
+.pg-hero{padding:0 2px 18px}
+.pg-hero .ic{width:52px;height:52px;border-radius:50%;background:var(--soft);color:var(--brand);display:grid;place-items:center}
+.pg-hero .ic svg{width:26px;height:26px}
+.pg-hero h2{margin:10px 0 0;font-size:28px;font-weight:700;letter-spacing:-.02em}
+.pg-hero .pv{font-size:34px;font-weight:700;letter-spacing:-.03em;line-height:1.1;font-variant-numeric:tabular-nums}
+.pg-hero p{margin:4px 0 0;color:var(--muted);font-size:14px}
+/* abas sem bolha deslizante: a aba ativa fica com fundo próprio */
+.seg.nopill button{display:flex;align-items:center;justify-content:center;gap:7px}
+.seg.nopill button svg{width:17px;height:17px}
+.seg.nopill button.on{background:var(--card);color:var(--ink)}
+:root[data-style] .sheet .seg.nopill button.on{background:var(--sheet)}
+.rseg{margin-bottom:12px}
+@media (min-width:900px){.rseg{max-width:420px}}
+/* listas em linhas de ponta a ponta, com divisória (cômodo, loja, quero comprar, painel, lojas) */
+:root[data-style] .card.flat{border:0;border-radius:0;background:transparent;box-shadow:none;border-top:1px solid var(--line);overflow:visible}
+:root[data-style] .card.flat>.it,:root[data-style] .card.flat>.bar{border-bottom:1px solid var(--line)}
+:root[data-style] .card.flat>.it::before,:root[data-style] .card.flat>.bar::before{display:none}
+@media (max-width:899px){
+  :root[data-style] .card.flat{margin-left:calc(-1 * var(--pad));margin-right:calc(-1 * var(--pad))}
+  :root[data-style] .card.flat>.it,:root[data-style] .card.flat>.bar{padding-left:var(--pad);padding-right:var(--pad)}
+}
+@media (min-width:900px){
+  :root[data-style] .card.group.two.flat{gap:0 32px;border-top:0}
+  :root[data-style] .group.two.flat>*{background:transparent;border:0;border-bottom:1px solid var(--line);border-radius:0;box-shadow:none;padding:14px 2px}
+  :root[data-style] .card.bars.flat.two{gap:0 32px}
+}
+:root[data-style] .card.flat .thumb{border-radius:12px}
+.it .chev{color:var(--muted);display:flex;margin-left:-4px}
+.it .chev svg{width:18px;height:18px}
+.it.add-row .nm{color:var(--brand)}
+.it.add-row .store-ic{color:var(--brand)}
+.st-search{margin-bottom:12px}
+@media (min-width:900px){.st-search{max-width:360px}}
+.page-t p{margin:2px 0 0}
+/* painel: três números em blocos cinza */
+:root[data-style] .dash-top>.hero-t{grid-column:1/-1}
+@media (min-width:900px){:root[data-style] .dash-top>.hero-t{grid-column:auto}}
+:root[data-style] .kpi{background:var(--soft);border:0;box-shadow:none}
+:root[data-style] .kpi .k-ic{background:var(--bg)}
+:root[data-style] .dash-body .card.bars{margin-top:0}
+/* compras: cômodos em cápsulas e cartões sem borda */
+.rchips{margin-top:0}
+@media (min-width:900px){.filters .rchips{flex:1}}
+:root[data-style] .pc{border:0;background:transparent;padding:0;box-shadow:none}
+:root[data-style] .pc-ph{border-radius:16px}
+:root[data-style] .pc-n{margin:8px 0 0}
+:root[data-style] .pc-s{margin:2px 0 0}
+:root[data-style] .pc-v{margin:3px 0 0}
+:root[data-style] .pgrid{row-gap:18px}
+/* quero comprar: próximas compras no topo e o resto embaixo */
+.w-sec{display:flex;justify-content:space-between;align-items:baseline;gap:10px;margin:18px 4px 8px;font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.w-sec>span{display:inline-flex;align-items:center;gap:6px}
+.w-sec svg{width:15px;height:15px;fill:currentColor}
+.w-sec b{font-size:15px;letter-spacing:0;text-transform:none;color:var(--ink)}
+.w-sec.fav>span{color:#C8913A}
+@media (min-width:900px){.w-sec{justify-content:flex-start;gap:14px}}
+.w-sec.rest~.card .it.wish>.thumb,.w-sec.rest~.card .it.wish>.mid{opacity:.5}
+.it.wish.is-fav>.thumb,.it.wish.is-fav>.mid,.it.wish.is-fav>.val{opacity:1}
+.it.wish.is-fav>.thumb{border-style:solid;border-color:transparent;background:color-mix(in srgb,var(--brand) 12%,var(--card));color:var(--brand)}
+/* nova compra: valor grande no topo e o cadastro em linhas */
+.f-money{display:flex;align-items:baseline;gap:8px;margin:4px 2px 2px}
+.f-money>span{font-size:28px;font-weight:700}
+.f-money input{border:0;background:none;outline:none;font:inherit;font-size:40px;font-weight:700;letter-spacing:-.03em;width:100%;min-width:0;padding:0;color:var(--ink);caret-color:var(--brand)}
+.f-money input::placeholder{color:var(--muted);opacity:.45}
+.f-hint{margin:0 2px 14px;font-size:13px;color:var(--muted)}
+.f-hint b{color:var(--ink);font-weight:600}
+.f-mode{margin-bottom:4px}
+:root[data-style] .sheet .f-mode{background:var(--sheet-in)}
+.frows{border-top:1px solid var(--line);margin-top:12px}
+.frow{display:flex;align-items:center;gap:14px;min-height:64px;padding:8px 2px;border-bottom:1px solid var(--line);margin:0;cursor:pointer}
+.frow>.fi{width:26px;display:grid;place-items:center;color:var(--ink);flex:none}
+.frow>.fi svg{width:22px;height:22px}
+.frow .fm{flex:1;min-width:0;display:flex;flex-direction:column;gap:1px}
+.frow .fm>small{font-size:12px;color:var(--muted);font-weight:500}
+.frow.fq .fm{font-size:17px;font-weight:600}
+:root[data-style] .frow .input,:root[data-style] .frow .select,:root[data-style] .frow .dd-btn{height:auto;min-height:28px;border:0;background:transparent!important;background-image:none;padding:0;font-size:17px;font-weight:600;border-radius:0;box-shadow:none}
+:root[data-style] .frow .dd-btn>svg:first-child{display:none}
+:root[data-style] .frow textarea.input{min-height:26px;font-weight:500;line-height:1.35;overflow:hidden}
+.frow .input::placeholder{font-weight:400;color:var(--muted)}
+:root[data-style] .frow .stepper{width:136px;height:42px;border-radius:999px;flex:none}
+:root[data-style] .sheet .frow .stepper{background:var(--sheet-in)}
+#itf .sheet-actions .btn.primary{height:54px}
+/* detalhe do item: valor grande e dados em linhas */
+.dt-hero{margin:2px 2px 14px}
+.dt-hero .v{font-size:34px;font-weight:700;letter-spacing:-.03em;line-height:1.1;font-variant-numeric:tabular-nums}
+.dt-hero small{color:var(--muted);font-size:14px}
+:root[data-style] .sheet .card.kv.flat{margin:0}
+:root[data-style] .card.kv.flat div{padding:15px 2px}
+:root[data-style] .card.kv.flat div+div::before{left:0}
+:root[data-style] .detail-photo{border-radius:20px}
+/* ===== padronização das telas ===== */
+/* tema escuro: fundo marrom com degradê atrás de tudo */
+:root[data-style]{--on:var(--card)}
+.nl-glow{display:none}
+@media (prefers-color-scheme:dark){:root[data-style]:not([data-theme="light"]) .nl-glow{display:block}}
+:root[data-style][data-theme="dark"] .nl-glow{display:block}
+.nl-glow{position:fixed;inset:0;z-index:-1;pointer-events:none;background:
+  radial-gradient(70% 45% at 8% -6%,rgba(201,154,112,.42),transparent 70%),
+  radial-gradient(60% 40% at 105% 18%,rgba(164,117,81,.30),transparent 70%),
+  radial-gradient(90% 50% at 40% 112%,rgba(122,82,54,.42),transparent 70%),
+  radial-gradient(50% 35% at 80% 75%,rgba(201,154,112,.12),transparent 70%),
+  linear-gradient(180deg,#1A110C 0%,#0F0A07 55%,#140D09 100%)}
+@media (prefers-color-scheme:dark){
+  :root[data-style]:not([data-theme="light"]) body,:root[data-style]:not([data-theme="light"]) html{background:transparent}
+  :root[data-style]:not([data-theme="light"]) .top::before{background:rgba(15,10,7,.55);-webkit-backdrop-filter:blur(18px) saturate(1.3);backdrop-filter:blur(18px) saturate(1.3)}
+  :root[data-style]:not([data-theme="light"]) body:has(#tabs)::after{background:linear-gradient(to bottom,transparent,rgba(15,10,7,.85) 75%)}
+}
+:root[data-style][data-theme="dark"] body{background:transparent}
+:root[data-style][data-theme="dark"] .top::before{background:rgba(15,10,7,.55);-webkit-backdrop-filter:blur(18px) saturate(1.3);backdrop-filter:blur(18px) saturate(1.3)}
+:root[data-style][data-theme="dark"] body:has(#tabs)::after{background:linear-gradient(to bottom,transparent,rgba(15,10,7,.85) 75%)}
+:root[data-style] .seg .pill,:root[data-style] .seg.nopill button.on{background:var(--on)}
+:root[data-style] .room .ic,:root[data-style] .kpi .k-ic{background:var(--on)}
+/* todas as listas no mesmo formato: linhas de ponta a ponta com divisória, sem caixa (telas e janelas) */
+:root[data-style] .card.group,:root[data-style] .card.menu-list,:root[data-style] .card.kv{border:0;border-radius:0;background:transparent;box-shadow:none;border-top:1px solid var(--line);overflow:visible}
+:root[data-style] .card.group>*,:root[data-style] .card.menu-list>button,:root[data-style] .card.kv>div{border-bottom:1px solid var(--line)}
+:root[data-style] .card.group>*::before,:root[data-style] .card.menu-list>button::before,:root[data-style] .card.kv>div::before{display:none}
+:root[data-style] .sheet .card.group>*,:root[data-style] .sheet .card.menu-list>button{padding-left:2px;padding-right:2px}
+@media (max-width:899px){
+  :root[data-style] main .card.group{margin-left:calc(-1 * var(--pad));margin-right:calc(-1 * var(--pad))}
+  :root[data-style] main .card.group>*{padding-left:var(--pad);padding-right:var(--pad)}
+}
+@media (min-width:900px){:root[data-style] .card.group.two{gap:0 32px;border-top:0}:root[data-style] .group.two>*{background:transparent;border:0;border-bottom:1px solid var(--line);border-radius:0;box-shadow:none;padding:14px 2px}}
+:root[data-style] .menu-list button svg{color:var(--ink)}
+:root[data-style] .menu-list button.red svg{color:var(--danger)}
+:root[data-style] .menu-list.mt-lg{margin-top:var(--sp-lg)}
+/* ícones de cômodo e loja sempre redondos; fotos e itens com canto arredondado */
+:root[data-style] .thumb{border-radius:12px}
+:root[data-style] .member .avatar,:root[data-style] .store-ic{border-radius:50%}
+:root[data-style] .icon-grid button{border-radius:50%;border:2px solid var(--line);background:transparent}
+:root[data-style] .icon-grid button.on{border-color:var(--brand);background:color-mix(in srgb,var(--brand) 14%,transparent)}
+/* títulos de seção: um formato só */
+.w-sec{font-size:17px;font-weight:700;letter-spacing:-.01em;text-transform:none;color:var(--ink);margin:22px 4px 10px}
+.w-sec b{font-size:15px;font-weight:600;color:var(--muted)}
+.w-sec svg{width:17px;height:17px}
+:root[data-style] .section-t h3,.w-sec{font-size:17px}
+:root[data-style] .section-t .btn.sm,.house-h .chip{height:34px;padding:0 12px;font-size:13px;border-radius:999px;border:2px solid var(--line);background:transparent;color:var(--ink)}
+:root[data-style] .section-t .btn.sm svg,.house-h .chip svg{width:15px;height:15px}
+/* campos das janelas no formato de linha (igual ao cadastro de compra) */
+:root[data-style] .sheet .field:has(>.input),:root[data-style] .sheet .field:has(>.select),:root[data-style] .sheet .field:has(>.dd),:root[data-style] .sheet .field:has(>.link-in){margin:0;padding:10px 2px 12px;border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+:root[data-style] .sheet .field:has(>.input)+.field:has(>.input),:root[data-style] .sheet .field:has(>.input)+.field:has(>.dd),:root[data-style] .sheet .field:has(>.dd)+.field:has(>.input){margin-top:-1px}
+:root[data-style] .sheet .field>span{margin:0 0 2px;font-size:12px;font-weight:500;color:var(--muted)}
+:root[data-style] .sheet .field>.input,:root[data-style] .sheet .field>.dd .dd-btn,:root[data-style] .sheet .field>.select{height:auto;min-height:28px;border:0;background:transparent!important;background-image:none;padding:0;font-size:17px;font-weight:600;border-radius:0;box-shadow:none}
+:root[data-style] .sheet .field>textarea.input{min-height:52px;font-weight:500}
+:root[data-style] .sheet .field>.input::placeholder{font-weight:400;color:var(--muted)}
+:root[data-style] .sheet .field+.field:not(:has(>.input)):not(:has(>.dd)),:root[data-style] .sheet .field:not(:has(>.input)):not(:has(>.dd))+.field{margin-top:var(--sp)}
+:root[data-style] .sheet .field .link-in .input{background:var(--sheet-in)!important;border-radius:999px}
+/* botões de ação no fim das janelas: mesma altura */
+:root[data-style] .sheet-actions .btn{height:52px}
+:root[data-style] .sheet-actions .btn.icon{width:52px}
+:root[data-style] .sheet-actions{margin-top:20px}
+/* ===== janelas do topo: conta, projetos e compartilhar ===== */
+.sheet-x{position:absolute;top:12px;right:12px;z-index:2}
+.sub-h{font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin:22px 2px 10px}
+/* conta */
+.me2{display:flex;flex-direction:column;align-items:center;text-align:center;gap:2px;padding:10px 0 18px}
+.avatar.xl{width:84px;height:84px;font-size:30px;margin-bottom:10px}
+.me2 b{font-size:22px;font-weight:700;letter-spacing:-.02em}
+.me2 small{font-size:14px;color:var(--muted)}
+.me2 .chip{margin-top:12px;height:34px;font-size:13px}
+.me2 .chip svg{width:15px;height:15px}
+.qtiles{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.qt{display:flex;flex-direction:column;align-items:flex-start;gap:2px;padding:14px 12px;border-radius:18px;background:var(--sheet-in,var(--soft));text-align:left;min-width:0;transition:transform .22s var(--spring,ease)}
+.qt:active{transform:scale(.95)}
+.qt .qi{width:36px;height:36px;border-radius:50%;display:grid;place-items:center;background:color-mix(in srgb,var(--brand) 16%,transparent);color:var(--brand);margin-bottom:10px}
+.qt .qi svg{width:19px;height:19px}
+.qt b{font-size:14px;font-weight:700}
+.qt small{font-size:12px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
+.themes{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.th-c{display:flex;flex-direction:column;gap:8px;padding:8px;border-radius:18px;border:2px solid var(--line);transition:border-color .2s,transform .22s var(--spring,ease)}
+.th-c:active{transform:scale(.95)}
+.th-c.on{border-color:var(--brand)}
+.th-pv{position:relative;display:block;height:58px;border-radius:12px;overflow:hidden}
+.th-pv i{position:absolute;left:10px;height:6px;border-radius:99px}
+.th-pv i:nth-child(1){top:12px;width:44%}
+.th-pv i:nth-child(2){top:26px;width:62%;height:12px;border-radius:4px}
+.th-pv i:nth-child(3){top:44px;width:30%}
+.th-light{background:#FFFFFF;box-shadow:inset 0 0 0 1px #E4E5E8}.th-light i{background:#E9E4DF}.th-light i:nth-child(2){background:#7A5236}
+.th-dark{background:radial-gradient(90% 80% at 10% 0%,#6B4730,transparent 70%),#140D09}.th-dark i{background:rgba(255,236,218,.18)}.th-dark i:nth-child(2){background:#C99A70}
+.th-system{background:linear-gradient(105deg,#FFFFFF 50%,#140D09 50%);box-shadow:inset 0 0 0 1px #E4E5E8}.th-system i{background:#A47551}
+.th-l{display:flex;align-items:center;justify-content:center;gap:6px;font-size:13px;font-weight:600}
+.th-l svg{width:15px;height:15px}
+.th-c.on .th-l{color:var(--brand)}
+.out-row{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;height:52px;margin-top:20px;border-radius:999px;border:2px solid color-mix(in srgb,var(--danger) 30%,transparent);color:var(--danger);font-weight:700;font-size:15px}
+.out-row svg{width:19px;height:19px}
+.out-row.brand{border-color:var(--line);color:var(--ink)}
+/* projetos */
+.pj-list{display:flex;flex-direction:column;gap:8px}
+.pj-c{display:flex;align-items:center;gap:14px;width:100%;padding:14px;border-radius:20px;background:var(--sheet-in,var(--soft));border:2px solid transparent;text-align:left;transition:transform .22s var(--spring,ease)}
+.pj-c:active{transform:scale(.97)}
+.pj-c.on{border-color:var(--brand);background:color-mix(in srgb,var(--brand) 10%,var(--sheet,var(--card)))}
+.pj-c .pj-i{width:44px;height:44px;border-radius:50%;display:grid;place-items:center;background:linear-gradient(140deg,var(--brand2),var(--brand));color:var(--brandInk);flex:none}
+.pj-c .pj-i svg{width:22px;height:22px}
+.pj-c .mid{flex:1;min-width:0}
+.pj-c b{display:block;font-size:16px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pj-c small{font-size:13px;color:var(--muted)}
+.pj-tag{font-size:12px;font-weight:700;padding:4px 10px;border-radius:999px;background:var(--brand);color:var(--brandInk)}
+.pj-c .chev{color:var(--muted);display:flex}
+.pj-c .chev svg{width:18px;height:18px}
+.pj-c.add{background:transparent;border:2px dashed var(--line)}
+.pj-c.add .pj-i{background:transparent;border:2px solid var(--line);color:var(--brand)}
+/* compartilhar */
+.sh-hero{display:flex;flex-direction:column;align-items:center;text-align:center;padding:14px 0 18px}
+.faces{display:flex;margin-bottom:12px}
+.faces .avatar{width:52px;height:52px;font-size:18px;margin-left:-12px;box-shadow:0 0 0 3px var(--sheet,var(--bg))}
+.faces .avatar:first-child{margin-left:0}
+.sh-hero h3{margin:0;font-size:22px;font-weight:700;letter-spacing:-.02em}
+.sh-hero p{margin:4px 0 0;font-size:14px;color:var(--muted)}
+.avatar.g1{background:linear-gradient(140deg,#C9A27E,#8A5E3E)}
+.avatar.g2{background:linear-gradient(140deg,#B07F5A,#5A3A24)}
+.invite{display:flex;flex-direction:column;gap:10px;padding:16px;border-radius:22px;background:var(--sheet-in,var(--soft))}
+.inv-h{display:flex;align-items:center;gap:8px;font-weight:700;font-size:15px}
+.inv-h svg{width:18px;height:18px;color:var(--brand)}
+:root[data-style] .invite .input{background:var(--sheet,var(--card));border-radius:14px;height:50px}
+:root[data-style] .invite .seg{background:var(--sheet,var(--card))}
+:root[data-style] .invite .seg .pill{background:var(--sheet-in,var(--soft))}
+.inv-note{margin:0;font-size:12px;color:var(--muted);line-height:1.4}
+.avatar.g1,.avatar.g2{color:#FFFFFF}
+
+/* ===== topo: sem faixa chapada e sem linha; some suavemente por cima do conteúdo ao rolar ===== */
+:root[data-style] .top,:root[data-style] .top.scrolled{border-bottom:0;box-shadow:none}
+:root[data-style] .top::before{bottom:-26px;background:linear-gradient(to bottom,var(--bg) 0%,var(--bg) 76%,transparent 100%);opacity:0;transition:opacity .3s;-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);-webkit-mask-image:linear-gradient(to bottom,#000 72%,transparent);mask-image:linear-gradient(to bottom,#000 72%,transparent)}
+:root[data-style] .top.scrolled::before{opacity:1}
+@media (prefers-color-scheme:dark){:root[data-style]:not([data-theme="light"]) .top::before{background:linear-gradient(to bottom,rgba(26,17,12,.98) 0%,rgba(22,14,10,.94) 76%,transparent 100%)}}
+:root[data-style][data-theme="dark"] .top::before{background:linear-gradient(to bottom,rgba(26,17,12,.98) 0%,rgba(22,14,10,.94) 76%,transparent 100%)}
+/* nome do projeto com a seta numa bolinha e quem edita embaixo */
+:root[data-style] .proj-btn{gap:8px}
+:root[data-style] .proj-btn>svg{width:26px;height:26px;padding:5px;margin-top:2px;border-radius:50%;background:var(--soft);color:var(--ink);transition:transform .25s var(--spring),background .2s}
+:root[data-style] .proj-btn:active>svg{transform:scale(.88)}
+:root[data-style] .proj-btn .s{margin-top:1px}
+:root[data-style] .proj-btn .s>span:first-child::before{content:"";display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--brand);margin-right:6px;vertical-align:1px}
+/* botões do canto: bolhas de vidro e avatar com anel */
+:root[data-style] .top-act{gap:10px}
+:root[data-style] .top-act .iconbtn{width:42px;height:42px;background:var(--soft);border:1px solid var(--line)}
+:root[data-style] .top-act .iconbtn svg{width:20px;height:20px}
+:root[data-style] .avatar{background:linear-gradient(140deg,var(--brand2) 0%,var(--brand) 100%);color:var(--brandInk);box-shadow:0 0 0 2px var(--bg),0 0 0 3.5px color-mix(in srgb,var(--brand2) 70%,transparent)}
+:root[data-style] .top-act .avatar{width:40px;height:40px;margin-left:2px}
+@media (hover:hover){:root[data-style] .top-act .iconbtn:hover{background:var(--bg2)}:root[data-style] button.avatar:hover{filter:brightness(1.08)}}
+
+/* quero comprar: cartões com foto, no mesmo formato das compradas */
+:root[data-style] .wc{border:0;background:transparent;padding:0;box-shadow:none}
+:root[data-style] .wc-ph{border-radius:16px;background:var(--soft);border:0}
+:root[data-style] .wc-ph:not(:has(img)){background:transparent;border:1.5px dashed color-mix(in srgb,var(--brand2) 55%,transparent)}
+:root[data-style] .wc-n{margin:8px 0 0}
+:root[data-style] .wc-s{margin:2px 0 0}
+:root[data-style] .wc .w-acts{margin:8px 0 0}
+:root[data-style] .wgrid{row-gap:18px;margin-top:0}
+/* cadastro mais baixo: cabe na tela sem rolar */
+:root[data-style] #itf .frow{min-height:56px;padding-top:6px;padding-bottom:6px}
+:root[data-style] #itf .f-money{margin-top:0}
+:root[data-style] #itf .f-money input{font-size:36px}
+:root[data-style] #itf .f-hint{margin-bottom:10px}
+:root[data-style] #itf .frows{margin-top:10px}
+:root[data-style] #itf .sheet-actions{margin-top:14px}
+:root[data-style] #itf .wish-in .field{margin-top:10px;margin-bottom:0}
+.ph-row .ph-ph{font-size:17px;color:var(--muted)}
+.ph-row .pbtns{display:flex;gap:6px;flex:none}
+.ph-row .pbtns label,.ph-row .pbtns button{width:40px;height:40px;border-radius:50%;display:grid;place-items:center;background:var(--soft);color:var(--ink);cursor:pointer}
+:root[data-style] .sheet .ph-row .pbtns label,:root[data-style] .sheet .ph-row .pbtns button{background:var(--sheet-in)}
+.ph-row .pbtns svg{width:19px;height:19px}
+.ph-row .pbtns [data-rmph]{color:var(--danger)}
+.ph-strip{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;padding:2px 0}
+.ph-strip::-webkit-scrollbar{display:none}
+.ph-th{width:44px;height:44px;border-radius:10px;overflow:hidden;flex:none;padding:0;outline:2px solid transparent;outline-offset:1px}
+.ph-th.on{outline-color:var(--brand)}
+.ph-th img{width:100%;height:100%;object-fit:cover;display:block}
+/* link do produto (quero comprar) também numa linha */
+:root[data-style] #itf .wish-in .field{margin:0;padding:0;border-top:0;border-bottom:1px solid var(--line)}
+:root[data-style] #itf .wish-in .field>span{display:none}
+:root[data-style] #itf .wish-in .link-in>svg{left:4px;width:22px;height:22px;color:var(--ink)}
+:root[data-style] #itf .wish-in .link-in .input{height:56px;background:transparent!important;border:0;border-radius:0;padding-left:42px;font-size:16px;font-weight:500}
+:root[data-style] #itf .wish-in .link-list{margin:0 0 8px}
+:root[data-style] #itf .wish-only>.wish-in{padding:0;margin:0}
+/* celulares baixos: tudo um pouco mais junto */
+@media (max-height:740px){
+  :root[data-style] #itf .frow{min-height:48px;padding-top:3px;padding-bottom:3px}
+  :root[data-style] #itf .frow .input,:root[data-style] #itf .frow .dd-btn{min-height:24px;font-size:16px}
+  :root[data-style] #itf .f-money input{font-size:30px}
+  :root[data-style] #itf .f-money>span{font-size:22px}
+  :root[data-style] #itf .f-hint{margin-bottom:8px}
+  :root[data-style] #itf .f-mode button{height:34px}
+  :root[data-style] #itf .sheet-h{margin-bottom:6px}
+  :root[data-style] #itf .sheet-actions .btn{height:48px}
+  :root[data-style] #itf .sheet-actions .btn.icon{width:48px}
+  :root[data-style] #itf .wish-in .link-in .input{height:48px}
+  :root[data-style] #itf .ph-row .pbtns label,:root[data-style] #itf .ph-row .pbtns button{width:36px;height:36px}
+  :root[data-style] #itf .ph-th{width:38px;height:38px}
+  :root[data-style] .sheet:has(#itf){max-height:calc(100dvh - 16px)}
+}
+
+.wgrid.rest .wc>.wc-ph,.wgrid.rest .wc>.wc-n,.wgrid.rest .wc>.wc-s{opacity:.55}
+
+
+
+
+/* ===== tema claro com mais vida: fundo creme com brilho marrom suave ===== */
+:root[data-style] .nl-glow{display:block;background:
+  radial-gradient(70% 42% at 0% -4%,rgba(201,154,112,.30),transparent 70%),
+  radial-gradient(55% 36% at 108% 14%,rgba(164,117,81,.16),transparent 70%),
+  radial-gradient(80% 45% at 40% 110%,rgba(201,154,112,.20),transparent 70%),
+  linear-gradient(180deg,#FBF6F1 0%,#FFFDFB 40%,#FCF8F4 100%)}
+@media (prefers-color-scheme:dark){:root[data-style]:not([data-theme="light"]) .nl-glow{background:
+  radial-gradient(70% 45% at 8% -6%,rgba(201,154,112,.42),transparent 70%),
+  radial-gradient(60% 40% at 105% 18%,rgba(164,117,81,.30),transparent 70%),
+  radial-gradient(90% 50% at 40% 112%,rgba(122,82,54,.42),transparent 70%),
+  radial-gradient(50% 35% at 80% 75%,rgba(201,154,112,.12),transparent 70%),
+  linear-gradient(180deg,#1A110C 0%,#0F0A07 55%,#140D09 100%)}}
+:root[data-style][data-theme="dark"] .nl-glow{background:
+  radial-gradient(70% 45% at 8% -6%,rgba(201,154,112,.42),transparent 70%),
+  radial-gradient(60% 40% at 105% 18%,rgba(164,117,81,.30),transparent 70%),
+  radial-gradient(90% 50% at 40% 112%,rgba(122,82,54,.42),transparent 70%),
+  radial-gradient(50% 35% at 80% 75%,rgba(201,154,112,.12),transparent 70%),
+  linear-gradient(180deg,#1A110C 0%,#0F0A07 55%,#140D09 100%)}
+:root[data-style] body,:root[data-style] html{background:transparent}
+:root[data-style] .top::before{background:linear-gradient(to bottom,rgba(251,246,241,.97) 0%,rgba(252,248,244,.92) 76%,transparent 100%)}
+:root[data-style] body:has(#tabs)::after{background:linear-gradient(to bottom,transparent,rgba(252,248,244,.9) 75%)}
+/* no claro: blocos em tom creme com leve degradê e borda bem suave */
+:root[data-style]:not([data-theme="dark"]) .room{background:linear-gradient(160deg,#FCF8F4 0%,#F4ECE4 100%);box-shadow:inset 0 0 0 1px rgba(122,82,54,.07)}
+:root[data-style]:not([data-theme="dark"]) .kpi,:root[data-style]:not([data-theme="dark"]) .qt,:root[data-style]:not([data-theme="dark"]) .pj-c:not(.add):not(.on),:root[data-style]:not([data-theme="dark"]) .invite{background:linear-gradient(160deg,#FCF8F4 0%,#F4ECE4 100%);box-shadow:inset 0 0 0 1px rgba(122,82,54,.07)}
+:root[data-style]:not([data-theme="dark"]) .room .ic,:root[data-style]:not([data-theme="dark"]) .kpi .k-ic{background:#FFFFFF;box-shadow:0 2px 8px rgba(122,82,54,.12)}
+:root[data-style]:not([data-theme="dark"]) .seg.nopill button.on,:root[data-style]:not([data-theme="dark"]) .seg .pill{background:#FFFFFF;box-shadow:0 2px 8px rgba(74,48,32,.10)}
+:root[data-style]:not([data-theme="dark"]) .hero-t .label{color:var(--brand)}
+:root[data-style]:not([data-theme="dark"]) .cap{background:rgba(122,82,54,.07)}
+:root[data-style]:not([data-theme="dark"]) .pc-ph,:root[data-style]:not([data-theme="dark"]) .wc-ph:has(img){background:#F2EAE2}
+:root[data-style]:not([data-theme="dark"]) .fab,:root[data-style]:not([data-theme="dark"]) .tabs .tab-add>span{box-shadow:0 8px 20px -6px rgba(122,82,54,.55)}
+/* o escuro do sistema não recebe os ajustes do claro */
+@media (prefers-color-scheme:dark){
+  :root[data-style]:not([data-theme]) .room{background:var(--soft);box-shadow:none}
+  :root[data-style]:not([data-theme]) .kpi,:root[data-style]:not([data-theme]) .qt,:root[data-style]:not([data-theme]) .pj-c:not(.add):not(.on),:root[data-style]:not([data-theme]) .invite{background:var(--sheet-in,var(--soft));box-shadow:none}
+  :root[data-style]:not([data-theme]) .kpi{background:var(--soft)}
+  :root[data-style]:not([data-theme]) .room .ic,:root[data-style]:not([data-theme]) .kpi .k-ic{background:var(--on);box-shadow:none}
+  :root[data-style]:not([data-theme]) .seg.nopill button.on,:root[data-style]:not([data-theme]) .seg .pill{background:var(--on);box-shadow:none}
+  :root[data-style]:not([data-theme]) .hero-t .label{color:var(--muted)}
+  :root[data-style]:not([data-theme]) .cap{background:var(--soft)}
+  :root[data-style]:not([data-theme]) .pc-ph{background:var(--soft)}
+  :root[data-style]:not([data-theme]) .top::before{background:linear-gradient(to bottom,rgba(26,17,12,.98) 0%,rgba(22,14,10,.94) 76%,transparent 100%)}
+  :root[data-style]:not([data-theme]) body:has(#tabs)::after{background:linear-gradient(to bottom,transparent,rgba(15,10,7,.85) 75%)}
+}
+:root[data-style][data-theme="dark"] .top::before{background:linear-gradient(to bottom,rgba(26,17,12,.98) 0%,rgba(22,14,10,.94) 76%,transparent 100%)}
+:root[data-style][data-theme="dark"] body:has(#tabs)::after{background:linear-gradient(to bottom,transparent,rgba(15,10,7,.85) 75%)}
+
+/* ===== movimento no estilo do FLUX: mola nos toques, entradas em cascata, janelas com impulso ===== */
+:root[data-style]{--spring:cubic-bezier(.2,1.25,.3,1);--ease-out:cubic-bezier(.16,1,.3,1)}
+@keyframes rise{from{opacity:0;transform:translateY(22px) scale(.97)}}
+:root[data-style] .rise{animation:rise .62s var(--ease-out) both;animation-delay:calc(var(--i,0) * 38ms)}
+:root[data-style] .room:not(.rise){animation:none}
+/* troca de aba: desliza para o lado; abrir e voltar: aproxima e afasta */
+@keyframes nlSlideL{from{transform:translateX(38%);opacity:0}}
+@keyframes nlSlideR{from{transform:translateX(-38%);opacity:0}}
+@keyframes nlEnter{from{opacity:0;transform:scale(.965)}}
+:root[data-style] .view-fwd{animation:nlSlideL .5s var(--ease-out)}
+:root[data-style] .view-back{animation:nlSlideR .5s var(--ease-out)}
+:root[data-style] .view-anim{animation:nlEnter .42s var(--ease-out);transform-origin:50% 0}
+:root[data-style] #app{overflow-x:clip}
+/* toque: tudo responde com mola */
+:root[data-style] .btn,:root[data-style] .iconbtn,:root[data-style] .chip,:root[data-style] .cap,:root[data-style] .w-btn,:root[data-style] .pg-n,:root[data-style] .pg-a,:root[data-style] .avatar,:root[data-style] .dd-btn,:root[data-style] .seg button,:root[data-style] .ph-row .pbtns>*,:root[data-style] .th-c,:root[data-style] .qt,:root[data-style] .pj-c{transition:transform .22s var(--spring),background-color .2s,color .2s,box-shadow .2s,border-color .2s,filter .2s}
+:root[data-style] .btn:active,:root[data-style] .iconbtn:active,:root[data-style] .chip:active,:root[data-style] .cap:active,:root[data-style] .w-btn:active,:root[data-style] .pg-n:active,:root[data-style] .pg-a:active,:root[data-style] .avatar:active,:root[data-style] .ph-row .pbtns>*:active{transform:scale(.92)}
+:root[data-style] .it,:root[data-style] .bar,:root[data-style] .frow,:root[data-style] .menu-list button,:root[data-style] .proj-row,:root[data-style] .kv div.go{transition:transform .22s var(--spring),background-color .15s}
+:root[data-style] button.it:active,:root[data-style] .it.wish:active,:root[data-style] .bar:active,:root[data-style] .menu-list button:active,:root[data-style] .proj-row:active,:root[data-style] .kv div.go:active{transform:scale(.98)}
+:root[data-style] .pc,:root[data-style] .wc,:root[data-style] .room{transition:transform .25s var(--spring),background .2s}
+:root[data-style] .pc:active,:root[data-style] .wc:active,:root[data-style] .room:active{transform:scale(.95)}
+@media (hover:hover){
+  :root[data-style] .btn.primary:hover{transform:translateY(-1px);box-shadow:0 8px 22px color-mix(in srgb,var(--brand) 32%,transparent)}
+  :root[data-style] .pc:hover,:root[data-style] .wc:hover{transform:translateY(-3px)}
+  :root[data-style] .room:not(.add):hover{transform:translateY(-3px)}
+}
+/* barra de baixo: o ícone da aba escolhida dá um pulinho; o + gira ao tocar */
+@keyframes bump{0%{transform:scale(1)}35%{transform:scale(1.22) translateY(-3px)}70%{transform:scale(.95)}100%{transform:scale(1)}}
+:root[data-style] .tabs button svg.bump{animation:bump .45s var(--spring)}
+:root[data-style] .tabs .tab-add>span svg,:root[data-style] .btn.add-btn svg{transition:transform .35s var(--spring)}
+:root[data-style] .tabs .tab-add:active>span svg,:root[data-style] .btn.add-btn:active svg{transform:rotate(90deg)}
+:root[data-style] .tabs .pill{transition:left .5s var(--spring),width .5s var(--spring)}
+:root[data-style] .seg .pill{transition:left .45s var(--spring),width .45s var(--spring)}
+/* janelas: no celular sobem com impulso; no computador aparecem com mola */
+:root[data-style] .sheet{transition:transform .5s var(--ease-out)}
+:root[data-style] .sheet-bg{transition:opacity .25s ease}
+@media (min-width:600px){
+  :root[data-style] .sheet{transform:translateY(26px) scale(.93);opacity:0;transition:transform .5s var(--spring),opacity .22s ease}
+  :root[data-style] .sheet-wrap.open .sheet{transform:none;opacity:1}
+}
+:root[data-style] .sheet .me2 .avatar.xl,:root[data-style] .sh-hero .faces{animation:popIn .55s var(--spring) .08s both}
+:root[data-style] .sheet .qt,:root[data-style] .sheet .th-c,:root[data-style] .sheet .pj-c{animation:rise .55s var(--ease-out) both}
+:root[data-style] .sheet .qt:nth-child(2),:root[data-style] .sheet .th-c:nth-child(2),:root[data-style] .sheet .pj-c:nth-child(2){animation-delay:.04s}
+:root[data-style] .sheet .qt:nth-child(3),:root[data-style] .sheet .th-c:nth-child(3),:root[data-style] .sheet .pj-c:nth-child(3){animation-delay:.08s}
+/* listas de escolha: abrem com mola */
+@keyframes popIn{from{opacity:0;transform:scale(.9) translateY(-6px)}}
+:root[data-style] .dd-menu{transition:opacity .18s,transform .28s var(--spring)}
+:root[data-style] .dd-menu:not(.show){transform:scale(.92) translateY(-6px)}
+/* barras do painel e dos cômodos: enchem com mola */
+:root[data-style] .bar .fill,:root[data-style] .room .share i,:root[data-style] .track i{transition:width 1.2s var(--spring)}
+/* estrela de favorito: estalinho ao marcar */
+@keyframes checkPop{0%{transform:scale(0) rotate(-30deg)}60%{transform:scale(1.5)}100%{transform:scale(1)}}
+:root[data-style] .w-btn.fav.pop.on svg{animation:checkPop .5s var(--spring)}
+/* aviso no topo: entra com mola */
+:root[data-style] #toast{transition:transform .5s var(--spring),opacity .25s,visibility .5s}
+/* troca de tema suave */
+html.theme-anim *,html.theme-anim *::before,html.theme-anim *::after{transition:background-color .4s ease,color .4s ease,border-color .4s ease,fill .4s ease,stroke .4s ease!important}
+/* login: os elementos sobem um depois do outro */
+:root[data-style] .auth-box>*{animation:rise .6s var(--ease-out) both}
+:root[data-style] .auth-box>*:nth-child(2){animation-delay:.05s}:root[data-style] .auth-box>*:nth-child(3){animation-delay:.1s}:root[data-style] .auth-box>*:nth-child(4){animation-delay:.15s}:root[data-style] .auth-box>*:nth-child(5){animation-delay:.2s}:root[data-style] .auth-box>*:nth-child(6){animation-delay:.25s}:root[data-style] .auth-box>*:nth-child(7){animation-delay:.3s}
+@media (prefers-reduced-motion:reduce){:root[data-style] *{animation:none!important;transition:none!important}}
 </style>
 </head>
 <body>
+<div class="nl-glow" aria-hidden="true"></div>
 <div id="app"><div class="splash"><div class="logo"><svg class="i" viewBox="0 0 24 24"><path d="M3 11l9-7 9 7M5 10v10h14V10M10 20v-3.5a2 2 0 0 1 4 0V20"/></svg></div></div></div>
 <div id="sheets"></div>
 <div id="toast"></div>
@@ -818,6 +1363,8 @@ const P = {
   eye:"M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12zM12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6z",
   copy:"M9 9h11v11H9zM5 15H4V4h11v1",
   moon:"M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5z",
+  sun:"M12 7a5 5 0 1 0 0 10 5 5 0 0 0 0-10zM12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4",
+  phone:"M7 2h10v20H7zM11 18h2",
   globe:"M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18zM3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18",
   pin:"M12 21s-7-6-7-11a7 7 0 0 1 14 0c0 5-7 11-7 11zM12 12a2 2 0 1 0 0-4 2 2 0 0 0 0 4z",
   more:"M5 12h.01M12 12h.01M19 12h.01",
@@ -828,6 +1375,7 @@ const P = {
   expand:"M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7",
   bag:"M5 8h14l-1 12H6zM9 8V6a3 3 0 0 1 6 0v2",
   bookmark:"M6 3h12v18l-6-4-6 4z",
+  tag:"M3 12V3h9l9 9-9 9zM7.5 7.5h.01",
   star:"M12 3.5l2.6 5.3 5.9.9-4.3 4.1 1 5.8L12 16.9l-5.2 2.7 1-5.8-4.3-4.1 5.9-.9z",
   crop:"M6 2v14a2 2 0 0 0 2 2h14M2 6h14a2 2 0 0 1 2 2v14",
   link:"M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1",
@@ -922,10 +1470,14 @@ function friendlyError(e){
 /* ================= TEMA ================= */
 function applyTheme(){
   const t = lsGet("nl.theme", "system");
+  /* troca de tema suave: as cores mudam com uma transição curta */
+  const prevT = document.documentElement.getAttribute("data-theme") || "system";
+  if (applyTheme.ran && prevT !== t) { const h = document.documentElement; h.classList.add("theme-anim"); clearTimeout(applyTheme.tm); applyTheme.tm = setTimeout(() => h.classList.remove("theme-anim"), 450); }
+  applyTheme.ran = true;
   if (t === "system") document.documentElement.removeAttribute("data-theme");
   else document.documentElement.setAttribute("data-theme", t);
   const dark = t === "dark" || (t === "system" && matchMedia("(prefers-color-scheme: dark)").matches);
-  setBarColor(dark ? "#15100D" : "#F7F3EE");
+  setBarColor(dark ? "#1A110C" : "#FBF6F1");
 }
 /* o iPhone guarda a cor antiga da barra superior quando só o valor muda;
    trocar a etiqueta inteira por uma nova obriga o sistema a ler a cor de novo */
@@ -1429,6 +1981,14 @@ function cropImage(file){
 
 /* ================= RENDER ================= */
 let lastKey = "";
+/* entrada em cascata (como no FLUX): blocos e linhas sobem um depois do outro */
+let prevTab = null;
+const RISE_SEL = ".hero-t,.caps>*,.house-h,.rooms>*,.card.group>*,.pgrid>*,.wgrid>*,.w-sec,.bars>*,.dash-top>*,.rseg,.pg-hero,.list-bar,.rchips,.wtabs";
+function riseIn(root, sel){
+  if (!root || !document.documentElement.hasAttribute("data-style")) return;
+  if (matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+  $$(sel || RISE_SEL, root).slice(0, 18).forEach((el, i) => { el.style.setProperty("--i", i); el.classList.remove("rise"); void el.offsetWidth; el.classList.add("rise"); el.addEventListener("animationend", () => el.classList.remove("rise"), { once:true }); });
+}
 function render(){
   if (!S.user) return;
   const app = $("#app");
@@ -1450,7 +2010,9 @@ function render(){
   syncBackGuard();
   placeTabPill(oldPill);
   fitRecent();
-  if (!sameView) countUp();
+  if (!sameView) { countUp(); riseIn($("#view")); }
+  if (prevTab !== S.tab) { const sv = $("#tabs button.on svg"); if (sv) { sv.classList.remove("bump"); void sv.offsetWidth; sv.classList.add("bump"); } }
+  prevTab = S.tab;
   requestAnimationFrame(() => requestAnimationFrame(() => {
     $$("[data-w]").forEach(el => el.style.width = el.dataset.w + "%");
     $$("[data-h]").forEach(el => el.style.height = el.dataset.h + "%");
@@ -1472,6 +2034,7 @@ function curPage(){
 }
 function openPage(kind, id){
   const cur = curPage(); if (cur && cur.kind === kind && cur.id === id) return;
+  S.rlist = "bought";
   if (kind === "room" && S.tab === "casa" && !S.pages.length && !S.roomId) S.roomId = id;
   else S.pages.push({ kind, id });
   S.nav = "fwd"; render();
@@ -1482,12 +2045,26 @@ function viewPage(){
   if (html) return html;
   S.pages.pop(); return S.pages.length ? viewPage() : tabBody(); /* o registro foi excluído: volta um nível */
 }
-function pageHead(icon, title, line, editAct){
+function pageHead(icon, title, line, editAct, value){
   return `<div class="room-top">
       <button class="iconbtn" data-act="back" aria-label="Voltar" title="Voltar">${ic("back")}</button>
       ${editAct ? `<button class="iconbtn" ${editAct} aria-label="Editar" title="Editar">${ic("edit")}</button>` : ""}
     </div>
-    <div class="room-hero"><div class="ic">${ic(icon)}</div><div><h2>${esc(title)}</h2><p>${line}</p></div></div>`;
+    <div class="pg-hero"><span class="ic">${ic(icon)}</span><h2>${esc(title)}</h2><div class="pv">${value}</div><p>${line}</p></div>`;
+}
+/* linha de baixo do cabeçalho (sem o valor, que aparece grande em cima) */
+function pageSub(t, wishCount, extra=[]){
+  const all = totals(S.items).value;
+  return [buysTxt(t.count), qtyTxt(t.qty), all && t.count ? Math.round(t.value / all * 100) + "% do total" : "", wishCount ? wishTxt(wishCount) : "", ...extra].filter(Boolean).map(esc).join(" · ");
+}
+/* abas Compradas e Quero comprar dentro do cômodo e da loja */
+function pageTabs(list, wl, emptyTxt, addAttrs){
+  const wish = S.rlist === "wish";
+  const tabs = `<div class="seg nopill rseg" role="group" aria-label="Lista"><button data-act="rlist" data-v="bought" class="${wish ? "" : "on"}" aria-pressed="${!wish}">${ic("bag")} Compradas</button><button data-act="rlist" data-v="wish" class="${wish ? "on" : ""}" aria-pressed="${wish}">${ic("bookmark")} Quero comprar${wl.length ? `<span class="seg-n">${wl.length}</span>` : ""}</button></div>`;
+  if (!wish) return tabs + (list.length ? groupedList(list) : emptyBox({ slim:true, text:emptyTxt, action: addAttrs ? addBtn("Nova compra", `data-act="addItem" ${addAttrs}`) : "" }));
+  const wf = favFirst(wl);
+  const addRow = canEdit() && addAttrs ? `<button class="it add-row" data-act="addItem" ${addAttrs} data-planned="1"><span class="store-ic">${ic("plus")}</span><span class="mid"><div class="nm">Adicionar à lista</div></span></button>` : "";
+  return tabs + (wf.length || addRow ? `<div class="card group two flat">${wf.map(i => wishRow(i)).join("")}${addRow}</div>` : emptyBox({ slim:true, text:"Nenhum item na lista." }));
 }
 /* resumo de uma tela de detalhe: sempre na mesma ordem (valor · compras · itens · lista · extras) */
 function pageLine(t, wishCount, extra=[]){
@@ -1515,11 +2092,9 @@ function viewStore(id){
   const match = i => none ? !(i.store_id && storeById(i.store_id)) : i.store_id === id;
   const list = S.items.filter(match), wl = S.wish.filter(match), t = totals(list);
   const kind = none ? "" : (st.kind === "online" ? "Online" : "Loja física");
-  const line = pageLine(t, wl.length, [kind, st.location || ""]);
-  return pageHead(none ? "box" : (st.kind === "online" ? "globe" : "store"), st.name, line, canEdit() && !none ? `data-act="editStore" data-id="${id}"` : "")
+  return pageHead(none ? "box" : (st.kind === "online" ? "globe" : "store"), st.name, pageSub(t, 0, [kind, st.location || ""]), canEdit() && !none ? `data-act="editStore" data-id="${id}"` : "", money(t.value))
     + (st.notes ? `<p class="note">${esc(st.notes)}</p>` : "")
-    + (list.length ? groupedList(list) : emptyBox({ slim:true, text:`Nenhuma compra registrada ${none ? "sem loja" : "nesta loja"}.` }))
-    + wishSection(wl, !none ? `data-store="${id}"` : "");
+    + pageTabs(list, wl, `Nenhuma compra registrada ${none ? "sem loja" : "nesta loja"}.`, !none ? `data-store="${id}"` : "");
 }
 /* depois de trocar lista, painel ou filtro: se a página ficou rolada para baixo,
    volta até os botões de troca, em vez de deixar a pessoa "presa" no fim da lista nova (telas menores) */
@@ -1634,7 +2209,7 @@ function byKey(list, fn){ const m = new Map(); list.forEach(i => { const k = fn(
 function viewHouse(){
   const t = totals(S.items), per = byKey(S.items, i => i.room_id && roomById(i.room_id) ? i.room_id : "none");
   const wper = byKey(S.wish, i => i.room_id && roomById(i.room_id) ? i.room_id : "none");
-  const wl = id => { const n = (wper.get(id) || {}).count || 0; return n ? `<div class="wl">${ic("bookmark")}${wishTxt(n)}</div>` : ""; };
+  const wl = id => { const n = (wper.get(id) || {}).count || 0; return n ? `<div class="wl">${ic("bookmark")}${wishTxt(n)}</div>` : `<div class="wl" aria-hidden="true" style="visibility:hidden">${ic("bookmark")}0</div>`; };
   const none = per.get("none") || (wper.get("none") ? { value:0, qty:0, count:0 } : null);
   /* todos os blocos de cômodo seguem o mesmo formato, inclusive "Sem cômodo" */
   const tile = (id, name, icon, v, k, cls="") => `<button class="room ${cls}" data-act="room" data-id="${id}" style="animation-delay:${k*45}ms" aria-label="${esc(name)}: ${v.count ? money(v.value) + ", " + buysTxt(v.count) : "nenhuma compra"}">
@@ -1642,27 +2217,22 @@ function viewHouse(){
       <span class="ic">${ic(icon)}</span><span><div class="nm">${esc(name)}</div><div class="vl">${v.count ? money(v.value) : "Nenhuma compra"}</div><span class="share" title="${t.value ? Math.round(v.value / t.value * 100) : 0}% do total"><i data-w="${t.value ? (v.value / t.value * 100).toFixed(1) : 0}"></i></span>${wl(id)}</span></button>`;
   const tiles = S.rooms.map((r, k) => tile(r.id, r.name, r.icon, per.get(r.id) || { value:0, count:0 }, k)).join("");
   const noneTile = none ? tile("none", "Sem cômodo", "box", none, S.rooms.length, "none") : "";
-  const add = canEdit() ? `<button class="room add" data-act="addRoom" style="animation-delay:${(S.rooms.length+1)*45}ms">${ic("plus")} Novo cômodo</button>` : "";
+  const addH = canEdit() && (S.rooms.length || none) ? `<button class="chip" data-act="addRoom">${ic("plus")} Novo</button>` : "";
   return `<div class="page-t"><h2>Casa</h2></div>
   <div class="home">
-  <div class="card summary">
-    <div><div class="label">Total do enxoval</div><div class="v" data-count="${t.value}">${money(t.value)}</div></div>
-    <div class="side">${buysTxt(t.count)}<br>${qtyTxt(t.qty)}</div>
+  <div class="hero-t">
+    <div class="label">Total do enxoval</div><div class="v" data-count="${t.value}">${money(t.value)}</div>
+    <div class="caps"><span class="cap">${buysTxt(t.count)}</span><span class="cap">${qtyTxt(t.qty)}</span>${S.wish.length ? `<button class="cap b" data-act="toWish">${ic("bookmark")}${wishTxt(S.wish.length)}</button>` : ""}</div>
   </div>
   <div class="house">
-    <svg class="roof" viewBox="0 0 400 70" preserveAspectRatio="none" aria-hidden="true">
-      <path class="r1" d="M1 69 L186 6 Q200 1 214 6 L399 69 Z"/>
-      <path class="r2" d="M60 69 L192 24 Q200 21 208 24 L340 69 Z" opacity=".7"/>
-      <rect class="r1" x="300" y="16" width="22" height="30" rx="4"/>
-    </svg>
+    <div class="section-t house-h"><h3>Cômodos</h3>${addH}</div>
     <div class="house-body">
-      ${S.rooms.length || none ? `<div class="rooms">${tiles}${noneTile}${add}</div>` : `<div class="empty"><h4>Nenhum cômodo ainda</h4><p>Adicione os cômodos do apartamento para organizar as compras.</p>${addBtn("Novo cômodo", `data-act="addRoom"`)}</div>`}
-      <div class="door"><span></span></div>
+      ${S.rooms.length || none ? `<div class="rooms">${tiles}${noneTile}</div>` : `<div class="empty"><h4>Nenhum cômodo ainda</h4><p>Adicione os cômodos do apartamento para organizar as compras.</p>${addBtn("Novo cômodo", `data-act="addRoom"`)}</div>`}
     </div>
   </div>
   <div class="recent">
     <div class="section-t"><h3>Últimas compras</h3>${S.items.length ? `<button class="btn soft sm" data-act="tab" data-tab="compras">Ver todas</button>` : ""}</div>
-    ${S.items.length ? `<div class="card group">${byRecent(S.items).slice(0,12).map(itemRow).join("")}</div>` : emptyBox({ mt:false, text:"As compras registradas aparecem aqui.", action:addBtn("Nova compra", `data-act="addItem"`) })}
+    ${S.items.length ? `<div class="card group">${byRecent(S.items).slice(0,6).map(itemRow).join("")}</div>` : emptyBox({ mt:false, text:"As compras registradas aparecem aqui.", action:addBtn("Nova compra", `data-act="addItem"`) })}
   </div>
   </div>`;
 }
@@ -1670,7 +2240,7 @@ function wishRow(i, showRoom){
   const r = roomById(i.room_id), s = storeById(i.store_id);
   const pg = curPage();
   const sub = [+i.unit_price ? money(itemTotal(i)) : null, s && pg?.kind !== "store" ? s.name : null, showRoom === true || (pg?.kind !== "room" && !(!pg && S.tab === "compras" && S.list === "wish")) ? (r ? r.name : "Sem cômodo") : null].filter(Boolean).join(" · ");
-  const ph = i.photo_path && S.photos[i.photo_path];
+  const ph = photoOf(i);
   return `<div class="it wish ${i.favorite ? "is-fav" : ""}" data-act="item" data-id="${i.id}" role="button" tabindex="0">
     <span class="thumb">${ph ? `<img src="${esc(ph)}" alt="" loading="lazy">` : ic(r ? r.icon : "bookmark")}</span>
     <span class="mid"><div class="nm">${esc(i.name)}</div><div class="sub">${esc(sub || "Sem valor estimado")}</div></span>
@@ -1689,6 +2259,7 @@ async function toggleFav(it){
   if (offlineBlock()) return false;
   if (!S.hasFav) { toast("Os favoritos ainda não estão ativos no banco de dados", true); return false; }
   const v = !it.favorite; it.favorite = v; render();
+  $$(`[data-act=fav][data-id="${it.id}"]`).forEach(b => { b.classList.remove("pop"); void b.offsetWidth; b.classList.add("pop"); });
   const { error } = await sb.from("items").update({ favorite:v }).eq("id", it.id);
   if (error) { it.favorite = !v; render(); toast(friendlyError(error), true); return false; }
   saveSnapshot();
@@ -1701,7 +2272,7 @@ function itemRow(i){
   const pg = curPage();
   /* linha de baixo: loja e cômodo (o que a tela atual já mostra fica de fora) */
   const sub = [pg?.kind !== "store" ? (s ? s.name : "Sem loja") : null, pg?.kind !== "room" && pg?.kind !== "day" ? (r ? r.name : "Sem cômodo") : null].filter(Boolean).join(" · ");
-  const ph = i.photo_path && S.photos[i.photo_path];
+  const ph = photoOf(i);
   return `<button class="it" data-act="item" data-id="${i.id}">
     <span class="thumb">${ph ? `<img src="${esc(ph)}" alt="" loading="lazy">` : ic(r ? r.icon : "box")}</span>
     <span class="mid"><div class="nm">${esc(i.name)}</div><div class="sub">${esc(sub)}</div></span>
@@ -1717,7 +2288,7 @@ function groupHead(kind, id, title, right){
 /* lista contínua, sem divisão por datas: as mais recentes primeiro */
 function groupedList(list){
   if (!list.length) return "";
-  return `<div class="card group two mt">${byRecent(list).map(itemRow).join("")}</div>`;
+  return `<div class="card group two flat">${byRecent(list).map(itemRow).join("")}</div>`;
 }
 /* ---------- cômodo ---------- */
 function viewRoom(id){
@@ -1726,10 +2297,8 @@ function viewRoom(id){
   if (!r) { if (S.roomId === id) { S.roomId = null; return viewHouse(); } return ""; }
   const match = i => none ? !(i.room_id && roomById(i.room_id)) : i.room_id === id;
   const list = S.items.filter(match), wl = S.wish.filter(match), t = totals(list);
-  return pageHead(r.icon, r.name, pageLine(t, wl.length), canEdit() && !none ? `data-act="editRoom" data-id="${r.id}"` : "")
-    + (list.length ? groupedList(list) : wl.length || none ? emptyBox({ slim:true, text:`Nenhuma compra registrada ${none ? "sem cômodo" : "neste cômodo"}.` })
-      : emptyBox({ title:"Nenhuma compra ainda", text:"As compras deste cômodo aparecem aqui.", action:addBtn("Nova compra", `data-act="addItem" data-room="${r.id}"`) }))
-    + wishSection(wl, !none ? `data-room="${r.id}"` : "");
+  return pageHead(r.icon, r.name, pageSub(t, 0), canEdit() && !none ? `data-act="editRoom" data-id="${r.id}"` : "", money(t.value))
+    + pageTabs(list, wl, `Nenhuma compra registrada ${none ? "sem cômodo" : "neste cômodo"}.`, !none ? `data-room="${r.id}"` : "");
 }
 
 /* ---------- compras ---------- */
@@ -1754,7 +2323,7 @@ const byRecent = arr => [...arr].sort((a, b) => recentKey(b).localeCompare(recen
 const byName = arr => [...arr].sort((a, b) => String(a.name).localeCompare(String(b.name), "pt-BR"));
 const photoOf = i => { const p = itemPhotos(i)[0]; return p ? S.photos[p] : ""; };
 const thumbIn = (i, icon) => { const ph = photoOf(i); return ph ? `<img src="${esc(ph)}" alt="" loading="lazy">` : ic(icon); };
-function relist(){ const el = $("#items-list"); if (el) el.innerHTML = itemsListHtml(); else render(); }
+function relist(){ const el = $("#items-list"); if (el) { el.innerHTML = itemsListHtml(); riseIn(el, ".pgrid>*,.wgrid>*,.w-sec,.card.group>*"); } else render(); }
 function sortedBought(list){ return S.sort === "value" ? [...list].sort((a, b) => itemTotal(b) - itemTotal(a)) : S.sort === "name" ? byName(list) : byRecent(list); }
 function pageOf(list){ const n = Math.max(1, Math.ceil(list.length / perPage())); S.pg = Math.max(0, Math.min(S.pg, n - 1)); return list.slice(S.pg * perPage(), S.pg * perPage() + perPage()); }
 function pager(total){
@@ -1784,19 +2353,22 @@ function wishCard(i, showRoom){
 function wishBody(list){
   const groups = wishGroups(list), cur = groups.find(g => g.k === S.wroom), arr = cur ? cur.arr : favFirst(list);
   return `<div class="chips wtabs" role="group" aria-label="Filtrar por cômodo"><button class="chip ${cur ? "" : "on"}" data-act="wtab" data-k="" aria-pressed="${!cur}">Todos <span class="seg-n">${list.length}</span></button>${groups.map(g => `<button class="chip ${cur && cur.k === g.k ? "on" : ""}" data-act="wtab" data-k="${g.k}" aria-pressed="${!!(cur && cur.k === g.k)}">${ic(g.icon)}${esc(g.name)} <span class="seg-n">${g.arr.length}</span></button>`).join("")}</div>
-    ${cur ? `<div class="card summary compact mt"><div><div class="label">Falta em ${esc(cur.name)}</div><div class="v">${money(totals(cur.arr).value)}</div></div><div class="side">${qtyTxt(cur.arr.length)}</div></div>` : ""}
-    <div class="wgrid">${arr.map(i => wishCard(i, !cur)).join("")}</div>`;
+    ${wishSections(arr, !cur)}`;
+}
+/* quero comprar: favoritos (próximas compras) numa seção no topo; o resto embaixo, mais apagado */
+function wishSections(arr, showRoom){
+  const favs = S.hasFav ? arr.filter(i => i.favorite) : [], rest = arr.filter(i => !favs.includes(i));
+  const sec = (cls, title, list) => `<div class="w-sec ${cls}"><span>${title}</span><b>${money(totals(list).value)}</b></div><div class="wgrid ${cls}">${list.map(i => wishCard(i, showRoom)).join("")}</div>`;
+  if (!favs.length) return sec("", "Itens", rest);
+  return sec("fav", `${ic("star")} Próximas compras`, favs) + (rest.length ? sec("rest", "Outros itens", rest) : "");
 }
 function wishListHtml(){
   const favN = S.wish.filter(i => i.favorite).length;
   /* o cômodo aqui é escolhido pelas abas; o filtro de cômodo do topo não vale para esta lista */
-  const list = filteredItems(S.wish, true).filter(i => !S.filter.fav || i.favorite);
+  const list = filteredItems(S.wish, true);
   if (!S.wish.length) return emptyBox({ icon:"bookmark", title:"Nenhum item na lista", text:"Guarde aqui o que ainda falta comprar, com o link do produto. Os itens da lista não entram no total do enxoval.", action:addBtn("Adicionar à lista", `data-act="addItem" data-planned="1"`) });
-  if (!list.length) return emptyBox({ text: S.filter.fav && !favN ? "Nenhum item nos favoritos. Toque na estrela de um item para favoritar." : "Nenhum item encontrado com este filtro." });
-  /* soma dos favoritos (valor × quantidade): só aparece com o filtro Favoritos ligado */
-  const favs = S.hasFav && S.filter.fav ? S.wish.filter(i => i.favorite) : [], ft = totals(favs);
-  const favSum = favs.length ? `<div class="card summary compact fav-sum"><div><div class="label">Total dos favoritos</div><div class="v">${money(ft.value)}</div></div><div class="side">${plural(favs.length, "favorito", "favoritos")}<br>${plural(ft.qty, "unidade", "unidades")}</div></div>` : "";
-  return favSum + wishBody(list);
+  if (!list.length) return emptyBox({ text:"Nenhum item encontrado com este filtro." });
+  return wishBody(list);
 }
 function itemsListHtml(){
   if (S.list === "wish") return wishListHtml();
@@ -1817,14 +2389,11 @@ function viewItems(){
       <button data-act="list" data-mode="bought" class="${S.list!=="wish"?"on":""}">${ic("bag")} Compradas</button>
       <button data-act="list" data-mode="wish" class="${S.list==="wish"?"on":""}">${ic("bookmark")} Quero comprar${S.wish.length ? `<span class="seg-n">${S.wish.length}</span>` : ""}</button></div>
     <div class="filters"><div class="search">${ic("search")}<input class="input" id="q" type="search" placeholder="${S.list === "wish" ? "Buscar item, loja ou cômodo" : "Buscar compra, loja ou cômodo"}" aria-label="Buscar" value="${esc(f.q)}" autocomplete="off"><button type="button" class="search-x" data-act="clearSearch" aria-label="Limpar busca" title="Limpar busca">${ic("x")}</button></div>
-    <div class="f-row">
-      ${S.list === "wish" ? "" : `<div class="room-w"><select class="select" id="f-room" aria-label="Filtrar por cômodo">
-        <option value="all" data-icon="home" ${f.room==="all"?"selected":""}>Todos</option>
-        ${S.rooms.map(r => `<option value="${r.id}" data-icon="${esc(r.icon)}" ${f.room===r.id?"selected":""}>${esc(r.name)}</option>`).join("")}
-        ${hasNone || f.room === "none" ? `<option value="none" data-icon="box" ${f.room==="none"?"selected":""}>Sem cômodo</option>` : ""}
-      </select></div>`}
-      ${S.list === "wish" && S.hasFav && S.wish.length ? (n => `<button class="fav-f ${f.fav ? "on" : ""}" data-act="fFav" aria-pressed="${!!f.fav}">${ic("star")}<span>Favoritos</span>${n ? `<span class="seg-n">${n}</span>` : ""}</button>`)(S.wish.filter(i => i.favorite).length) : ""}
-    </div></div>
+    ${S.list === "wish" ? "" : `<div class="chips rchips" role="group" aria-label="Filtrar por cômodo">
+        <button class="chip ${f.room==="all"?"on":""}" data-act="fRoom" data-id="all" aria-pressed="${f.room==="all"}">Todos</button>
+        ${S.rooms.map(r => `<button class="chip ${f.room===r.id?"on":""}" data-act="fRoom" data-id="${r.id}" aria-pressed="${f.room===r.id}">${ic(r.icon)}${esc(r.name)}</button>`).join("")}
+        ${hasNone || f.room === "none" ? `<button class="chip ${f.room==="none"?"on":""}" data-act="fRoom" data-id="none" aria-pressed="${f.room==="none"}">${ic("box")}Sem cômodo</button>` : ""}
+      </div>`}</div>
     ${st ? `<div class="chips mt-sm"><button class="chip on" data-act="fStore" data-id="" aria-label="Tirar filtro da loja ${esc(st.name)}">${ic("store")}${esc(st.name)} ${ic("x")}</button></div>` : ""}
     <div id="items-list">${itemsListHtml()}</div>`;
 }
@@ -1849,7 +2418,7 @@ function viewDash(){
   }
   return `<div class="page-t"><h2>Painel</h2></div>
   <div class="dash-top">
-    <div class="card summary"><div><div class="label">Total do enxoval</div><div class="v" data-count="${t.value}">${money(t.value)}</div></div><div class="side">${plural(S.rooms.length, "cômodo", "cômodos")}<br>${plural(S.stores.length, "loja", "lojas")}</div></div>
+    <div class="hero-t"><div class="label">Total do enxoval</div><div class="v" data-count="${t.value}">${money(t.value)}</div><div class="caps"><span class="cap">${plural(S.rooms.length, "cômodo", "cômodos")}</span><span class="cap">${plural(S.stores.length, "loja", "lojas")}</span></div></div>
     <div class="card kpi"><span class="k-ic">${ic("bag")}</span><div class="label">Compras</div><div class="v">${t.count}</div></div>
     <div class="card kpi"><span class="k-ic">${ic("box")}</span><div class="label">Itens</div><div class="v">${(+t.qty).toLocaleString("pt-BR")}</div></div>
     <div class="card kpi"><span class="k-ic">${ic("chart")}</span><div class="label" title="Média por compra">Média</div><div class="v" title="${money(t.count ? t.value / t.count : 0)}">${moneyShort(t.count ? t.value / t.count : 0)}</div></div>
@@ -1857,7 +2426,7 @@ function viewDash(){
 }
 function barsCard(rows, total, attrs, two){
   const mx = Math.max(...rows.map(r => r.v.value), 1);
-  return `<div class="card bars ${two && rows.length > 1 ? "two" : ""}">${rows.map(r => `<button class="bar" ${attrs(r)}>
+  return `<div class="card bars flat ${two && rows.length > 1 ? "two" : ""}">${rows.map(r => `<button class="bar" ${attrs(r)}>
     <div class="top-l"><span>${ic(r.icon)}<em>${esc(r.name)}</em></span><b>${money(r.v.value)}${ic("right")}</b></div>
     <div class="track"><div class="fill" data-w="${(r.v.value / mx * 100).toFixed(1)}"></div></div>
     <div class="meta">${buysTxt(r.v.count)} · ${qtyTxt(r.v.qty)} · ${total ? Math.round(r.v.value / total * 100) : 0}% do total</div></button>`).join("")}</div>`;
@@ -1867,12 +2436,25 @@ function barsCard(rows, total, attrs, two){
 function viewStores(){
   const per = byKey(S.items, i => i.store_id);
   const list = S.stores.map(s => ({ s, v: per.get(s.id) || { value:0, count:0 } })).sort((a,b) => b.v.value - a.v.value || a.s.name.localeCompare(b.s.name));
-  return `<div class="page-t"><h2>Lojas</h2>${canEdit() && list.length ? `<button class="btn soft sm" data-act="addStore">${ic("plus")} Nova loja</button>` : ""}</div>
-  ${list.length ? `<div class="card group two">${list.map(({s, v}) => `<button class="it" data-act="store" data-id="${s.id}">
-      <span class="store-ic">${ic(s.kind === "online" ? "globe" : "store")}</span>
-      <span class="mid"><div class="nm">${esc(s.name)}</div><div class="sub">${esc([s.kind === "online" ? "Online" : "Loja física", s.location].filter(Boolean).join(" · "))}</div></span>
-      <span class="val"><b>${money(v.value)}</b><small>${buysTxt(v.count)}</small></span></button>`).join("")}</div>`
+  const tot = totals(S.items).value;
+  return `<div class="page-t"><div><h2>Lojas</h2>${list.length ? `<p>${plural(list.length, "loja", "lojas")} · ${money(tot)}</p>` : ""}</div></div>
+  ${list.length ? `<div class="search st-search">${ic("search")}<input class="input" id="sq" type="search" placeholder="Buscar loja" aria-label="Buscar loja" value="${esc(S.sq || "")}" autocomplete="off"><button type="button" class="search-x" data-act="clearSearch" aria-label="Limpar busca" title="Limpar busca">${ic("x")}</button></div>
+  <div id="st-list">${storesListHtml(list)}</div>`
   : emptyBox({ mt:false, icon:"store", title:"Nenhuma loja ainda", text:"Adicione as lojas das compras para ver quanto foi gasto em cada uma.", action:addBtn("Nova loja", `data-act="addStore"`) })}`;
+}
+function storesList(){
+  const per = byKey(S.items, i => i.store_id);
+  return S.stores.map(s => ({ s, v: per.get(s.id) || { value:0, count:0 } })).sort((a,b) => b.v.value - a.v.value || a.s.name.localeCompare(b.s.name));
+}
+function storesListHtml(list){
+  const q = String(S.sq || "").trim().toLowerCase();
+  const show = (list || storesList()).filter(({s}) => !q || [s.name, s.location].join(" ").toLowerCase().includes(q));
+  return `<div class="card group two flat">${show.map(({s, v}) => `<button class="it" data-act="store" data-id="${s.id}">
+      <span class="store-ic">${ic(s.kind === "online" ? "globe" : "store")}</span>
+      <span class="mid"><div class="nm">${esc(s.name)}</div><div class="sub">${esc([buysTxt(v.count), s.kind === "online" ? "Online" : s.location].filter(Boolean).join(" · "))}</div></span>
+      <span class="val"><b>${money(v.value)}</b></span><span class="chev">${ic("right")}</span></button>`).join("")}
+    ${canEdit() && !q ? `<button class="it add-row" data-act="addStore"><span class="store-ic">${ic("plus")}</span><span class="mid"><div class="nm">Nova loja</div></span></button>` : ""}</div>
+    ${!show.length ? emptyBox({ slim:true, text:"Nenhuma loja encontrada." }) : ""}`;
 }
 
 /* ================= MENU DE SELEÇÃO (visual do app) =================
@@ -2040,8 +2622,10 @@ function itemForm(item, preset={}){
   const multi = S.hasMulti, maxPh = multi ? MAX_PHOTOS : 1;
   const srcOf = x => x.file ? (x.url || (x.url = URL.createObjectURL(x.file))) : (S.photos[x.path] || "");
   const dropPhoto = x => { if (x.path) dropped.push(x.path); if (x.url) URL.revokeObjectURL(x.url); };
-  const photoHtml = () => { const has = phs.length > 0; return `<div class="photo ${has?"has":""}" id="ph">${has ? carHtml(phs.map(srcOf)) : `${ic("image")}<span style="font-size:14px">${multi ? "Fotos do produto (opcional)" : "Foto do produto (opcional)"}</span>`}
-      <div class="pbtns"><label>${ic("camera")} Câmera<input type="file" accept="image/*" capture="environment" hidden data-file></label><label>${ic("image")} Galeria<input type="file" accept="image/*" ${multi ? "multiple" : ""} hidden data-file></label>${has ? `<button type="button" data-crop aria-label="Recortar foto" title="Recortar foto">${ic("crop")}</button><button type="button" data-rmph aria-label="Remover foto" title="Remover foto">${ic("trash")}</button>` : ""}</div></div>`; };
+  /* fotos numa linha só (miniaturas + botões), para o cadastro caber na tela sem rolar */
+  const photoHtml = () => { const has = phs.length > 0; return `<div class="frow ph-row ${has?"has":""}" id="ph"><span class="fi">${ic("image")}</span>
+      <span class="fm">${has ? `<span class="ph-strip">${phs.map((x, k) => `<button type="button" class="ph-th ${k===cur?"on":""}" data-pk="${k}" aria-label="Foto ${k + 1}"><img src="${esc(srcOf(x))}" alt=""></button>`).join("")}</span>` : `<small>${multi ? "Fotos" : "Foto"}</small><span class="ph-ph">Opcional</span>`}</span>
+      <span class="pbtns">${has ? `<button type="button" data-crop aria-label="Recortar foto" title="Recortar foto">${ic("crop")}</button><button type="button" data-rmph aria-label="Remover foto" title="Remover foto">${ic("trash")}</button>` : ""}<label aria-label="Tirar foto" title="Tirar foto">${ic("camera")}<input type="file" accept="image/*" capture="environment" hidden data-file></label><label aria-label="Escolher da galeria" title="Escolher da galeria">${ic("image")}<input type="file" accept="image/*" ${multi ? "multiple" : ""} hidden data-file></label></span></div>`; };
   /* links do produto: com vários links, cada um entra numa lista compacta embaixo do campo */
   let links = itemLinks(it).slice();
   const linkLi = (l, k) => `<li>${ic("link")}<a href="${esc(l)}" target="_blank" rel="noopener"><b>${esc(linkHost(l))}</b><span>${esc(linkPath(l))}</span></a><button type="button" data-rmlink="${k}" aria-label="Remover link" title="Remover link">${ic("x")}</button></li>`;
@@ -2052,20 +2636,18 @@ function itemForm(item, preset={}){
   const saveTxt = () => "Salvar";
   openSheet(`<form id="itf" novalidate class="${planned ? "is-wish" : ""}">
     <div class="sheet-h"><h3 id="it-t">${title()}</h3>${S.hasFav && !preset.buy ? `<button type="button" class="iconbtn fav-ic ${fav ? "on" : ""}" id="it-fav" aria-pressed="${fav}" aria-label="${favT()}" title="${favT()}" ${planned ? "" : "hidden"}>${ic("star")}</button>` : ""}<button type="button" class="iconbtn" data-close aria-label="Fechar" title="Fechar">${ic("x")}</button></div>
-    ${preset.buy ? "" : `<label class="switch-row"><span class="sw-ic">${ic("bookmark")}</span><span class="sw-tx"><b>Quero comprar</b><small>Ainda não comprei. Fica na lista e não entra no total</small></span><input type="checkbox" name="planned" ${planned ? "checked" : ""}><span class="sw" aria-hidden="true"></span></label>`}
-    <div class="wish-only"><div class="wish-in"><label class="field"><span>${multi ? "Links do produto (opcional)" : "Link do produto (opcional)"}</span><div class="link-in ${multi ? "multi" : ""}">${ic("link")}<input class="input" name="link" type="url" inputmode="url" autocapitalize="off" spellcheck="false" placeholder="Cole aqui o link do produto" value="${multi ? "" : esc(links[0] || "")}" autocomplete="off">${multi ? `<button type="button" class="link-add" data-addlink aria-label="Adicionar link" title="Adicionar link">${ic("plus")}</button>` : ""}</div></label>${multi ? `<ul class="link-list" id="links">${links.map(linkLi).join("")}</ul>` : ""}</div></div>
-    <div id="phw">${photoHtml()}</div>
-    <label class="field"><span>Nome do produto</span><input class="input" name="name" value="${esc(it.name)}" placeholder="Ex.: Jogo de panelas" maxlength="120" autocomplete="off"></label>
-    <div class="row2" id="row-rd">
-      <label class="field"><span>Cômodo</span><select class="select" name="room"><option value="" data-icon="box">Sem cômodo</option>${S.rooms.map(r => `<option value="${r.id}" data-icon="${esc(r.icon)}" ${r.id===it.room_id?"selected":""}>${esc(r.name)}</option>`).join("")}</select></label>
-      <label class="field"><span>Loja</span><select class="select" name="store">${storeOpts()}</select></label>
+    <div class="f-money"><span>R$</span><input name="price" inputmode="numeric" placeholder="0,00" value="${priceStr}" aria-labelledby="price-l"></div>
+    <div class="f-hint"><span id="price-l">Cada unidade</span> · <span id="tot-l">${planned ? "total estimado" : "total"}</span> <b id="tot">${money(itemTotal(it))}</b></div>
+    ${preset.buy ? "" : `<div class="seg nopill f-mode" role="group" aria-label="Tipo"><button type="button" data-pm="0" class="${planned ? "" : "on"}" aria-pressed="${!planned}">${ic("bag")} Comprei</button><button type="button" data-pm="1" class="${planned ? "on" : ""}" aria-pressed="${planned}">${ic("bookmark")} Quero comprar</button><input type="checkbox" name="planned" ${planned ? "checked" : ""} hidden></div>`}
+    <div class="frows">
+      <label class="frow"><span class="fi">${ic("tag")}</span><span class="fm"><small>Nome do produto</small><input class="input" name="name" value="${esc(it.name)}" placeholder="Ex.: Jogo de panelas" maxlength="120" autocomplete="off"></span></label>
+      <label class="frow"><span class="fi">${ic("home")}</span><span class="fm"><small>Cômodo</small><select class="select" name="room"><option value="" data-icon="box">Sem cômodo</option>${S.rooms.map(r => `<option value="${r.id}" data-icon="${esc(r.icon)}" ${r.id===it.room_id?"selected":""}>${esc(r.name)}</option>`).join("")}</select></span></label>
+      <label class="frow"><span class="fi">${ic("store")}</span><span class="fm"><small>Loja</small><select class="select" name="store">${storeOpts()}</select></span></label>
+      <div class="frow fq"><span class="fi">${ic("box")}</span><span class="fm">Quantidade</span><div class="stepper"><button type="button" data-q="-1" aria-label="Diminuir quantidade">${ic("minus")}</button><input name="qty" inputmode="numeric" value="${+it.quantity || 1}" aria-label="Quantidade"><button type="button" data-q="1" aria-label="Aumentar quantidade">${ic("plus")}</button></div></div>
+      <div id="phw">${photoHtml()}</div>
+      <label class="frow"><span class="fi">${ic("edit")}</span><span class="fm"><small>Observações</small><textarea class="input" name="notes" rows="1" maxlength="500" placeholder="Opcional">${esc(it.notes || "")}</textarea></span></label>
     </div>
-    <div class="row2">
-      <label class="field"><span>Quantidade</span><div class="stepper"><button type="button" data-q="-1" aria-label="Diminuir quantidade">${ic("minus")}</button><input name="qty" inputmode="numeric" value="${+it.quantity || 1}" aria-label="Quantidade"><button type="button" data-q="1" aria-label="Aumentar quantidade">${ic("plus")}</button></div></label>
-      <label class="field"><span id="price-l">${planned ? "Valor estimado (R$)" : "Valor unitário (R$)"}</span><input class="input" name="price" inputmode="numeric" placeholder="0,00" value="${priceStr}"></label>
-    </div>
-    <div class="total-line"><span class="muted" id="tot-l">${planned ? "Total estimado" : "Total"}</span><b id="tot">${money(itemTotal(it))}</b></div>
-    <label class="field"><span>Observações (opcional)</span><textarea class="input" name="notes" rows="2" maxlength="500" placeholder="Ex.: cor, tamanho, garantia, entrega">${esc(it.notes || "")}</textarea></label>
+    <div class="wish-only"><div class="wish-in"><label class="field mt"><span>${multi ? "Links do produto (opcional)" : "Link do produto (opcional)"}</span><div class="link-in ${multi ? "multi" : ""}">${ic("link")}<input class="input" name="link" type="url" inputmode="url" autocapitalize="off" spellcheck="false" placeholder="Cole aqui o link do produto" value="${multi ? "" : esc(links[0] || "")}" autocomplete="off">${multi ? `<button type="button" class="link-add" data-addlink aria-label="Adicionar link" title="Adicionar link">${ic("plus")}</button>` : ""}</div></label>${multi ? `<ul class="link-list" id="links">${links.map(linkLi).join("")}</ul>` : ""}</div></div>
     <div class="sheet-actions">${!isNew && !preset.buy ? `<button type="button" class="btn danger icon" data-del aria-label="Excluir" title="Excluir">${ic("trash")}</button>` : ""}<button class="btn primary" type="submit" id="its">${saveTxt()}</button></div>
   </form>`, w => {
     const f = $("#itf", w);
@@ -2074,12 +2656,16 @@ function itemForm(item, preset={}){
     const applyMode = () => {
       f.classList.toggle("is-wish", planned);
       $("#it-t", w).textContent = title(); $("#its", w).textContent = saveTxt();
-      $("#price-l", w).textContent = planned ? "Valor estimado (R$)" : "Valor unitário (R$)";
-      $("#tot-l", w).textContent = planned ? "Total estimado" : "Total";
+      $("#price-l", w).textContent = "Cada unidade";
+      $("#tot-l", w).textContent = planned ? "total estimado" : "total";
+      $$("[data-pm]", w).forEach(b => { const on = (b.dataset.pm === "1") === planned; b.classList.toggle("on", on); b.setAttribute("aria-pressed", on); });
       const fb = $("#it-fav", w); if (fb) fb.hidden = !planned;
     };
     const fb = $("#it-fav", w); if (fb) fb.onclick = () => { fav = !fav; fb.classList.toggle("on", fav); fb.setAttribute("aria-pressed", fav); fb.setAttribute("aria-label", favT()); fb.title = favT(); };
-    const sw = f.planned; if (sw) sw.addEventListener("change", () => { planned = sw.checked; applyMode(); if (planned) setTimeout(() => f.link.focus(), 220); });
+    const sw = f.planned; if (sw) sw.addEventListener("change", () => { planned = sw.checked; applyMode(); });
+    $$("[data-pm]", w).forEach(b => b.onclick = () => { if (!sw) return; const v = b.dataset.pm === "1"; if (sw.checked === v) return; sw.checked = v; sw.dispatchEvent(new Event("change")); });
+    /* observações: o campo cresce conforme o texto */
+    const grow = () => { f.notes.style.height = "auto"; f.notes.style.height = f.notes.scrollHeight + "px"; }; f.notes.addEventListener("input", grow); requestAnimationFrame(grow);
     moneyMask(f.price); f.price.addEventListener("money", upd);
     f.qty.addEventListener("input", () => { f.qty.value = f.qty.value.replace(/\D/g, "").slice(0, 4); upd(); });
     f.qty.addEventListener("blur", () => { f.qty.value = qty(); upd(); });
@@ -2088,6 +2674,7 @@ function itemForm(item, preset={}){
     const wirePhoto = () => {
       const show = () => { $("#phw", w).innerHTML = photoHtml(); wirePhoto(); };
       wireCar($("#ph", w), cur, k => { cur = k; });
+      $$("[data-pk]", w).forEach(t => t.onclick = () => { cur = +t.dataset.pk; $$("[data-pk]", w).forEach(x => x.classList.toggle("on", x === t)); });
       $$("[data-file]", w).forEach(inp => inp.onchange = async () => {
         const files = [...(inp.files || [])]; inp.value = ""; if (!files.length) return;
         const imgs = files.filter(file => /^image\//.test(file.type) || /\.(heic|heif)$/i.test(file.name));
@@ -2207,8 +2794,8 @@ function itemDetail(id){
     ${wish ? `<div class="wish-tag">${ic("bookmark")} Quero comprar · não entra no total</div>` : ""}
     ${phs.length > 1 ? `<div class="detail-photo multi" data-zoom role="button" aria-label="Ver foto em tela cheia">${carHtml(phs)}<span class="zoom">${ic("expand")}</span></div>`
       : phs.length ? `<div class="detail-photo" data-zoom role="button" aria-label="Ver foto em tela cheia"><img src="${esc(phs[0])}" alt=""><span class="zoom">${ic("expand")}</span></div>` : ""}
-    <div class="card summary compact ${wish ? "ghost" : ""}"><div><div class="label">${wish ? "Total estimado" : "Total"}</div><div class="v">${money(itemTotal(it))}</div></div><div class="side">${(+it.quantity).toLocaleString("pt-BR")} × ${money(it.unit_price)}</div></div>
-    <div class="card kv">
+    <div class="dt-hero"><div class="v">${money(itemTotal(it))}</div><small>${wish ? "Total estimado · " : ""}${(+it.quantity).toLocaleString("pt-BR")} × ${money(it.unit_price)}</small></div>
+    <div class="card kv flat">
       ${kvGo("room", r ? r.id : "none", "Cômodo", r ? r.name : "Sem cômodo")}
       ${kvGo("store", s ? s.id : "none", "Loja", s ? s.name : "Sem loja")}
       ${wish ? (links.length > 1 ? `<div class="block links-b"><span>Links</span>${links.map(l => `<a class="kv-link" href="${esc(l)}" target="_blank" rel="noopener">${ic("external")}<span>${esc(linkHost(l) + linkPath(l))}</span></a>`).join("")}</div>`
@@ -2340,10 +2927,10 @@ function newProjectForm(){
 }
 function projectsSheet(){
   openSheet(`<div class="sheet-h"><h3>Meus projetos</h3><button class="iconbtn" data-close aria-label="Fechar" title="Fechar">${ic("x")}</button></div>
-    <div class="card group">${S.projects.map(p => { const mine = p.owner_id === S.user.id; return `<button class="proj-row" data-pid="${p.id}"><span class="store-ic">${ic("home")}</span><span class="mid">${esc(p.name)}<small>${mine ? "Criado por você" : "Compartilhado com você"}</small></span>${S.project && p.id === S.project.id ? `<span class="ok">${ic("check")}</span>` : ""}</button>`; }).join("")}</div>
-    <div class="sheet-actions">${S.project ? `<button class="btn soft" data-set>${ic("gear")} Configurar</button>` : ""}<button class="btn primary" data-new>${ic("plus")} Novo projeto</button></div>`, w => {
+    <div class="pj-list">${S.projects.map(p => { const mine = p.owner_id === S.user.id, on = S.project && p.id === S.project.id; return `<button class="pj-c ${on ? "on" : ""}" data-pid="${p.id}"><span class="pj-i">${ic("home")}</span><span class="mid"><b>${esc(p.name)}</b><small>${mine ? "Criado por você" : "Compartilhado com você"}</small></span>${on ? `<span class="pj-tag">Aberto</span>` : `<span class="chev">${ic("right")}</span>`}</button>`; }).join("")}<button class="pj-c add" data-new2><span class="pj-i">${ic("plus")}</span><span class="mid"><b>Novo projeto</b><small>Outra casa ou outro enxoval</small></span></button></div>
+    ${S.project ? `<div class="sheet-actions"><button class="btn soft" data-set>${ic("gear")} Configurar ${esc(S.project.name)}</button></div>` : ""}`, w => {
     $$("[data-pid]", w).forEach(b => b.onclick = async () => { closeSheet(w); if (b.dataset.pid !== S.project?.id) { S.tab = "casa"; await openProject(b.dataset.pid); } });
-    $("[data-new]", w).onclick = () => { closeSheet(w); setTimeout(newProjectForm, 150); };
+    $("[data-new2]", w).onclick = () => { closeSheet(w); setTimeout(newProjectForm, 150); };
     const st = $("[data-set]", w); if (st) st.onclick = () => { closeSheet(w); setTimeout(projectSettings, 150); };
   });
 }
@@ -2399,18 +2986,22 @@ function shareSheet(){
       ? `<select class="select" data-role="${m.id}"><option value="editor" data-icon="edit" ${m.role==="editor"?"selected":""}>Pode editar</option><option value="viewer" data-icon="eye" ${m.role==="viewer"?"selected":""}>Só visualizar</option></select><button type="button" class="iconbtn" data-rm="${m.id}" aria-label="Remover acesso" title="Remover acesso">${ic("x")}</button>`
       : `<span class="badge ${m.role==="owner"?"owner":""}">${ROLE[m.role] || m.role}</span>`;
     /* nome em cima e e-mail embaixo, como no resto do app */
-    return `<div class="member"><span class="avatar">${esc(initials(personName(m.email)))}</span><span class="mid"><b>${esc(personName(m.email))}${me ? " (você)" : ""}</b><small>${esc(m.email)}</small></span>${ctrl}</div>`;
+    return `<div class="member"><span class="avatar g${(m.email.length % 3)}">${esc(initials(personName(m.email)))}</span><span class="mid"><b>${esc(personName(m.email))}${me ? " (você)" : ""}</b><small>${esc(m.email)}</small></span>${ctrl}</div>`;
   }).join("");
-  openSheet(`<div class="sheet-h"><h3>Compartilhar projeto</h3><button class="iconbtn" data-close aria-label="Fechar" title="Fechar">${ic("x")}</button></div>
-    ${isOwner() ? `<form id="shf" novalidate>
-      <label class="field"><span>E-mail da pessoa</span><input class="input" name="email" type="email" inputmode="email" autocapitalize="off" placeholder="pessoa@email.com" autocomplete="off"></label>
-      <div class="field"><span>Permissão</span>${segHtml("role", [["editor","Pode editar"],["viewer","Só visualizar"]], "editor")}</div>
-      <button class="btn primary block" type="submit" id="shs">${ic("mail")} Dar acesso</button>
-    </form>
-    <p class="note">A pessoa precisa entrar no Nosso Lar com este mesmo e-mail (ou criar a conta, se ainda não tiver). O projeto aparece para ela automaticamente.</p>
-    <button class="btn soft block" data-copy>${ic("copy")} Copiar link do app</button>` : `<p class="note">Só o dono do projeto pode dar acesso ou alterar permissões.</p>`}
-    <div class="section-t"><h3>Pessoas com acesso</h3></div>
-    <div class="card group" id="mlist">${draw()}</div>`, w => {
+  const faces = [...new Set([...(S.project && S.project.owner_id === S.user?.id ? [myEmail()] : []), ...S.members.map(m => String(m.email).toLowerCase())])].slice(0, 4);
+  openSheet(`<button class="iconbtn sheet-x" data-close aria-label="Fechar" title="Fechar">${ic("x")}</button>
+    <div class="sh-hero"><div class="faces">${faces.map((e, k) => `<span class="avatar g${k % 3}">${esc(initials(personName(e)))}</span>`).join("")}</div>
+      <h3>Compartilhar ${esc(S.project.name)}</h3><p>${plural(peopleCount(), "pessoa tem", "pessoas têm")} acesso a este projeto</p></div>
+    ${isOwner() ? `<form id="shf" class="invite" novalidate>
+      <div class="inv-h">${ic("mail")} Convidar alguém</div>
+      <input class="input" name="email" type="email" inputmode="email" autocapitalize="off" placeholder="E-mail da pessoa" aria-label="E-mail da pessoa" autocomplete="off">
+      ${segHtml("role", [["editor","Pode editar"],["viewer","Só visualizar"]], "editor")}
+      <button class="btn primary block" type="submit" id="shs">Dar acesso</button>
+      <p class="inv-note">A pessoa entra no Nosso Lar com este mesmo e-mail (ou cria a conta) e o projeto aparece para ela.</p>
+    </form>` : `<p class="note">Só o dono do projeto pode dar acesso ou alterar permissões.</p>`}
+    <div class="sub-h">Pessoas com acesso</div>
+    <div class="card group" id="mlist">${draw()}</div>
+    ${isOwner() ? `<button class="out-row brand" data-copy>${ic("copy")} Copiar link do app</button>` : ""}`, w => {
     wireSeg(w);
     const cp = $("[data-copy]", w);
     if (cp) cp.onclick = async () => { try { await navigator.clipboard.writeText(baseUrl()); toast("Link copiado"); } catch { toast(baseUrl()); } };
@@ -2447,19 +3038,21 @@ function shareSheet(){
 }
 
 /* ================= MENU ================= */
+function peopleCount(){ const e = new Set(S.members.map(m => String(m.email).toLowerCase())); if (S.project && S.project.owner_id === S.user?.id) e.add(myEmail()); (S.people || []).forEach(p => e.add(String(p.email).toLowerCase())); return Math.max(1, e.size); }
 function menuSheet(){
   const th = lsGet("nl.theme", "system");
-  openSheet(`<div class="me"><span class="avatar">${esc(initials(myName()))}</span><div><b>${esc(myName())}</b><small>${esc(myEmail())}</small></div><button class="iconbtn" data-close aria-label="Fechar" title="Fechar">${ic("x")}</button></div>
-    <div class="card menu-list">
-      <button data-m="projects">${ic("folder")} Meus projetos<span class="end">${S.projects.length}</span></button>
-      ${S.project ? `<button data-m="share">${ic("users")} Compartilhar projeto</button><button data-m="settings">${ic("gear")} Configurar projeto</button>` : ""}
-      <button data-m="name">${ic("edit")} Alterar meu nome</button>
+  const THEMES = [["system","Sistema","phone"],["light","Claro","sun"],["dark","Escuro","moon"]];
+  openSheet(`<button class="iconbtn sheet-x" data-close aria-label="Fechar" title="Fechar">${ic("x")}</button>
+    <div class="me2"><span class="avatar xl">${esc(initials(myName()))}</span><b>${esc(myName())}</b><small>${esc(myEmail())}</small><button class="chip" data-m="name">${ic("edit")} Alterar meu nome</button></div>
+    <div class="qtiles">
+      <button class="qt" data-m="projects"><span class="qi">${ic("folder")}</span><b>Projetos</b><small>${plural(S.projects.length, "projeto", "projetos")}</small></button>
+      ${S.project ? `<button class="qt" data-m="share"><span class="qi">${ic("users")}</span><b>Compartilhar</b><small>${plural(peopleCount(), "pessoa", "pessoas")}</small></button>
+      <button class="qt" data-m="settings"><span class="qi">${ic("gear")}</span><b>Configurar</b><small>${esc(S.project.name)}</small></button>` : ""}
     </div>
-    <div class="section-t"><h3>Aparência</h3></div>
-    ${segHtml("theme", [["system","Sistema"],["light","Claro"],["dark","Escuro"]], th)}
-    <div class="card menu-list mt-lg"><button class="red" data-m="logout">${ic("logout")} Sair da conta</button></div>`, w => {
-    wireSeg(w);
-    $("[data-seg=theme]", w).addEventListener("change", e => { lsSet("nl.theme", e.currentTarget.dataset.value); applyTheme(); });
+    <div class="sub-h">Aparência</div>
+    <div class="themes" role="group" aria-label="Aparência">${THEMES.map(([v, l, i]) => `<button class="th-c ${v === th ? "on" : ""}" data-th="${v}" aria-pressed="${v === th}"><span class="th-pv th-${v}"><i></i><i></i><i></i></span><span class="th-l">${ic(i)}${l}</span></button>`).join("")}</div>
+    <button class="out-row" data-m="logout">${ic("logout")} Sair da conta</button>`, w => {
+    $$("[data-th]", w).forEach(b => b.onclick = () => { lsSet("nl.theme", b.dataset.th); applyTheme(); $$("[data-th]", w).forEach(x => { x.classList.toggle("on", x === b); x.setAttribute("aria-pressed", x === b); }); });
     $$("[data-m]", w).forEach(b => b.onclick = async () => {
       const m = b.dataset.m; closeSheet(w);
       if (m === "logout") return signOut();
@@ -2501,11 +3094,13 @@ const ACT = {
   addStore: () => storeForm(null),
   store: d => openPage("store", d.id),
   editStore: d => { const st = storeById(d.id); if (st) storeForm(st); },
-  fRoom: d => { S.filter.room = d.id; const el = $("#items-list"); if (el) { $$(".chips [data-act=fRoom]").forEach(c => c.classList.toggle("on", c.dataset.id === d.id)); el.innerHTML = itemsListHtml(); } else render(); keepInView(".filters"); },
+  fRoom: d => { S.filter.room = d.id; S.pg = 0; const el = $("#items-list"); if (el) { $$(".chips [data-act=fRoom]").forEach(c => c.classList.toggle("on", c.dataset.id === d.id)); el.innerHTML = itemsListHtml(); } else render(); keepInView(".filters"); },
   fStore: d => { S.filter.store = d.id || null; if (d.go) { S.filter.room = "all"; S.filter.q = ""; S.tab = "compras"; lsSet("nl.tab", S.tab); S.nav = "fwd"; } render(); if (!d.go) keepInView(".filters"); },
   dash: d => { S.dash = d.mode; render(); keepInView("#dash-seg"); },
   sort: d => { S.sort = d.v; lsSet("nl.sort", S.sort); S.pg = 0; relist(); },
   pg: d => { S.pg = Math.max(0, +d.p || 0); relist(); keepInView("#items-list"); },
+  toWish: () => { S.list = "wish"; lsSet("nl.list", S.list); S.pg = 0; ACT.tab({ tab:"compras" }); },
+  rlist: d => { if (S.rlist === d.v) return; S.rlist = d.v; S.nav = ""; render(); keepInView(".rseg"); },
   wtab: d => { S.wroom = d.k || null; S.pg = 0; relist(); },
   clearSearch: (d, b) => { const i = b.closest(".search")?.querySelector("input"); if (!i) return; i.value = ""; i.dispatchEvent(new Event("input", { bubbles:true })); i.focus(); },
   projects: () => projectsSheet(),
@@ -2524,6 +3119,7 @@ document.addEventListener("change", e => {
   if (e.target.id === "sort") { S.sort = e.target.value; lsSet("nl.sort", S.sort); const el = $("#items-list"); if (el) el.innerHTML = itemsListHtml(); keepInView(".filters"); }
 });
 document.addEventListener("input", e => {
+  if (e.target.id === "sq") { S.sq = e.target.value; const el = $("#st-list"); if (el) el.innerHTML = storesListHtml(); return; }
   if (e.target.id === "q") { S.filter.q = e.target.value; S.pg = 0; const el = $("#items-list"); if (el) el.innerHTML = itemsListHtml(); }
 });
 window.addEventListener("resize", () => placeTabPill(null));
