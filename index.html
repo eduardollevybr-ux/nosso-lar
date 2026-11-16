@@ -1517,7 +1517,7 @@ document.addEventListener("visibilitychange", () => { if (document.visibilitySta
 const S = {
   user:null, projects:[], project:null, role:null,
   rooms:[], stores:[], items:[], wish:[], members:[], people:null, photos:{}, hasPlanned:false, hasFav:false, hasMulti:false, list: lsGet("nl.list", "bought"),
-  tab: lsGet("nl.tab", "casa"), roomId:null, pages:[],
+  tab: "casa" /* o app sempre abre na Casa */, roomId:null, pages:[],
   filter:{ room:"all", store:null, q:"", fav:false }, dash:"rooms", sort: lsGet("nl.sort", "recent"),
   pg:0, wroom:null,
   channel:null, nav:"", recovery:RECOVERY_AT_LOAD, booting:true
@@ -3141,6 +3141,18 @@ document.addEventListener("input", e => {
   if (e.target.id === "q") { S.filter.q = e.target.value; S.pg = 0; const el = $("#items-list"); if (el) el.innerHTML = itemsListHtml(); }
 });
 window.addEventListener("resize", () => placeTabPill(null));
+/* o app sempre volta para a Casa: ao abrir e ao voltar depois de um tempo fora (sem atrapalhar uma janela aberta) */
+let hiddenAt = 0;
+function goHome(){
+  if (!S.user || !S.project || document.querySelector("#sheets .sheet-wrap")) return;
+  if (S.tab === "casa" && !S.roomId && !S.pages.length) return;
+  S.tab = "casa"; S.roomId = null; S.pages = []; S.nav = ""; lsSet("nl.tab", "casa"); render(); window.scrollTo(0, 0);
+}
+document.addEventListener("visibilitychange", () => {
+  if (document.visibilityState === "hidden") hiddenAt = Date.now();
+  else if (hiddenAt && Date.now() - hiddenAt > 60000) goHome();
+});
+window.addEventListener("pageshow", e => { if (e.persisted) goHome(); });
 new MutationObserver(() => { ["#dash-seg", "#list-seg"].forEach(id => { const seg = $(id); if (seg && !seg.dataset.wired) { seg.dataset.wired = "1"; wireSeg(seg.parentElement); } }); }).observe($("#app"), { childList:true, subtree:false });
 
 /* ================= VOLTAR (arrastar da esquerda para a direita + botão voltar do celular) ================= */
