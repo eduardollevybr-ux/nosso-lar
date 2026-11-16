@@ -6,7 +6,7 @@
 <meta name="theme-color" content="#FFFFFF" id="meta-theme">
 <script>
 /* aplica o tema antes de desenhar a tela, para a barra superior já nascer na cor certa */
-(function(){try{var t=JSON.parse(localStorage.getItem("nl.theme")||'"system"');if(t==="light"||t==="dark")document.documentElement.setAttribute("data-theme",t);var d=t==="dark"||(t!=="light"&&matchMedia("(prefers-color-scheme: dark)").matches);var m=document.getElementById("meta-theme");if(m)m.setAttribute("content",d?"#1A110C":"#FBF6F1");}catch(e){}})();
+(function(){try{var t=JSON.parse(localStorage.getItem("nl.theme")||'"system"');if(t==="light"||t==="dark")document.documentElement.setAttribute("data-theme",t);var d=t==="dark"||(t!=="light"&&matchMedia("(prefers-color-scheme: dark)").matches);var m=document.getElementById("meta-theme");if(m)m.setAttribute("content",d?"#2A1B12":"#FBF6F1");var cs=document.createElement("meta");cs.name="color-scheme";cs.content=d?"dark":"light";document.head.appendChild(cs);document.documentElement.style.colorScheme=d?"dark":"light";}catch(e){}})();
 </script>
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
@@ -1127,8 +1127,8 @@ button.cap{cursor:pointer}
 :root[data-style] .top,:root[data-style] .top.scrolled{border-bottom:0;box-shadow:none}
 :root[data-style] .top::before{bottom:-26px;background:linear-gradient(to bottom,var(--bg) 0%,var(--bg) 76%,transparent 100%);opacity:0;transition:opacity .3s;-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);-webkit-mask-image:linear-gradient(to bottom,#000 72%,transparent);mask-image:linear-gradient(to bottom,#000 72%,transparent)}
 :root[data-style] .top.scrolled::before{opacity:1}
-@media (prefers-color-scheme:dark){:root[data-style]:not([data-theme="light"]) .top::before{background:linear-gradient(to bottom,rgba(26,17,12,.98) 0%,rgba(22,14,10,.94) 76%,transparent 100%)}}
-:root[data-style][data-theme="dark"] .top::before{background:linear-gradient(to bottom,rgba(26,17,12,.98) 0%,rgba(22,14,10,.94) 76%,transparent 100%)}
+@media (prefers-color-scheme:dark){:root[data-style]:not([data-theme="light"]) .top::before{background:linear-gradient(to bottom,rgba(42,27,18,.9) 0%,rgba(32,21,15,.82) 76%,transparent 100%)}}
+:root[data-style][data-theme="dark"] .top::before{background:linear-gradient(to bottom,rgba(42,27,18,.9) 0%,rgba(32,21,15,.82) 76%,transparent 100%)}
 /* nome do projeto com a seta numa bolinha e quem edita embaixo */
 :root[data-style] .proj-btn{gap:8px}
 :root[data-style] .proj-btn>svg{width:26px;height:26px;padding:5px;margin-top:2px;border-radius:50%;background:var(--soft);color:var(--ink);transition:transform .25s var(--spring),background .2s}
@@ -1210,13 +1210,13 @@ button.cap{cursor:pointer}
   radial-gradient(60% 40% at 105% 18%,rgba(164,117,81,.30),transparent 70%),
   radial-gradient(90% 50% at 40% 112%,rgba(122,82,54,.42),transparent 70%),
   radial-gradient(50% 35% at 80% 75%,rgba(201,154,112,.12),transparent 70%),
-  linear-gradient(180deg,#1A110C 0%,#0F0A07 55%,#140D09 100%)}}
+  linear-gradient(180deg,#2A1B12 0%,#160E0A 22%,#0F0A07 55%,#140D09 100%)}}
 :root[data-style][data-theme="dark"] .nl-glow{background:
   radial-gradient(70% 45% at 8% -6%,rgba(201,154,112,.42),transparent 70%),
   radial-gradient(60% 40% at 105% 18%,rgba(164,117,81,.30),transparent 70%),
   radial-gradient(90% 50% at 40% 112%,rgba(122,82,54,.42),transparent 70%),
   radial-gradient(50% 35% at 80% 75%,rgba(201,154,112,.12),transparent 70%),
-  linear-gradient(180deg,#1A110C 0%,#0F0A07 55%,#140D09 100%)}
+  linear-gradient(180deg,#2A1B12 0%,#160E0A 22%,#0F0A07 55%,#140D09 100%)}
 :root[data-style] body,:root[data-style] html{background:transparent}
 :root[data-style] .top::before{background:linear-gradient(to bottom,rgba(251,246,241,.97) 0%,rgba(252,248,244,.92) 76%,transparent 100%)}
 :root[data-style] body:has(#tabs)::after{background:linear-gradient(to bottom,transparent,rgba(252,248,244,.9) 75%)}
@@ -1239,10 +1239,10 @@ button.cap{cursor:pointer}
   :root[data-style]:not([data-theme]) .hero-t .label{color:var(--muted)}
   :root[data-style]:not([data-theme]) .cap{background:var(--soft)}
   :root[data-style]:not([data-theme]) .pc-ph{background:var(--soft)}
-  :root[data-style]:not([data-theme]) .top::before{background:linear-gradient(to bottom,rgba(26,17,12,.98) 0%,rgba(22,14,10,.94) 76%,transparent 100%)}
+  :root[data-style]:not([data-theme]) .top::before{background:linear-gradient(to bottom,rgba(42,27,18,.9) 0%,rgba(32,21,15,.82) 76%,transparent 100%)}
   :root[data-style]:not([data-theme]) body:has(#tabs)::after{background:linear-gradient(to bottom,transparent,rgba(15,10,7,.85) 75%)}
 }
-:root[data-style][data-theme="dark"] .top::before{background:linear-gradient(to bottom,rgba(26,17,12,.98) 0%,rgba(22,14,10,.94) 76%,transparent 100%)}
+:root[data-style][data-theme="dark"] .top::before{background:linear-gradient(to bottom,rgba(42,27,18,.9) 0%,rgba(32,21,15,.82) 76%,transparent 100%)}
 :root[data-style][data-theme="dark"] body:has(#tabs)::after{background:linear-gradient(to bottom,transparent,rgba(15,10,7,.85) 75%)}
 
 /* ===== movimento no estilo do FLUX: mola nos toques, entradas em cascata, janelas com impulso ===== */
@@ -1476,8 +1476,20 @@ function applyTheme(){
   applyTheme.ran = true;
   if (t === "system") document.documentElement.removeAttribute("data-theme");
   else document.documentElement.setAttribute("data-theme", t);
-  const dark = t === "dark" || (t === "system" && matchMedia("(prefers-color-scheme: dark)").matches);
-  setBarColor(dark ? "#1A110C" : "#FBF6F1");
+  /* a cor da barra do celular segue o tema que está de fato na tela (lido do próprio estilo da página) */
+  const bg = getComputedStyle(document.documentElement).getPropertyValue("--bg").trim().toLowerCase();
+  const dark = bg ? !/^#f|^#e|^#ff/.test(bg) : (t === "dark" || (t === "system" && matchMedia("(prefers-color-scheme: dark)").matches));
+  setScheme(dark);
+  setBarColor(dark ? BAR_DARK : BAR_LIGHT);
+}
+/* barra do celular: creme no claro e o marrom do topo do fundo no escuro */
+const BAR_LIGHT = "#FBF6F1", BAR_DARK = "#2A1B12";
+/* avisa o sistema se a página está clara ou escura (o iPhone usa isso para desenhar a barra de cima) */
+function setScheme(dark){
+  let m = document.querySelector('meta[name="color-scheme"]');
+  if (!m) { m = document.createElement("meta"); m.name = "color-scheme"; document.head.appendChild(m); }
+  m.content = dark ? "dark" : "light";
+  document.documentElement.style.colorScheme = dark ? "dark" : "light";
 }
 /* o iPhone guarda a cor antiga da barra superior quando só o valor muda;
    trocar a etiqueta inteira por uma nova obriga o sistema a ler a cor de novo */
