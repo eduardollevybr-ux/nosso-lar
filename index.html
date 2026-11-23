@@ -82,6 +82,16 @@ svg.i{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:1.8;stro
 .splash{position:fixed;inset:0;display:grid;place-items:center;background:var(--bg)}
 .splash .logo{animation:pulse 1.4s ease-in-out infinite}
 @keyframes pulse{0%,100%{transform:scale(1);opacity:1}50%{transform:scale(.92);opacity:.7}}
+/* abertura no estilo do FLUX: logo + nome no fundo do tema, pelo menos 2 segundos, só ao abrir o app do zero */
+.bootsplash{position:fixed;inset:0;z-index:300;background:var(--bg);display:flex;align-items:center;justify-content:center;gap:14px;transition:opacity .45s ease,visibility .45s}
+.bootsplash.hide{opacity:0;visibility:hidden;pointer-events:none}
+.bootsplash .logo{width:56px;height:56px;box-shadow:none}
+.bootsplash .logo svg{width:30px;height:30px}
+.sp-t{font-size:38px;font-weight:800;letter-spacing:-.01em;line-height:1;color:var(--ink)}
+.bootsplash>*{animation:spIn .8s cubic-bezier(.16,1,.3,1) both}
+.bootsplash>.sp-t{animation-delay:.08s}
+.bootsplash.hide>*{transform:scale(1.04);transition:transform .45s ease}
+@keyframes spIn{from{opacity:0;transform:translateY(12px) scale(.94)}}
 .logo{width:64px;height:64px;border-radius:var(--r);background:var(--brand);color:var(--bg);display:grid;place-items:center;box-shadow:0 10px 30px rgba(122,82,54,.3)}
 .logo svg{width:34px;height:34px;stroke-width:2.4}
 .logo.sm{width:52px;height:52px;border-radius:var(--r-md);box-shadow:none}
@@ -511,10 +521,15 @@ button.it:active,button.proj-row:active{background:var(--soft)}
 #toast .t-ic svg{width:15px;height:15px;stroke-width:2.6}
 
 /* aviso de sem internet (modo consulta) */
-#net-pill{position:fixed;top:calc(env(safe-area-inset-top,0px) + 8px);left:50%;transform:translateX(-50%);z-index:85;display:flex;align-items:center;gap:7px;height:26px;padding:0 12px;border-radius:999px;font-size:12px;font-weight:600;white-space:nowrap;pointer-events:none;background:var(--soft);color:var(--ink2);border:1px solid var(--line);box-shadow:0 4px 14px rgba(40,25,15,.08);animation:fadeIn .25s ease}
-#net-pill .dot{width:7px;height:7px;border-radius:50%;background:var(--muted)}
-body.is-offline .top-in{padding-top:calc(42px + env(safe-area-inset-top))}
-body.is-offline .auth{padding-top:calc(48px + env(safe-area-inset-top))}
+/* sem internet (mesmo padrão do FLUX): sem pílula; o que foi lançado sem internet ganha a nuvem riscada até ser enviado */
+.pend{display:inline-flex;vertical-align:-2px;margin-left:6px;color:var(--brand)}
+.pend svg{width:14px;height:14px}
+/* o que precisa de internet fica apagado e não abre enquanto estiver sem internet */
+body.net-off [data-net]{opacity:.38;pointer-events:none;position:relative}
+body.net-off [data-net]::after{content:"";position:absolute;right:14px;top:50%;width:16px;height:16px;margin-top:-8px;background:currentColor;-webkit-mask:var(--cloud-off) center/contain no-repeat;mask:var(--cloud-off) center/contain no-repeat}
+body.net-off .qt[data-net]::after{top:14px;margin-top:0}
+body.net-off .chip[data-net]{padding-right:34px}
+:root{--cloud-off:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m2 2 20 20'/%3E%3Cpath d='M5.8 5.8A7 7 0 0 0 9 19h8.5a4.5 4.5 0 0 0 1.3-.2'/%3E%3Cpath d='M21.5 16.5A4.5 4.5 0 0 0 17.5 10h-1.8A7 7 0 0 0 10 5.1'/%3E%3C/svg%3E")}
 
 /* botão flutuante de nova compra (celular e tablet) */
 .fab{position:fixed;z-index:31;right:max(var(--pad),calc((100vw - 560px)/2));bottom:calc(92px + env(safe-area-inset-bottom));width:60px;height:60px;border-radius:var(--r);background:var(--brand);color:var(--brandInk);display:grid;place-items:center;box-shadow:0 12px 28px -6px color-mix(in srgb,var(--brand) 70%,transparent),0 2px 6px rgba(0,0,0,.12);transition:transform .2s cubic-bezier(.3,1.4,.5,1);animation:fabIn .5s cubic-bezier(.3,1.4,.5,1) both}
@@ -879,7 +894,6 @@ span.w-btn.fav{cursor:default}
 :root[data-style] .fab{border-radius:50%;box-shadow:0 10px 28px -8px color-mix(in srgb,var(--brand) 60%,transparent)}
 
 /* avisos e detalhes */
-:root[data-style] #net-pill{box-shadow:none}
 :root[data-style] .switch-row{border-color:var(--line)}
 :root[data-style] .sw::after{box-shadow:none}
 :root[data-style] .icon-grid button{border-width:2px}
@@ -1326,6 +1340,7 @@ html.theme-anim *,html.theme-anim *::before,html.theme-anim *::after{transition:
 </head>
 <body>
 <div class="nl-glow" aria-hidden="true"></div>
+<div id="bootsplash" class="bootsplash" role="img" aria-label="Nosso Lar"><div class="logo"><svg class="i" viewBox="0 0 24 24"><path d="M3 11l9-7 9 7M5 10v10h14V10M10 20v-3.5a2 2 0 0 1 4 0V20"/></svg></div><span class="sp-t">Nosso Lar</span></div>
 <div id="app"><div class="splash"><div class="logo"><svg class="i" viewBox="0 0 24 24"><path d="M3 11l9-7 9 7M5 10v10h14V10M10 20v-3.5a2 2 0 0 1 4 0V20"/></svg></div></div></div>
 <div id="sheets"></div>
 <div id="toast"></div>
@@ -1333,6 +1348,10 @@ html.theme-anim *,html.theme-anim *::before,html.theme-anim *::after{transition:
 <script>
 (function(){
 "use strict";
+/* abertura: tempo mínimo na tela (ver hideSplash) */
+const SPLASH_MIN = 2000;
+let SPLASH_WAIT = false;
+let SPLASH_T = setTimeout(() => hideSplash(), 12000); // segurança: nunca fica preso na abertura
 
 /* ================= SUPABASE =================
    Mesmo projeto do Controle e do FLUX (plano gratuito), mas com login próprio:
@@ -1590,7 +1609,17 @@ try {
 } catch (e) { console.error(e); }
 
 /* ================= LOGIN ================= */
+/* a abertura fica pelo menos 2 segundos na tela toda vez que o app é aberto do zero
+   (voltar do segundo plano não recarrega a página, então ela não aparece de novo) */
+function hideSplash(){
+  const falta = SPLASH_MIN - performance.now();
+  if (falta > 0) { if (!SPLASH_WAIT) { SPLASH_WAIT = true; setTimeout(() => { SPLASH_WAIT = false; hideSplash(); }, falta); } return; }
+  clearTimeout(SPLASH_T);
+  const el = document.getElementById("bootsplash"); if (!el || el.classList.contains("hide")) return;
+  el.classList.add("hide"); setTimeout(() => el.remove(), 500);
+}
 function showAuth(mode, keepMsg=""){
+  hideSplash();
   S.user = mode === "newpass" ? S.user : null;
   $("#sheets").innerHTML = ""; syncLock();
   const sub = { login:"Entre na sua conta", signup:"Crie sua conta", forgot:"Informe seu e-mail para receber o link de nova senha", newpass:"Crie uma nova senha" };
@@ -1654,22 +1683,21 @@ function showAuth(mode, keepMsg=""){
   });
 }
 
-/* ================= SEM INTERNET (modo consulta) =================
+/* ================= SEM INTERNET =================
    Uma cópia dos dados fica guardada no aparelho (localStorage), ligada ao usuário e ao projeto.
-   Sem internet o app abre com essa cópia e serve só para consultar. */
-const OFF_MSG = "Sem internet. Conecte para salvar alterações";
+   Sem internet o app abre com essa cópia e continua lançando (mesmo padrão do FLUX): compras, lista
+   Quero comprar, cômodos e lojas ficam numa fila no aparelho e sobem sozinhos quando a internet volta.
+   Só o que depende do servidor na hora (projetos, compartilhar, nome, sair) fica apagado sem internet. */
+const OFF_MSG = "Sem internet agora";
 const OFF_LAST = "nl.off.last";                       // último usuário que abriu o app neste aparelho
 const offUserKey = uid => "nl.off." + uid;            // usuário + lista de projetos
 const offProjKey = (uid, pid) => "nl.off." + uid + "." + pid; // dados de um projeto
 const NET = { offline: navigator.onLine === false };
 const isNetErr = e => { const m = String((e && (e.message || e.error_description || e.details)) || e || ""); return navigator.onLine === false || /failed to fetch|networkerror|network request failed|load failed|fetch failed|err_internet|err_network|timed? ?out/i.test(m); };
 function renderNet(){
-  document.body.classList.toggle("is-offline", NET.offline);
-  let el = document.getElementById("net-pill");
-  if (!NET.offline) { if (el) el.remove(); return; }
-  if (!el) { el = document.createElement("div"); el.id = "net-pill"; el.setAttribute("role", "status"); el.innerHTML = `<span class="dot"></span>Sem internet · modo consulta`; document.body.appendChild(el); }
+  document.body.classList.toggle("net-off", NET.offline);
 }
-function setOffline(v){ v = !!v; if (NET.offline === v) return; NET.offline = v; renderNet(); }
+function setOffline(v){ v = !!v; if (NET.offline === v) return; NET.offline = v; renderNet(); if (S.project && opsFor(S.project.id).length) { S.nav = ""; render(); } }
 /* chame no começo de qualquer ação que grava algo: sem internet, avisa e não deixa seguir */
 function offlineBlock(){ if (!NET.offline) return false; toast(OFF_MSG, true); return true; }
 function plainUser(u){ return u ? { id:u.id, email:u.email, user_metadata:u.user_metadata || {} } : null; }
@@ -1709,7 +1737,7 @@ function bootFromCache(){
   if (p && !applySnapshot(p.id)) { S.rooms = []; S.stores = []; S.items = []; S.wish = []; S.members = []; S.role = "viewer"; }
   S.cacheShown = true; S.booting = false;
   document.body.classList.remove("auth-on"); $("#sheets").innerHTML = ""; syncLock();
-  S.nav = "fade"; render();
+  S.nav = "fade"; render(); restorePendingPhotos();
   return true;
 }
 /* confere se o Supabase responde de verdade (o celular pode dizer que tem rede sem ter internet) */
@@ -1738,9 +1766,122 @@ async function resync(){
   } catch (e) { console.warn(e); }
   finally { resyncing = false; }
 }
-window.addEventListener("offline", () => setOffline(true));
-window.addEventListener("online", () => { setOffline(false); resync(); });
+// a troca de rede (Wi-Fi para 5G, volta do segundo plano) derruba a conexão por instantes: só conta depois de 4 segundos
+let OFF_T = null;
+window.addEventListener("offline", () => { clearTimeout(OFF_T); OFF_T = setTimeout(() => { if (navigator.onLine === false) setOffline(true); }, 4000); });
+window.addEventListener("online", () => { clearTimeout(OFF_T); setOffline(false); resync(); });
 setInterval(() => { if (NET.offline && navigator.onLine !== false && document.visibilityState === "visible") resync(); }, 30000);
+
+/* ================= FILA DO QUE FOI FEITO SEM INTERNET =================
+   Cada alteração feita sem internet vira uma operação guardada no aparelho (por usuário):
+   { k:"ins"|"upd"|"del", t:"items"|"rooms"|"stores", pid, id, row } ou { k:"up", pid, path } (foto)
+   ou { k:"rm", pid, paths } (fotos que saíram). A alteração já aparece na tela na hora; a fila
+   sobe na ordem quando a internet volta. Fotos novas ficam no IndexedDB até subirem. */
+const opsKey = () => S.user ? "nl.ops." + S.user.id : null;
+const getOps = () => { const k = opsKey(); return k ? lsGet(k, []) : []; };
+const setOps = a => { const k = opsKey(); if (k) lsSet(k, a); };
+const opsFor = pid => getOps().filter(o => o.pid === pid);
+const isPending = id => NET.offline && getOps().some(o => (o.k === "ins" || o.k === "upd") && o.t === "items" && o.id === id);
+const CLOUD_OFF = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m2 2 20 20"/><path d="M5.8 5.8A7 7 0 0 0 9 19h8.5a4.5 4.5 0 0 0 1.3-.2"/><path d="M21.5 16.5A4.5 4.5 0 0 0 17.5 10h-1.8A7 7 0 0 0 10 5.1"/></svg>';
+const pendIco = id => isPending(id) ? `<span class="pend" aria-label="salvo no aparelho">${CLOUD_OFF}</span>` : "";
+/* fotos guardadas no aparelho até subir */
+const PH_DB = "nossolar-pend";
+function phDb(){ return new Promise((res, rej) => { const r = indexedDB.open(PH_DB, 1); r.onupgradeneeded = () => r.result.createObjectStore("f"); r.onsuccess = () => res(r.result); r.onerror = () => rej(r.error); }); }
+async function phPut(path, blob){ const db = await phDb(); await new Promise((res, rej) => { const tx = db.transaction("f", "readwrite"); tx.objectStore("f").put(blob, path); tx.oncomplete = res; tx.onerror = () => rej(tx.error); }); }
+async function phGet(path){ const db = await phDb(); return new Promise((res, rej) => { const r = db.transaction("f").objectStore("f").get(path); r.onsuccess = () => res(r.result || null); r.onerror = () => rej(r.error); }); }
+async function phDel(path){ try { const db = await phDb(); await new Promise(res => { const tx = db.transaction("f", "readwrite"); tx.objectStore("f").delete(path); tx.oncomplete = res; tx.onerror = res; }); } catch {} }
+/* mostra as fotos que ainda não subiram (depois de fechar e abrir o app) */
+let restoring = false;
+async function restorePendingPhotos(){
+  if (restoring) return;
+  const ups = getOps().filter(o => o.k === "up" && !S.photos[o.path]);
+  if (!ups.length) return;
+  restoring = true;
+  try { for (const o of ups) { try { const b = await phGet(o.path); if (b) S.photos[o.path] = URL.createObjectURL(b); } catch {} } }
+  finally { restoring = false; }
+  S.nav = ""; render();
+}
+/* aplica uma operação nos dados da tela (pode repetir sem duplicar) */
+function applyOp(o){
+  if (!S.project || o.pid !== S.project.id) return;
+  if (o.t === "items") {
+    let all = allItems();
+    if (o.k === "del") all = all.filter(x => x.id !== o.id);
+    else { const k = all.findIndex(x => x.id === o.id); if (k >= 0) all[k] = { ...all[k], ...o.row }; else if (o.k === "ins") all.unshift({ ...o.row, id:o.id, project_id:o.pid, created_at:o.at || new Date().toISOString() }); }
+    all.sort((a, b) => String(b.purchased_on || "").localeCompare(String(a.purchased_on || "")) || String(b.created_at || "").localeCompare(String(a.created_at || "")));
+    S.items = all.filter(x => !x.planned); S.wish = all.filter(x => x.planned);
+  } else if (o.t === "rooms") {
+    if (o.k === "del") { S.rooms = S.rooms.filter(x => x.id !== o.id); allItems().forEach(i => { if (i.room_id === o.id) i.room_id = null; }); }
+    else { const k = S.rooms.findIndex(x => x.id === o.id); if (k >= 0) S.rooms[k] = { ...S.rooms[k], ...o.row }; else if (o.k === "ins") S.rooms.push({ ...o.row, id:o.id, project_id:o.pid }); }
+    S.rooms.sort((a, b) => (a.position || 0) - (b.position || 0));
+  } else if (o.t === "stores") {
+    if (o.k === "del") { S.stores = S.stores.filter(x => x.id !== o.id); allItems().forEach(i => { if (i.store_id === o.id) i.store_id = null; }); }
+    else { const k = S.stores.findIndex(x => x.id === o.id); if (k >= 0) S.stores[k] = { ...S.stores[k], ...o.row }; else if (o.k === "ins") S.stores.push({ ...o.row, id:o.id, project_id:o.pid }); }
+    S.stores.sort((a, b) => a.name.localeCompare(b.name));
+  }
+}
+/* depois de buscar do servidor, o que ainda está na fila continua valendo na tela */
+function overlayOps(pid){ opsFor(pid).forEach(applyOp); }
+async function dbRun(o){
+  if (o.k === "up") { const b = await phGet(o.path); if (!b) return; const { error } = await sb.storage.from(BUCKET).upload(o.path, b, { contentType: b.type || "image/jpeg", upsert:true, cacheControl:"3600" }); if (error) throw error; return; }
+  if (o.k === "rm") { const { error } = await sb.storage.from(BUCKET).remove(o.paths); if (error) throw error; return; }
+  let q;
+  if (o.k === "ins") q = sb.from(o.t).insert({ ...o.row, id:o.id, project_id:o.pid });
+  else if (o.k === "upd") q = sb.from(o.t).update(o.row).eq("id", o.id);
+  else q = sb.from(o.t).delete().eq("id", o.id);
+  const { error } = await q;
+  if (error && !(o.k === "ins" && error.code === "23505")) throw error; /* já tinha subido antes: segue */
+}
+function queueOps(list){
+  setOps(getOps().concat(list));
+  list.forEach(applyOp); saveSnapshot();
+}
+/* grava: com internet vai direto; sem internet (ou se a conexão cair no meio) entra na fila e já aparece na tela.
+   Devolve "online" ou "fila"; erro de verdade (não de conexão) sobe como exceção */
+async function dbWrite(list){
+  list.forEach(o => { if (o.k === "ins" && !o.at) o.at = new Date().toISOString(); });
+  if (sb && !NET.offline && navigator.onLine !== false && !getOps().length) {
+    let done = 0;
+    try { for (const o of list) { await dbRun(o); done++; if (o.k === "up") phDel(o.path); } list.forEach(applyOp); saveSnapshot(); return "online"; }
+    catch (e) { if (!isNetErr(e)) throw e; setOffline(true); list = list.slice(done); }
+  }
+  queueOps(list);
+  if (sb && !NET.offline && navigator.onLine !== false) flushOps();
+  return "fila";
+}
+/* foto nova: guarda no aparelho e entra na lista de envio (sobe antes do item) */
+async function savePhoto(file, list){
+  const blob = await compressImage(file);
+  const ext = blob.type === "image/png" ? "png" : blob.type === "image/webp" ? "webp" : /hei[cf]/.test(blob.type) ? "heic" : "jpg";
+  const path = `${S.project.id}/${uid()}.${ext}`;
+  S.photos[path] = URL.createObjectURL(blob);
+  await phPut(path, blob);
+  list.push({ k:"up", pid:S.project.id, path });
+  return path;
+}
+let flushing = null;
+function flushOps(){
+  if (flushing) return flushing;
+  flushing = (async () => {
+    let sent = 0;
+    try {
+      while (true) {
+        const ops = getOps(); if (!ops.length) break;
+        if (!sb || navigator.onLine === false) break;
+        const o = ops[0];
+        try { await dbRun(o); }
+        catch (e) {
+          if (isNetErr(e)) { setOffline(true); break; }
+          console.warn(e); toast(friendlyError(e), true); /* erro de verdade: descarta e segue com o resto */
+        }
+        if (o.k === "up") phDel(o.path);
+        setOps(getOps().slice(1)); sent++;
+      }
+    } finally { flushing = null; }
+    return sent;
+  })();
+  return flushing;
+}
 
 /* ================= SESSÃO ================= */
 async function handleSession(session, force=false){
@@ -1814,7 +1955,7 @@ async function openProject(id, silent=false){
   S.photos = {}; S.photosAt = 0;
   await loadProjectData();
   if (!NET.offline) subscribe();
-  S.nav = "fade"; render();
+  S.nav = "fade"; render(); restorePendingPhotos();
   if (!silent) toast("Projeto aberto: " + S.project.name);
 }
 async function loadProjectData(){
@@ -1822,6 +1963,7 @@ async function loadProjectData(){
   const pid = S.project.id;
   const fromCopy = () => { if (!applySnapshot(pid)) { S.rooms = []; S.stores = []; S.items = []; S.wish = []; S.members = []; toast("Este projeto ainda não foi aberto com internet neste aparelho", true); } };
   if (!sb || NET.offline) return fromCopy();
+  if (getOps().length) { await flushOps(); if (NET.offline) return fromCopy(); }
   const [r, s, i, m, p, pl, fv, pp, mu] = await Promise.all([
     sb.from("rooms").select("*").eq("project_id", pid).order("position").order("created_at"),
     sb.from("stores").select("*").eq("project_id", pid).order("name"),
@@ -1853,8 +1995,10 @@ async function loadProjectData(){
   if (!pp.error) S.people = pp.data || []; else if (!isNetErr(pp.error)) S.people = null; /* função ainda não criada: usa o e-mail */
   const me = S.members.find(x => String(x.email).toLowerCase() === myEmail());
   S.role = me ? me.role : (S.project.owner_id === S.user.id ? "owner" : "viewer");
+  overlayOps(pid);
   await refreshPhotos();
   saveSnapshot(); saveUserCache();
+  restorePendingPhotos();
 }
 async function refreshPhotos(){
   if (!sb || NET.offline) return;
@@ -2121,6 +2265,7 @@ function riseIn(root, sel){
 }
 function render(){
   if (!S.user) return;
+  hideSplash();
   const app = $("#app");
   if (!S.project) { document.body.classList.remove("home-fit"); app.innerHTML = viewWelcome(); lastKey = "welcome"; return; }
   const pg = curPage();
@@ -2374,7 +2519,7 @@ function wishRow(i, showRoom){
   const ph = photoOf(i);
   return `<div class="it wish ${i.favorite ? "is-fav" : ""}" data-act="item" data-id="${i.id}" role="button" tabindex="0">
     <span class="thumb">${ph ? `<img src="${esc(ph)}" alt="" loading="lazy">` : ic(r ? r.icon : "bookmark")}</span>
-    <span class="mid"><div class="nm">${esc(i.name)}</div><div class="sub">${esc(sub || "Sem valor estimado")}</div></span>
+    <span class="mid"><div class="nm">${esc(i.name)}</div><div class="sub">${esc(sub || "Sem valor estimado")}${pendIco(i.id)}</div></span>
     <span class="w-acts">${favBtn(i)}${i.link ? `<a class="w-btn" href="${esc(i.link)}" target="_blank" rel="noopener" aria-label="Abrir link" title="Abrir link">${ic("external")}</a>` : ""}${canEdit() ? `<button class="w-btn buy" data-act="buy" data-id="${i.id}" aria-label="Marcar como comprado" title="Marcar como comprado">${ic("check")}</button>` : ""}</span>
   </div>`;
 }
@@ -2387,13 +2532,11 @@ function favBtn(i){
 }
 async function toggleFav(it){
   if (!it || !canEdit()) return false;
-  if (offlineBlock()) return false;
   if (!S.hasFav) { toast("Os favoritos ainda não estão ativos no banco de dados", true); return false; }
   const v = !it.favorite; it.favorite = v; render();
   $$(`[data-act=fav][data-id="${it.id}"]`).forEach(b => { b.classList.remove("pop"); void b.offsetWidth; b.classList.add("pop"); });
-  const { error } = await sb.from("items").update({ favorite:v }).eq("id", it.id);
-  if (error) { it.favorite = !v; render(); toast(friendlyError(error), true); return false; }
-  saveSnapshot();
+  try { await dbWrite([{ k:"upd", t:"items", pid:S.project.id, id:it.id, row:{ favorite:v } }]); }
+  catch (error) { it.favorite = !v; render(); toast(friendlyError(error), true); return false; }
   toast(v ? "Adicionado aos favoritos" : "Tirado dos favoritos");
   return true;
 }
@@ -2406,7 +2549,7 @@ function itemRow(i){
   const ph = photoOf(i);
   return `<button class="it" data-act="item" data-id="${i.id}">
     <span class="thumb">${ph ? `<img src="${esc(ph)}" alt="" loading="lazy">` : ic(r ? r.icon : "box")}</span>
-    <span class="mid"><div class="nm">${esc(i.name)}</div><div class="sub">${esc(sub)}</div></span>
+    <span class="mid"><div class="nm">${esc(i.name)}</div><div class="sub">${esc(sub)}${pendIco(i.id)}</div></span>
     <span class="val"><b>${money(itemTotal(i))}</b>${+i.quantity !== 1 ? `<small>${(+i.quantity).toLocaleString("pt-BR")} × ${money(i.unit_price)}</small>` : ""}</span>
   </button>`;
 }
@@ -2487,7 +2630,7 @@ function wishGroups(list){
 function wishCard(i, showRoom){
   const r = roomById(i.room_id), lk = itemLinks(i)[0];
   const sub = [+i.unit_price ? money(itemTotal(i)) : "Sem valor estimado", showRoom ? (r ? r.name : "Sem cômodo") : ""].filter(Boolean).join(" · ");
-  return `<div class="wc ${i.favorite ? "is-fav" : ""}" data-act="item" data-id="${i.id}" role="button" tabindex="0"><span class="wc-ph">${thumbIn(i, r ? r.icon : "bookmark")}</span><span class="wc-n">${esc(i.name)}</span><span class="wc-s">${esc(sub)}</span><span class="w-acts">${favBtn(i)}${lk ? `<a class="w-btn" href="${esc(lk)}" target="_blank" rel="noopener" aria-label="Abrir link" title="Abrir link">${ic("external")}</a>` : ""}${canEdit() ? `<button class="w-btn buy" data-act="buy" data-id="${i.id}" aria-label="Marcar como comprado" title="Marcar como comprado">${ic("check")}</button>` : ""}</span></div>`;
+  return `<div class="wc ${i.favorite ? "is-fav" : ""}" data-act="item" data-id="${i.id}" role="button" tabindex="0"><span class="wc-ph">${thumbIn(i, r ? r.icon : "bookmark")}</span><span class="wc-n">${esc(i.name)}</span><span class="wc-s">${esc(sub)}${pendIco(i.id)}</span><span class="w-acts">${favBtn(i)}${lk ? `<a class="w-btn" href="${esc(lk)}" target="_blank" rel="noopener" aria-label="Abrir link" title="Abrir link">${ic("external")}</a>` : ""}${canEdit() ? `<button class="w-btn buy" data-act="buy" data-id="${i.id}" aria-label="Marcar como comprado" title="Marcar como comprado">${ic("check")}</button>` : ""}</span></div>`;
 }
 function wishBody(list){
   const groups = wishGroups(list), cur = groups.find(g => g.k === S.wroom), arr = cur ? cur.arr : favFirst(list);
@@ -2745,7 +2888,6 @@ const parseMoney = s => { const d = String(s || "").replace(/\D/g, ""); return d
 /* ================= COMPRA: formulário ================= */
 function itemForm(item, preset={}){
   if (!canEdit()) return;
-  if (offlineBlock()) return;
   const isNew = !item;
   const cp = preset.copy;
   const it = item ? { ...item } : (cp ? { name:cp.name, room_id:cp.room_id, store_id:cp.store_id, quantity:cp.quantity, unit_price:cp.unit_price, purchased_on:todayStr(), notes:cp.notes || "", photo_path:null, planned:!!cp.planned, link:cp.link || "", links:itemLinks(cp) } : null) || { name:"", room_id: preset.room || (curPage()?.kind === "room" && curPage().id !== "none" ? curPage().id : (!curPage() && S.tab === "compras" && S.filter.room !== "all" && S.filter.room !== "none" ? S.filter.room : null)), store_id: preset.store || (curPage()?.kind === "store" && curPage().id !== "none" ? curPage().id : null), quantity:1, unit_price:0, purchased_on: curPage()?.kind === "day" ? curPage().id : todayStr(), notes:"", photo_path:null, planned:!!preset.planned, link:"" };
@@ -2834,6 +2976,11 @@ function itemForm(item, preset={}){
         const x = phs[cur]; if (!x) return;
         /* foto já salva: baixa a original para recortar (direto do Storage, sem passar pela cópia do aparelho) */
         if (!x.orig && x.path) {
+          /* foto que ainda não subiu: está guardada no aparelho */
+          const local = await phGet(x.path).catch(() => null);
+          if (local) { x.orig = new File([local], "foto.jpg", { type:local.type || "image/jpeg" }); x.origStored = true; }
+        }
+        if (!x.orig && x.path) {
           if (offlineBlock()) return;
           busy(cb, true);
           try { const { data, error } = await sb.storage.from(BUCKET).download(x.path); if (error || !data) throw error || new Error("download"); x.orig = new File([data], "foto.jpg", { type:data.type || "image/jpeg" }); x.origStored = true; }
@@ -2885,33 +3032,37 @@ function itemForm(item, preset={}){
         if (S.hasPlanned) { row.planned = planned; row.link = allLinks[0] || null; }
         if (multi) row.links = allLinks.length ? allLinks : null;
         if (S.hasFav) row.favorite = planned && fav; /* comprou: sai dos favoritos */
-        /* envia as fotos novas na ordem do carrossel; a primeira vira a capa (photo_path) */
-        const paths = [], replaced = [];
+        /* fotos novas na ordem do carrossel (a primeira vira a capa, photo_path); sobem antes do item.
+           Sem internet ficam no aparelho e sobem junto com a compra quando a internet volta */
+        const ops = [], paths = [], replaced = [];
         for (const x of phs) {
-          if (x.file) { const np = await uploadPhoto(x.file); uploaded.push(np); paths.push(np); if (x.path) replaced.push(x.path); }
+          if (x.file) { const np = await savePhoto(x.file, ops); uploaded.push(np); paths.push(np); if (x.path) replaced.push(x.path); }
           else if (x.path) paths.push(x.path);
         }
         row.photo_path = paths[0] || null;
         if (multi) row.photo_paths = paths.length ? paths : null;
-        if (isNew) { const { error } = await sb.from("items").insert({ ...row, project_id: S.project.id }); if (error) throw error; }
-        else { const { error } = await sb.from("items").update(row).eq("id", it.id); if (error) throw error; }
-        removePhotos([...dropped, ...replaced].filter(p => !paths.includes(p)));
+        ops.push({ k: isNew ? "ins" : "upd", t:"items", pid:S.project.id, id: isNew ? uid() : it.id, row });
+        const gone = [...dropped, ...replaced].filter(p => !paths.includes(p));
+        if (gone.length) ops.push({ k:"rm", pid:S.project.id, paths:gone });
+        const how = await dbWrite(ops);
         closeAllSheets();
         toast(wasPlanned && !planned ? "Marcado como comprado" : planned ? (isNew ? "Item adicionado à lista" : "Item atualizado") : (isNew ? "Compra registrada" : "Compra atualizada"));
-        await loadProjectData(); render();
-      } catch (err) { console.warn(err); removePhotos(uploaded); toast(friendlyError(err), true); busy(btn, false); }
+        if (how === "online") await loadProjectData();
+        S.nav = ""; render();
+      } catch (err) { console.warn(err); removePhotos(uploaded); uploaded.forEach(phDel); toast(friendlyError(err), true); busy(btn, false); }
     });
   });
 }
 async function deleteItem(it, formSheet){
-  if (offlineBlock()) return;
   const wish = !!it.planned;
   if (!(await confirmBox({ title: wish ? "Excluir item da lista?" : "Excluir compra?", text:`Esta ação exclui <b>${esc(it.name)}</b> ${wish ? "da lista Quero comprar" : "do enxoval"}.`, ok:"Excluir", danger:true }))) return;
-  const { error } = await sb.from("items").delete().eq("id", it.id);
-  if (error) return toast(friendlyError(error), true);
-  removePhotos(itemPhotos(it));
+  const ops = [{ k:"del", t:"items", pid:S.project.id, id:it.id }], phs = itemPhotos(it).filter(Boolean);
+  if (phs.length) ops.push({ k:"rm", pid:S.project.id, paths:phs });
+  let how;
+  try { how = await dbWrite(ops); } catch (error) { return toast(friendlyError(error), true); }
   closeAllSheets(); toast(wish ? "Item excluído" : "Compra excluída");
-  await loadProjectData(); render();
+  if (how === "online") await loadProjectData();
+  S.nav = ""; render();
 }
 
 /* ================= COMPRA: detalhes ================= */
@@ -2964,7 +3115,6 @@ function kvGo(kind, id, label, value){
 /* ================= CÔMODO ================= */
 function roomForm(room){
   if (!canEdit()) return;
-  if (offlineBlock()) return;
   const isNew = !room; let icon = room ? room.icon : "box";
   openSheet(`<form id="rf" novalidate><div class="sheet-h"><h3>${isNew ? "Novo cômodo" : "Editar cômodo"}</h3><button type="button" class="iconbtn" data-close aria-label="Fechar" title="Fechar">${ic("x")}</button></div>
     <label class="field"><span>Nome do cômodo</span><input class="input" name="name" value="${esc(room ? room.name : "")}" placeholder="Ex.: ${esc(ROOM_EX[icon] || "Lavanderia")}" maxlength="40" autocomplete="off"></label>
@@ -2975,18 +3125,19 @@ function roomForm(room){
     f.addEventListener("submit", async e => {
       e.preventDefault(); const name = fmtName(f.name.value); if (!name) return toast("Informe o nome do cômodo", true);
       const btn = $("#rs", w); busy(btn, true);
-      const q = isNew ? sb.from("rooms").insert({ project_id:S.project.id, name, icon, position: S.rooms.length ? Math.max(...S.rooms.map(r => r.position || 0)) + 1 : 0 }) : sb.from("rooms").update({ name, icon }).eq("id", room.id);
-      const { error } = await q;
-      if (error) { busy(btn, false); return toast(friendlyError(error), true); }
-      closeSheet(w); toast(isNew ? "Cômodo adicionado" : "Cômodo atualizado"); await loadProjectData(); render();
+      const row = isNew ? { name, icon, position: S.rooms.length ? Math.max(...S.rooms.map(r => r.position || 0)) + 1 : 0 } : { name, icon };
+      let how;
+      try { how = await dbWrite([{ k: isNew ? "ins" : "upd", t:"rooms", pid:S.project.id, id: isNew ? uid() : room.id, row }]); }
+      catch (error) { busy(btn, false); return toast(friendlyError(error), true); }
+      closeSheet(w); toast(isNew ? "Cômodo adicionado" : "Cômodo atualizado"); if (how === "online") await loadProjectData(); S.nav = ""; render();
     });
     const d = $("[data-del]", w);
     if (d) d.onclick = async () => {
       const n = allItems().filter(i => i.room_id === room.id).length;
-      if (offlineBlock()) return; if (!(await confirmBox({ title:"Excluir cômodo?", text: `<b>${esc(room.name)}</b> será excluído.` + (n ? ` ${n === 1 ? "O item deste cômodo não será excluído e passa" : `Os ${n} itens deste cômodo não serão excluídos e passam`} para Sem cômodo.` : ""), ok:"Excluir", danger:true }))) return;
-      const { error } = await sb.from("rooms").delete().eq("id", room.id);
-      if (error) return toast(friendlyError(error), true);
-      closeAllSheets(); if (S.roomId === room.id) S.roomId = null; S.pages = S.pages.filter(x => !(x.kind === "room" && x.id === room.id)); S.nav = "back"; toast("Cômodo excluído"); await loadProjectData(); render();
+      if (!(await confirmBox({ title:"Excluir cômodo?", text: `<b>${esc(room.name)}</b> será excluído.` + (n ? ` ${n === 1 ? "O item deste cômodo não será excluído e passa" : `Os ${n} itens deste cômodo não serão excluídos e passam`} para Sem cômodo.` : ""), ok:"Excluir", danger:true }))) return;
+      let how;
+      try { how = await dbWrite([{ k:"del", t:"rooms", pid:S.project.id, id:room.id }]); } catch (error) { return toast(friendlyError(error), true); }
+      closeAllSheets(); if (S.roomId === room.id) S.roomId = null; S.pages = S.pages.filter(x => !(x.kind === "room" && x.id === room.id)); S.nav = "back"; toast("Cômodo excluído"); if (how === "online") await loadProjectData(); render();
     };
   });
 }
@@ -2995,7 +3146,6 @@ function roomForm(room){
 const LOC_EX = { fisica:"Ex.: Shopping Center, loja 120", online:"Ex.: amazon.com.br" };
 function storeForm(store, onSaved){
   if (!canEdit()) return;
-  if (offlineBlock()) return;
   const isNew = !store, st = store || { name:"", kind:"fisica", location:"", notes:"" };
   openSheet(`<form id="sf" novalidate><div class="sheet-h"><h3>${isNew ? "Nova loja" : "Editar loja"}</h3><button type="button" class="iconbtn" data-close aria-label="Fechar" title="Fechar">${ic("x")}</button></div>
     <label class="field"><span>Nome da loja</span><input class="input" name="name" value="${esc(st.name)}" placeholder="Ex.: Amazon, Magazine Luiza" maxlength="60" autocomplete="off"></label>
@@ -3011,21 +3161,21 @@ function storeForm(store, onSaved){
       if (isNew && S.stores.some(s => s.name.toLowerCase() === name.toLowerCase())) return toast("Já existe uma loja com este nome", true);
       const btn = $("#ss", w); busy(btn, true);
       const row = { name, kind: seg.dataset.value || "fisica", location: f.location.value.trim() || null, notes: f.notes.value.trim() || null };
-      const q = isNew ? sb.from("stores").insert({ ...row, project_id:S.project.id }).select().single() : sb.from("stores").update(row).eq("id", store.id).select().single();
-      const { data, error } = await q;
-      if (error) { busy(btn, false); return toast(friendlyError(error), true); }
-      const k = S.stores.findIndex(s => s.id === data.id); if (k >= 0) S.stores[k] = data; else S.stores.push(data);
-      S.stores.sort((a,b) => a.name.localeCompare(b.name));
+      const id = isNew ? uid() : store.id;
+      let how;
+      try { how = await dbWrite([{ k: isNew ? "ins" : "upd", t:"stores", pid:S.project.id, id, row }]); }
+      catch (error) { busy(btn, false); return toast(friendlyError(error), true); }
+      const data = S.stores.find(s => s.id === id) || { ...row, id, project_id:S.project.id };
       closeSheet(w); toast(isNew ? "Loja adicionada" : "Loja atualizada");
-      if (onSaved) onSaved(data); else { await loadProjectData(); render(); }
+      if (onSaved) onSaved(data); else { if (how === "online") await loadProjectData(); S.nav = ""; render(); }
     });
     const d = $("[data-del]", w);
     if (d) d.onclick = async () => {
       const n = allItems().filter(i => i.store_id === store.id).length;
-      if (offlineBlock()) return; if (!(await confirmBox({ title:"Excluir loja?", text: `<b>${esc(store.name)}</b> será excluída.` + (n ? ` ${n === 1 ? "O item desta loja não será excluído e passa" : `Os ${n} itens desta loja não serão excluídos e passam`} para Sem loja.` : ""), ok:"Excluir", danger:true }))) return;
-      const { error } = await sb.from("stores").delete().eq("id", store.id);
-      if (error) return toast(friendlyError(error), true);
-      closeAllSheets(); S.pages = S.pages.filter(x => !(x.kind === "store" && x.id === store.id)); S.nav = "back"; toast("Loja excluída"); await loadProjectData(); render();
+      if (!(await confirmBox({ title:"Excluir loja?", text: `<b>${esc(store.name)}</b> será excluída.` + (n ? ` ${n === 1 ? "O item desta loja não será excluído e passa" : `Os ${n} itens desta loja não serão excluídos e passam`} para Sem loja.` : ""), ok:"Excluir", danger:true }))) return;
+      let how;
+      try { how = await dbWrite([{ k:"del", t:"stores", pid:S.project.id, id:store.id }]); } catch (error) { return toast(friendlyError(error), true); }
+      closeAllSheets(); S.pages = S.pages.filter(x => !(x.kind === "store" && x.id === store.id)); S.nav = "back"; toast("Loja excluída"); if (how === "online") await loadProjectData(); render();
     };
   });
 }
@@ -3066,7 +3216,7 @@ function newProjectForm(){
 }
 function projectsSheet(){
   openSheet(`<div class="sheet-h"><h3>Meus projetos</h3><button class="iconbtn" data-close aria-label="Fechar" title="Fechar">${ic("x")}</button></div>
-    <div class="pj-list">${S.projects.map(p => { const mine = p.owner_id === S.user.id, on = S.project && p.id === S.project.id; return `<button class="pj-c ${on ? "on" : ""}" data-pid="${p.id}"><span class="pj-i">${ic("home")}</span><span class="mid"><b>${esc(p.name)}</b><small>${mine ? "Criado por você" : "Compartilhado com você"}</small></span>${on ? `<span class="pj-tag">Aberto</span>` : `<span class="chev">${ic("right")}</span>`}</button>`; }).join("")}<button class="pj-c add" data-new2><span class="pj-i">${ic("plus")}</span><span class="mid"><b>Novo projeto</b><small>Outra casa ou outro enxoval</small></span></button></div>
+    <div class="pj-list">${S.projects.map(p => { const mine = p.owner_id === S.user.id, on = S.project && p.id === S.project.id; return `<button class="pj-c ${on ? "on" : ""}" data-pid="${p.id}"><span class="pj-i">${ic("home")}</span><span class="mid"><b>${esc(p.name)}</b><small>${mine ? "Criado por você" : "Compartilhado com você"}</small></span>${on ? `<span class="pj-tag">Aberto</span>` : `<span class="chev">${ic("right")}</span>`}</button>`; }).join("")}<button class="pj-c add" data-new2 data-net><span class="pj-i">${ic("plus")}</span><span class="mid"><b>Novo projeto</b><small>Outra casa ou outro enxoval</small></span></button></div>
     ${S.project ? `<div class="sheet-actions"><button class="btn soft" data-set>${ic("gear")} Configurar ${esc(S.project.name)}</button></div>` : ""}`, w => {
     $$("[data-pid]", w).forEach(b => b.onclick = async () => { closeSheet(w); if (b.dataset.pid !== S.project?.id) { S.tab = "casa"; await openProject(b.dataset.pid); } });
     $("[data-new2]", w).onclick = () => { closeSheet(w); setTimeout(newProjectForm, 150); };
@@ -3077,13 +3227,13 @@ function projectSettings(){
   const p = S.project; if (!p) return;
   openSheet(`<form id="psf" novalidate><div class="sheet-h"><h3>Configurar projeto</h3><button type="button" class="iconbtn" data-close aria-label="Fechar" title="Fechar">${ic("x")}</button></div>
     <label class="field"><span>Nome do projeto</span><input class="input" name="name" value="${esc(p.name)}" maxlength="50" ${isOwner() ? "" : "disabled"}></label>
-    ${isOwner() ? `<button class="btn primary block" type="submit" id="pss">Salvar</button>` : `<p class="note">Só o dono do projeto pode alterar o nome.</p>`}
+    ${isOwner() ? `<button class="btn primary block" type="submit" id="pss" data-net>Salvar</button>` : `<p class="note">Só o dono do projeto pode alterar o nome.</p>`}
     <div class="section-t"><h3>Cômodos</h3>${canEdit() ? `<button type="button" class="btn soft sm" data-addroom>${ic("plus")} Novo cômodo</button>` : ""}</div>
     <div class="card group">${S.rooms.length ? S.rooms.map(r => `<button type="button" class="proj-row" data-room="${r.id}"><span class="store-ic">${ic(r.icon)}</span><span class="mid">${esc(r.name)}</span>${canEdit() ? `<span class="muted" aria-hidden="true">${ic("edit")}</span>` : ""}</button>`).join("") : `<div class="empty"><p>Nenhum cômodo ainda.</p></div>`}</div>
     <div class="section-t"><h3>Acesso</h3></div>
     <div class="card menu-list">
-      <button type="button" data-share>${ic("users")} Pessoas com acesso<span class="end">${S.members.length}</span></button>
-      ${isOwner() ? `<button type="button" class="red" data-delp>${ic("trash")} Excluir projeto</button>` : `<button type="button" class="red" data-leave>${ic("logout")} Sair do projeto</button>`}
+      <button type="button" data-share data-net>${ic("users")} Pessoas com acesso<span class="end">${S.members.length}</span></button>
+      ${isOwner() ? `<button type="button" class="red" data-delp data-net>${ic("trash")} Excluir projeto</button>` : `<button type="button" class="red" data-leave data-net>${ic("logout")} Sair do projeto</button>`}
     </div></form>`, w => {
     const f = $("#psf", w);
     f.addEventListener("submit", async e => {
@@ -3182,15 +3332,15 @@ function menuSheet(){
   const th = lsGet("nl.theme", "system");
   const THEMES = [["system","Sistema","phone"],["light","Claro","sun"],["dark","Escuro","moon"]];
   openSheet(`<button class="iconbtn sheet-x" data-close aria-label="Fechar" title="Fechar">${ic("x")}</button>
-    <div class="me2"><span class="avatar xl">${esc(initials(myName()))}</span><b>${esc(myName())}</b><small>${esc(myEmail())}</small><button class="chip" data-m="name">${ic("edit")} Alterar meu nome</button></div>
+    <div class="me2"><span class="avatar xl">${esc(initials(myName()))}</span><b>${esc(myName())}</b><small>${esc(myEmail())}</small><button class="chip" data-m="name" data-net>${ic("edit")} Alterar meu nome</button></div>
     <div class="qtiles">
       <button class="qt" data-m="projects"><span class="qi">${ic("folder")}</span><b>Projetos</b><small>${plural(S.projects.length, "projeto", "projetos")}</small></button>
-      ${S.project ? `<button class="qt" data-m="share"><span class="qi">${ic("users")}</span><b>Compartilhar</b><small>${plural(peopleCount(), "pessoa", "pessoas")}</small></button>
+      ${S.project ? `<button class="qt" data-m="share" data-net><span class="qi">${ic("users")}</span><b>Compartilhar</b><small>${plural(peopleCount(), "pessoa", "pessoas")}</small></button>
       <button class="qt" data-m="settings"><span class="qi">${ic("gear")}</span><b>Configurar</b><small>${esc(S.project.name)}</small></button>` : ""}
     </div>
     <div class="sub-h">Aparência</div>
     <div class="themes" role="group" aria-label="Aparência">${THEMES.map(([v, l, i]) => `<button class="th-c ${v === th ? "on" : ""}" data-th="${v}" aria-pressed="${v === th}"><span class="th-pv th-${v}"><i></i><i></i><i></i></span><span class="th-l">${ic(i)}${l}</span></button>`).join("")}</div>
-    <button class="out-row" data-m="logout">${ic("logout")} Sair da conta</button>`, w => {
+    <button class="out-row" data-m="logout" data-net>${ic("logout")} Sair da conta</button>`, w => {
     $$("[data-th]", w).forEach(b => b.onclick = () => { lsSet("nl.theme", b.dataset.th); applyTheme(); $$("[data-th]", w).forEach(x => { x.classList.toggle("on", x === b); x.setAttribute("aria-pressed", x === b); }); });
     $$("[data-m]", w).forEach(b => b.onclick = async () => {
       const m = b.dataset.m; closeSheet(w);
