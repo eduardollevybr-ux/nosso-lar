@@ -68,7 +68,15 @@ body{min-height:100dvh;overscroll-behavior-y:none;background:var(--bg)}
 button:focus-visible,a:focus-visible,label:focus-visible,[tabindex]:focus-visible,.chip:focus-visible{outline:2.5px solid var(--brand2);outline-offset:2px}
 img{transition:opacity .35s}
 /* trava a rolagem da página só enquanto houver uma janela aberta (a trava fica no html, que é quem rola) */
-html.locked{overflow:hidden}
+html.locked,html.locked body{overflow:hidden}
+/* celular: sem barra de rolagem. No iPhone a barra da página inteira não some com CSS,
+   então a página passa a rolar dentro do body (a rolagem continua igual) */
+@media (hover:none) and (pointer:coarse){
+  html{height:100%;overflow:hidden}
+  body{height:100%;min-height:0;overflow-x:hidden;overflow-y:auto;overscroll-behavior-y:auto}
+  *{scrollbar-width:none!important}
+  *::-webkit-scrollbar{display:none!important;width:0!important;height:0!important}
+}
 /* computador: reserva o espaço da barra de rolagem para a tela não "pular" ao abrir e fechar janelas */
 @media (min-width:900px){html{scrollbar-gutter:stable}}
 button,input,select,textarea{font:inherit;color:inherit}
@@ -81,12 +89,13 @@ svg.i{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:1.8;stro
 /* ---------- splash ---------- */
 .splash{position:fixed;inset:0;display:grid;place-items:center;background:var(--bg)}
 .splash .logo{animation:pulse 1.4s ease-in-out infinite}
+/* abertura: só o desenho da casa (sem o quadrado em volta), na mesma cor do nome "Nosso Lar" */
+.splash .logo,.bootsplash .logo{width:auto;height:auto;background:none;border-radius:0;box-shadow:none;color:var(--ink)}
+.splash .logo svg,.bootsplash .logo svg{width:50px;height:50px;stroke-width:2.4}
 @keyframes pulse{0%,100%{transform:scale(1);opacity:1}50%{transform:scale(.92);opacity:.7}}
 /* abertura no estilo do FLUX: logo + nome no fundo do tema, pelo menos 2 segundos, só ao abrir o app do zero */
-.bootsplash{position:fixed;inset:0;z-index:300;background:var(--bg);display:flex;align-items:center;justify-content:center;gap:14px;transition:opacity .45s ease,visibility .45s}
+.bootsplash{position:fixed;inset:0;z-index:300;background:var(--bg);display:flex;align-items:center;justify-content:center;gap:12px;transition:opacity .45s ease,visibility .45s}
 .bootsplash.hide{opacity:0;visibility:hidden;pointer-events:none}
-.bootsplash .logo{width:56px;height:56px;box-shadow:none}
-.bootsplash .logo svg{width:30px;height:30px}
 .sp-t{font-size:38px;font-weight:800;letter-spacing:-.01em;line-height:1;color:var(--ink)}
 .bootsplash>*{animation:spIn .8s cubic-bezier(.16,1,.3,1) both}
 .bootsplash>.sp-t{animation-delay:.08s}
@@ -103,6 +112,9 @@ body.auth-on{overflow-x:hidden}
 .auth{min-height:100dvh;display:flex;align-items:center;justify-content:center;padding:24px var(--pad) calc(24px + env(safe-area-inset-bottom))}
 .auth-box{width:100%;max-width:360px;display:flex;flex-direction:column;align-items:center;text-align:center;animation:fadeIn .5s ease}
 .auth-box h1{font-size:24px;font-weight:700;letter-spacing:-.02em;margin:14px 0 2px}
+/* login: só o desenho da casa (sem o quadrado em volta), na mesma cor do nome "Nosso Lar", como na abertura */
+.auth-box .logo{width:auto;height:auto;background:none;border-radius:0;box-shadow:none;color:var(--ink)}
+.auth-box .logo svg{width:44px;height:44px;stroke-width:2.2}
 .auth-sub{margin:0 0 24px;color:var(--muted);font-size:14px}
 .auth-fields{width:100%;display:flex;flex-direction:column;gap:10px;margin-bottom:12px}
 .auth-msg{min-height:18px;font-size:13px;color:var(--danger);margin:10px 0 0}
@@ -1352,6 +1364,9 @@ html.theme-anim *,html.theme-anim *::before,html.theme-anim *::after{transition:
 const SPLASH_MIN = 2000;
 let SPLASH_WAIT = false;
 let SPLASH_T = setTimeout(() => hideSplash(), 12000); // segurança: nunca fica preso na abertura
+/* rolagem da página: no celular quem rola é o body; no computador, a janela */
+const pageY = () => window.scrollY || document.body.scrollTop || 0;
+const pageTo = (top, smooth) => { const o = { top, behavior: smooth ? "smooth" : "auto" }; window.scrollTo(o); if (document.body.scrollTo) document.body.scrollTo(o); };
 
 /* ================= SUPABASE =================
    Mesmo projeto do Controle e do FLUX (plano gratuito), mas com login próprio:
@@ -2158,10 +2173,10 @@ let lastKey = "";
    as fileiras de filtros que deslizam para o lado guardam a posição em que estavam */
 function keepX(root, fn){
   const rows = $$(".chips,.wtabs,.rchips,.sort-c", root || document).map(el => el.scrollLeft);
-  const y = window.scrollY;
+  const y = pageY();
   fn();
   $$(".chips,.wtabs,.rchips,.sort-c", root || document).forEach((el, k) => { if (rows[k]) el.scrollLeft = rows[k]; });
-  if (Math.abs(window.scrollY - y) > 1) window.scrollTo(0, y);
+  if (Math.abs(pageY() - y) > 1) pageTo(y);
 }
 /* troca só as partes pedidas (pelo id) pelo conteúdo novo da mesma tela */
 function swapParts(...ids){
@@ -2271,7 +2286,7 @@ function render(){
   const pg = curPage();
   const key = S.tab + ":" + (S.tab === "casa" ? (S.roomId || "") : "") + ":" + (pg && S.pages.length ? pg.kind + "=" + pg.id : "");
   const sameView = key === lastKey;
-  const y = window.scrollY;
+  const y = pageY();
   const oldPill = $("#tabpill") ? { left: $("#tabpill").style.left, width: $("#tabpill").style.width } : null;
   const anim = sameView ? "" : (S.nav === "fwd" ? "view-fwd" : S.nav === "back" ? "view-back" : "view-anim");
   const body = S.pages.length ? viewPage() : tabBody();
@@ -2280,7 +2295,7 @@ function render(){
   document.body.classList.toggle("home-fit", !S.pages.length && S.tab === "casa" && !S.roomId);
   const draw = () => { app.innerHTML = header() + `<main class="view ${anim} ${fab ? "has-fab" : ""}" id="view">${body}</main>` + fab; };
   if (sameView) keepX(app, draw); else draw();
-  if (!sameView) window.scrollTo(0, 0); else if (Math.abs(window.scrollY - y) > 1) window.scrollTo(0, y);
+  if (!sameView) pageTo(0); else if (Math.abs(pageY() - y) > 1) pageTo(y);
   markScrolled();
   lastKey = key; S.nav = "";
   syncBackGuard();
@@ -2378,7 +2393,7 @@ function keepInView(sel){
   const el = $(sel); if (!el) return;
   const head = $(".top") ? $(".top").getBoundingClientRect().bottom : 0;
   const t = el.getBoundingClientRect().top;
-  if (t < head) window.scrollTo(0, Math.max(0, window.scrollY + t - head - 12));
+  if (t < head) pageTo(Math.max(0, pageY() + t - head - 12));
 }
 /* sombra no topo quando a página rola */
 /* tela Casa no computador: cômodos em linhas equilibradas e só as últimas compras que cabem inteiras no espaço */
@@ -2400,8 +2415,9 @@ function fitRecent(){
   rows.forEach((r, k) => { if (k && r.getBoundingClientRect().bottom > b) r.classList.add("cut"); });
 }
 let fitT; window.addEventListener("resize", () => { clearTimeout(fitT); fitT = setTimeout(fitRecent, 60); });
-function markScrolled(){ const t = $(".top"); if (t) t.classList.toggle("scrolled", window.scrollY > 4); }
+function markScrolled(){ const t = $(".top"); if (t) t.classList.toggle("scrolled", pageY() > 4); }
 window.addEventListener("scroll", markScrolled, { passive:true });
+document.body.addEventListener("scroll", markScrolled, { passive:true });
 /* valores principais "sobem" do zero ao abrir a tela */
 function countUp(){
   if (matchMedia("(prefers-reduced-motion: reduce)").matches) return;
@@ -3368,7 +3384,7 @@ function nameForm(){
 
 /* ================= CLIQUES ================= */
 const ACT = {
-  tab: d => { if (S.tab === d.tab && !S.roomId && !S.pages.length) { window.scrollTo({ top:0, behavior:"smooth" }); return; } const order = TABS.map(t => t[0]); S.nav = order.indexOf(d.tab) > order.indexOf(S.tab) ? "fwd" : "back"; S.tab = d.tab; S.roomId = null; S.pages = []; lsSet("nl.tab", S.tab); render(); },
+  tab: d => { if (S.tab === d.tab && !S.roomId && !S.pages.length) { pageTo(0, true); return; } const order = TABS.map(t => t[0]); S.nav = order.indexOf(d.tab) > order.indexOf(S.tab) ? "fwd" : "back"; S.tab = d.tab; S.roomId = null; S.pages = []; lsSet("nl.tab", S.tab); render(); },
   room: d => openPage("room", d.id),
   page: d => openPage(d.kind, d.id),
   back: () => { if (S.pages.length) S.pages.pop(); else S.roomId = null; S.nav = "back"; render(); },
@@ -3417,7 +3433,7 @@ let hiddenAt = 0;
 function goHome(){
   if (!S.user || !S.project || document.querySelector("#sheets .sheet-wrap")) return;
   if (S.tab === "casa" && !S.roomId && !S.pages.length) return;
-  S.tab = "casa"; S.roomId = null; S.pages = []; S.nav = ""; lsSet("nl.tab", "casa"); render(); window.scrollTo(0, 0);
+  S.tab = "casa"; S.roomId = null; S.pages = []; S.nav = ""; lsSet("nl.tab", "casa"); render(); pageTo(0);
 }
 document.addEventListener("visibilitychange", () => {
   if (document.visibilityState === "hidden") hiddenAt = Date.now();
